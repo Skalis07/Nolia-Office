@@ -12,510 +12,221 @@
   <meta name="generator" content={Astro.generator} /> <!-- Esto lo agrega Astro automáticamente, indica que se utiliza Astro y su versión-->
   <title>Para mi princesa &lt;3</title> <!-- Texto que se ve en la pestaña del navegador, &lt; es el símbolo "<" -->
 
-  <style>
+<style>
   *, *::before, *::after { box-sizing: border-box; }
+
   .title-wrap{
     width:100%;
     max-width:1200px;
-    /*overflow:hidden;           /* oculta cualquier resto sin scroll */
-    overflow: visible;   /* no recortes arriba/abajo del título */
-    padding-top: 4px;    /* un colchón para que no roce el borde */
+    overflow: visible;      /* no recortes arriba/abajo del título */
+    padding-top: 4px;       /* colchón superior */
     position: relative;
-    z-index: 10;               /* por si algo se superpone */
+    z-index: 10;
   }
-
   #pageTitle{
-    display:inline-block;       /* necesario para poder escalar */
-    white-space:nowrap;         /* fuerza UNA sola línea */
-    transform-origin: left top; /* escala “desde arriba”, no se corta */
+    display:inline-block;
+    white-space:nowrap;
+    transform-origin: left top;
     line-height:1.15;
-    font-size: clamp(14px, 4vw, 28px); /* tamaño base razonable */
+    font-size: clamp(14px, 4vw, 28px);
   }
 
-  /* =====================================================
-     ===============  ESTILOS (CSS)  =====================
-     - Mantuve tus comentarios originales.
-     - Agregué comentarios en CADA línea que no tenía.
-     - Apliqué los cambios pedidos:
-       (1) En modo oscuro, la barra NO se “enciende” al hover.
-       (2) Los GIF verticales ahora se EXPANDEN para rellenar (object-fit: cover).
-       (3) Rutas preparadas para GitHub Pages (sin / inicial o usando BASE_URL).
-  ====================================================== */
+  /* ===== Página ===== */
+  html, body{ height:100%; margin:0; overflow-x:hidden; }
+  body{ text-align:center; background:#2a5b3d; }
 
-  /* ===== Estilos generales para toda la página ===== */
+  .page{
+    background-image: var(--bg-url);
+    background-repeat:repeat;
+    background-position:0 0;
+    background-size:auto;
+    background-attachment:scroll;
 
-  /* El elemento "html" es la raíz de la página (lo que contiene TODO el contenido)
-     El elemento "body" es el cuerpo visible donde aparece lo que se ve en pantalla.
-     Aquí se le da una altura del 100% de la ventana y quito los márgenes por defecto. */
-  html, body {
-    height: 100%; /* Que ocupen toda la altura de la pantalla */
-    margin: 0;    /* Sin márgenes alrededor */
-    /* NUEVO: ocultamos SOLO el scroll horizontal; el vertical queda libre (bien para zoom). */
-    overflow-x: hidden; /* Evita barra de desplazamiento horizontal que moleste */
+    min-height:100vh;
+    display:flex; flex-direction:column; align-items:center;
+    gap:16px; padding:10px 10px 0; box-sizing:border-box; position:relative;
   }
 
-  body {
-
-    background-color: #2a5b3d;     /* Color de respaldo por si la imagen no carga (verde oscuro) */
-
-    /* ===== Ajuste del contenido ===== */
-    text-align: center;            /* Centra horizontalmente todo el texto e imágenes dentro del body */
-    /* EDITADO: quitamos el padding-top del body para eliminar el micro-scroll */
-    /* padding-top: 10px;  <-- removido */
+  /* ===== Título ===== */
+  h1{
+    margin:0; color:#000; font-family:Arial, sans-serif;
+    font-size:clamp(14px, 8vw, 28px);
+    white-space:nowrap;
   }
 
-  /* NUEVO: envoltorio para evitar micro-desbordes y controlar el espacio superior
-     - Usamos layout en columna con un "gap" fijo (sin márgenes sueltos).
-     - min-height: 100vh asegura que, si todo cabe, no aparece scrollbar;
-       si haces zoom o la pantalla es chica, el contenido crece y podrás scrollear.
-     - Aquí movimos el padding superior que antes estaba en body. */
-  .page {
-        /* ===== Fondo de la página ===== */
-    /* IMPORTANTE: usamos ruta RELATIVA para que funcione igual en local y en GitHub Pages */
-    background-image: var(--bg-url); /* Imagen de fondo (en la carpeta /public) */
-    background-repeat: repeat;     /* La imagen se repite como mosaico en X e Y */
-    background-position: 0 0;      /* Comienza a repetirse desde la esquina superior izquierda */
-    background-size: auto;         /* Mantiene el tamaño real de la imagen, sin estirar */
-    background-attachment: scroll; /* El fondo se mueve con el contenido al hacer scroll */
-
-
-    min-height: 100vh;                 /* Alto mínimo = alto de ventana */
-    display: flex;                     /* Columna apilada */
-    flex-direction: column;            /* Eje principal vertical */
-    align-items: center;               /* Centra horizontalmente el contenido dentro */
-    gap: 16px;                         /* Separación consistente (evita sumar márgenes que causen 1px extra) */
-    padding: 10px 10px 0;              /* NUEVO: 10px arriba (lo que antes estaba en body) + respiración lateral */
-    box-sizing: border-box;            /* Incluye padding en el cálculo del ancho */
-    position: relative;                /* NUEVO: sirve para controlar z-index locales */
+  /* ===== Marco del GIF ===== */
+  .img-redondeada{
+    max-width:1200px; width:100%;
+    border-radius:20px; border:5px solid #fff;
+    box-shadow:0 4px 15px rgba(0,0,0,.3);
+    overflow:hidden; position:relative;
+  }
+  .img-redondeada img{
+    display:block; width:100%; height:100%;
+    object-fit:cover; object-position:center bottom;
+    position:relative; z-index:1;
   }
 
-  /* ===== Estilo del título principal (h1) ===== */
-  h1 {
-    color: rgb(0, 0, 0);           /* Color del texto: negro */
-    margin: 0;                     /* NUEVO: sin margen para evitar desbordes sumando píxeles */
-    font-family: Arial, sans-serif;/* Fuente usada para el texto */
-    
-    font-size: clamp(14px, 8vw, 28px); /* tamaño fluido más agresivo para que quepa */
-    white-space: nowrap; /* fuerza una sola línea y evita el salto */
-    /*font-size:clamp(1rem,6vw,1.75rem); /* se achica en pantallas chicas */               /* Tamaño del texto */
+  /* ===== Fecha/hora ===== */
+  .badge-fecha{
+    position:absolute; left:0; bottom:0; background:none; color:#fff;
+    font:600 clamp(14px,4vw,20px)/1.2 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    padding:8px 10px; border-top-right-radius:10px; text-align:left;
+    white-space:pre-line; user-select:none;
+    text-shadow:0 0 3px rgba(0,0,0,.9), 0 0 6px rgba(0,0,0,.7);
+    z-index:2;
   }
 
-  /* ===== Estilo para imágenes redondeadas =====
-     EDITADO → ahora esta clase se aplicará al CONTENEDOR del GIF (no al <img> directamente)
-     ¿Por qué? Porque así podemos "recortar" cualquier cosa que pongamos encima (como la etiqueta de fecha/hora)
-     respetando los bordes redondeados, gracias a overflow:hidden.
-  */
-  .img-redondeada { /* EDITADO */
-    max-width: 1200px;             /* Ancho máximo total del bloque */
-    width: 100%;                   /* Se adapta al ancho de pantalla */
-    border-radius: 20px;           /* Bordes redondeados del marco */
-    border: 5px solid white;       /* Borde blanco alrededor del marco */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Sombra suave del marco */
-    overflow: hidden;              /* NUEVO: recorta lo que se salga (la etiqueta quedará "dentro" del marco) */
-    position: relative;            /* NUEVO: referencia para posicionar la etiqueta interna en esquina */
-    /* NUEVO: la altura se resolverá con aspect-ratio vía JS para que los GIFs no “salten” de tamaño */
+  /* ===== iframes ocultos ===== */
+  #yt-audio,#yt-rain{ position:absolute; left:0; top:0; width:1px; height:1px; opacity:0; pointer-events:none; z-index:0; }
+  #yt-audio iframe,#yt-rain iframe{ width:1px!important; height:1px!important; border:0!important; }
+
+  /* ===== Barra música ===== */
+  .barra-musica{
+    --turquesa:#5aa7a6; --borde-claro:rgba(255,255,255,.75);
+    max-width:100%; width:100%; margin-inline:auto;
+    background:var(--turquesa);
+    border:4px solid var(--borde-claro);
+    border-radius:9999px; padding:10px 16px;
+    display:flex; align-items:center; justify-content:center;
+    flex-wrap:nowrap; box-sizing:border-box; gap:10px;
+    box-shadow:0 4px 12px rgba(0,0,0,.25);
+    position:relative; z-index:20; transition:opacity .2s, filter .2s;
   }
+  .oscuro .barra-musica{ opacity:.85; filter:saturate(.75) brightness(.85); }
 
-  /* La imagen dentro del contenedor: ocupa todo el marco sin deformarse visualmente
-     IMPORTANTE: para cumplir tu pedido, cambiamos a object-fit: cover (rellenar).
-     cover = rellena todo el contenedor aunque deba recortar un poco arriba/abajo o lados. */
-  .img-redondeada img {            /* NUEVO */
-    display: block;               /* Elimina espacios en blanco por ser elemento inline */
-    width: 100%;                  /* La imagen se ajusta al ancho del contenedor */
-    height: 100%;                 /* Ocupa TODO el alto del contenedor (controlado por aspect-ratio) */
-    object-fit: cover;            /* *** Clave para “expandir” y rellenar sin dejar bordes *** */
-    object-position: center bottom; /* Centrar horizontalmente, pegar al fondo verticalmente */
-    position: relative;           /* NUEVO: para controlar la superposición (z-index) */
-    z-index: 1;                   /* NUEVO: la imagen queda por ENCIMA del iframe oculto */
+  .icon-btn{
+    width:44px; height:44px; flex:0 0 44px;
+    border-radius:50%; border:3px solid #fff; background:transparent; color:#fff;
+    display:grid; place-items:center; cursor:pointer;
+    transition:background-color .2s, transform .05s, opacity .2s;
   }
+  .icon-btn:hover{ background-color:rgba(255,255,255,.12); }
+  .icon-btn:active{ transform:scale(.98); }
+  .icon-btn svg{ width:20px; height:20px; display:block; }
+  .icon-btn.active{ background-color:rgba(255,255,255,.18); }
 
-  /* ===== Etiqueta de fecha/hora superpuesta =====
-  - Se posiciona dentro del contenedor (.img-redondeada) en la esquina inferior izquierda.
-  - SIN fondo (para que se vea directamente sobre la imagen).
-  - Texto blanco con sombra para que se lea incluso sobre fondos claros.
-    - NUEVO: este bloque solo afecta al "cartelito" de fecha/hora que ponemos encima del GIF.
-  */
-  .badge-fecha {                    
-    position: absolute;           /* Posicionamiento relativo al contenedor padre (.img-redondeada) */
-    left: 0;                      /* Pegado al lado izquierdo del marco */
-    bottom: 0;                    /* Pegado a la parte inferior del marco */
-    background: none;             /* SIN fondo, el texto queda flotando sobre el GIF */
-    color: #fff;                  /* Texto blanco */
-    font: 600 clamp(14px,4vw,20px)/1.2 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; /* Fuente legible */
-    padding: 8px 10px;            /* Espacio interno alrededor del texto */
-    border-top-right-radius: 10px;/* Redondea solo la esquina superior derecha del área de texto */
-    /* Nota: el borde inferior-izquierdo ya queda redondo gracias al marco con overflow:hidden */
-    text-align: left;             /* Alinea el texto a la izquierda dentro del área */
-    white-space: pre-line;        /* Respeta el salto de línea que pondremos con \n (fecha \n hora) */
-    user-select: none;            /* Evita que se pueda seleccionar el texto con el ratón */
-    text-shadow: 0 0 3px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.7); /* Contorno para legibilidad */
-    z-index: 2;                   /* NUEVO: por encima de la imagen */
-  }
-
-  /* ===== NUEVO: Contenedor del reproductor de YouTube “detrás” del GIF (MÚSICA) ===== */
-  #yt-audio {
-    position: absolute; /* Posición absoluta para esconderlo detrás del GIF */
-    left: 0;            /* Coordenada X mínima */
-    top: 0;             /* Coordenada Y mínima */
-    width: 1px;         /* Tamaño mínimo para que exista pero no se vea */
-    height: 1px;        /* Idem arriba */
-    opacity: 0;         /* Totalmente invisible */
-    pointer-events: none; /* no intercepta clics */
-    z-index: 0;           /* Queda DETRÁS de la imagen (que tiene z-index:1) */
-  }
-  #yt-audio iframe { width: 1px !important; height: 1px !important; border: 0 !important; } /* Ajuste del iframe interno */
-
-  /* ===== NUEVO: Segundo contenedor oculto para la LLUVIA ===== */
-  #yt-rain {
-    position: absolute; /* Igual que #yt-audio */
-    left: 0;            /* Pegado a la izquierda */
-    top: 0;             /* Pegado arriba */
-    width: 1px;         /* Mínimo tamaño visible */
-    height: 1px;        /* Mínimo tamaño visible */
-    opacity: 0;         /* Invisible */
-    pointer-events: none; /* No recibe clics */
-    z-index: 0;           /* Detrás del GIF */
-  }
-  #yt-rain iframe { width: 1px !important; height: 1px !important; border: 0 !important; } /* Quita borde y fuerza tamaño */
-
-  /* ===== NUEVO: Barra de control de música (look parecido al ejemplo) ===== */
-  .barra-musica {
-    --turquesa: #5aa7a6;           /* Color base aproximado al de tu imagen */
-    --borde-claro: rgba(255,255,255,0.75); /* Borde sutil translúcido */
-
-
-    max-width: 100%;
-    margin-inline: auto;   /* centra y evita recortes laterales */
-    /*max-width: 1200px;             /* igual que el GIF */
-    width: 100%;                   /* Se adapta al ancho disponible */
-    background-color: var(--turquesa); /* Fondo turquesa */
-    border: 4px solid var(--borde-claro); /* Borde claro */
-    border-radius: 9999px;         /* súper redondeado (pastilla) */
-    padding: 10px 16px;            /* Espaciado interno */
-
-    display: flex;                 /* Usamos flexbox para alinear controles */
-    align-items: center;           /* Centra verticalmente los elementos */
-    justify-content: center;       /* Centra horizontalmente el grupo de controles */
-
-    flex-wrap: nowrap;      /* siempre en una sola fila */         /* ★ permite bajar a otra línea en móvil */
-    box-sizing: border-box;   /* <- evita que el borde “empuje” fuera y se corte */
-
-    gap: 10px;                     /* separación entre controles */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25); /* Sombra para levantar visualmente */
-    position: relative;            /* Posición para controlar z-index y transiciones */
-    z-index: 20;                   /* por encima del oscurecido */
-    transition: opacity .2s ease, filter .2s ease; /* Transición suave de apariencia */
-  }
-  /* NUEVO: en modo oscurito, la barra se “apaga” (se ve tenue)… */
-  .oscuro .barra-musica {
-    opacity: .85;                         /* Un poco más opaca para sensación de apagado */
-    filter: saturate(.75) brightness(.85);/* Menos saturación y brillo */
-  }
-  /* …pero si pasas el mouse o algún control tiene foco, se “enciende” para usarla */
-  /* DESACTIVADO POR REQUERIMIENTO: ya no debe “encenderse” en oscuro. */
-  /* .oscuro .barra-musica:hover,
-     .oscuro .barra-musica:focus-within { opacity: 1; filter: none; } */
-
-  /* ===== Botón icono circular (Play/Pause música, Lluvia y Cambiar GIF) ===== */
-  .icon-btn {
-    width: 44px;                /* Ancho del botón circular */
-    height: 44px;               /* Alto del botón circular */
-    border-radius: 50%;         /* Hace el botón redondo */
-    border: 3px solid #fff;     /* aro blanco un poquito más grueso */
-    background: transparent;    /* Fondo transparente por defecto */
-    color: #fff;                /* Iconos en blanco para contraste */
-    display: grid;              /* Grid para centrar el icono fácil */
-    place-items: center;        /* Centra el icono en ambos ejes */
-    cursor: pointer;            /* Cursor de mano al pasar encima */
-    transition: background-color .2s ease, transform .05s ease, opacity .2s ease; /* Micro animaciones */
-
-    flex: 0 0 44px; /* ancho fijo del botón para que los sliders ocupen el resto */
-
-  }
-  .icon-btn:hover { background-color: rgba(255,255,255,0.12); } /* Sutil fondo al pasar el mouse */
-  .icon-btn:active { transform: scale(0.98); }                 /* Pequeño “click” visual */
-  .icon-btn svg { width: 20px; height: 20px; display: block; } /* Tamaño y display del icono SVG */
-  /* NUEVO: estado activo para el botón de lluvia (pequeño indicador) */
-  .icon-btn.active { background-color: rgba(255,255,255,0.18); } /* Se marca cuando la lluvia está encendida */
-
-  /* ===== Barras de volumen horizontales (Música y Lluvia) ===== */
+  /* ===== Slider volumen (MÚSICA) ===== */
   .volume-slider{
-    -webkit-appearance: none;
-    appearance: none;
-    flex: 1 1 160px;   /* base razonable, pero flexible */
-    min-width: 0;      /* CLAVE: permite encoger de verdad */
-    max-width: 320px;  /* en grande puede estirarse un poco más */
-    width: auto;
-    height: 6px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.65);
-    outline: none;
-    cursor: pointer;
+    -webkit-appearance:none; appearance:none;
+    flex:1 1 160px;      /* se estira, pero puede encoger sin cortarse */
+    min-width:0;         /* CLAVE para flexbox */
+    max-width:320px;     /* en pantallas grandes se permite crecer */
+    width:auto; height:6px; border-radius:999px;
+    background:rgba(255,255,255,.65); outline:none; cursor:pointer;
   }
-  .volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;   /* Quita el estilo por defecto del pulgar (Chrome/Safari) */
-    appearance: none;           /* Quita estilo por defecto general */
-    width: 16px; height: 16px;  /* Tamaño del pulgar */
-    border-radius: 50%;         /* Pulgar redondo */
-    background: #fff;           /* Fondo del pulgar */
-    border: 2px solid var(--turquesa); /* Borde del pulgar con color de barra */
-    box-shadow: 0 1px 2px rgba(0,0,0,.25); /* Sombrita para relieve */
+  .volume-slider::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:16px; height:16px; border-radius:50%; background:#fff;
+    border:2px solid var(--turquesa); box-shadow:0 1px 2px rgba(0,0,0,.25);
   }
-  .volume-slider::-moz-range-thumb {
-    width: 16px; height: 16px;  /* Tamaño del pulgar para Firefox */
-    border-radius: 50%;         /* Redondo */
-    background: #fff;           /* Fondo blanco */
-    border: 2px solid var(--turquesa); /* Borde */
-    box-shadow: 0 1px 2px rgba(0,0,0,.25); /* Sombrita */
+  .volume-slider::-moz-range-thumb{
+    width:16px; height:16px; border-radius:50%; background:#fff;
+    border:2px solid var(--turquesa); box-shadow:0 1px 2px rgba(0,0,0,.25);
   }
-  .volume-slider::-moz-range-track {
-    height: 6px;                /* Altura de la pista en Firefox */
-    border-radius: 999px;       /* Bordes redondos */
-    background: rgba(255,255,255,0.65); /* Color de pista */
+  .volume-slider::-moz-range-track{ height:6px; border-radius:999px; background:rgba(255,255,255,.65); }
+
+  /* ===== Tirita sol/luna ===== */
+  @keyframes stretch{ 0%{transform:translateZ(0) scaleY(1)} 50%{transform:translateZ(0) scaleY(1.06)} 100%{transform:translateZ(0) scaleY(1)} }
+  .right-handle{ --thumb:34px; --strip-h:220px; position:fixed; top:0; right:16px; z-index:30; pointer-events:none; display:flex; align-items:flex-start; justify-content:center; }
+  .right-handle .track{
+    position:relative; width:24px; height:var(--strip-h); background:#fff9e8; border-radius:0;
+    margin-bottom:calc(var(--thumb)*.5);
+    box-shadow:inset 0 2px 0 rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.15);
+    pointer-events:auto; transform-origin:top center; cursor:pointer;
+    transition:box-shadow .18s, background .18s;
   }
-
-  /* ===== “Tirita” vertical (Sol/Luna fijos en la punta) ===== */
-  @keyframes stretch {
-    0%   { transform: translateZ(0) scaleY(1);    } /* Estado normal */
-    50%  { transform: translateZ(0) scaleY(1.06); } /* Estira un poquito */
-    100% { transform: translateZ(0) scaleY(1);    } /* Vuelve al normal */
+  .right-handle .track:hover{ background:#fff4d1; box-shadow:inset 0 2px 0 rgba(0,0,0,.1), 0 3px 10px rgba(0,0,0,.2); }
+  .right-handle .track.stretch{ animation:stretch 220ms ease-out; }
+  .right-handle .thumb{
+    position:absolute; left:50%; transform:translateX(-50%); width:var(--thumb); height:var(--thumb);
+    border-radius:50%; border:3px solid #fff; display:grid; place-items:center;
+    bottom:calc(-1 * var(--thumb) * .5); transition:background 160ms, color 160ms, box-shadow 160ms, transform 80ms;
+    cursor:pointer; color:#6b4a00; background:#ffc400; box-shadow:0 3px 6px rgba(0,0,0,.25); pointer-events:auto;
   }
+  .right-handle .thumb:hover{ transform:translateX(-50%) scale(1.03); }
+  .right-handle .thumb svg{ width:18px; height:18px; display:block; }
+  .right-handle.activo .thumb{ background:#2e2e2e; color:#fff; }
 
-  .right-handle {
-    --thumb: 34px;        /* Tamaño de la bolita Sol/Luna */
-    --strip-h: 220px;     /* ALTURA visible de la tirita */
-    position: fixed;      /* Fijada en la pantalla, no se mueve con el scroll */
-    top: 0;               /* ARRIBA pegada (corte recto) */
-    right: 16px;          /* separada del borde derecho */
-    z-index: 30;          /* encima de todo */
-    pointer-events: none; /* el click lo reciben riel/bolita */
-    display: flex;        /* Flex para ubicar los hijos */
-    align-items: flex-start; /* Alinea arriba */
-    justify-content: center; /* Centra horizontalmente */
+  /* ===== Oscurecido ===== */
+  .dim-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.45); opacity:0; visibility:hidden; transition:opacity 160ms, visibility 160ms; z-index:25; pointer-events:none; }
+  .dim-overlay.activo{ opacity:1; visibility:visible; }
+
+  /* ===== Frame: mismo ancho para GIF y barra ===== */
+  .frame{ width:100%; max-width:1200px; margin-inline:auto; }
+  .frame .img-redondeada, .frame .barra-musica{ width:100%; max-width:none; box-sizing:border-box; }
+
+  /* ===== Ajustes móviles generales ===== */
+  @media (max-width:520px){
+    .barra-musica{ padding:8px 10px; gap:8px; }
+    .icon-btn{ width:36px; height:36px; flex-basis:36px; }
+    .volume-slider{ min-width:0; max-width:none; }
+    .volume-slider::-webkit-slider-thumb{ width:12px; height:12px; }
+    .volume-slider::-moz-range-thumb{ width:12px; height:12px; }
   }
-
-  .right-handle .track {
-    position: relative;   /* Para posicionar el thumb dentro */
-    width: 24px;          /* Ancho del riel */
-    height: var(--strip-h); /* Alto del riel */
-    background: #fff9e8;  /* crema claro */
-    border-radius: 0;     /* corte recto arriba y abajo */
-    margin-bottom: calc(var(--thumb) * 0.5); /* hueco para media bolita */
-    box-shadow:
-      inset 0 2px 0 rgba(0,0,0,0.08),  /* Sombrado interno sutil */
-      0 2px 8px rgba(0,0,0,0.15);      /* Sombrado externo sutil */
-    pointer-events: auto;  /* Este sí recibe clics */
-    transform-origin: top center; /* Origen de la animación stretch */
-    cursor: pointer;       /* Cursor de mano para indicar que es clickeable */
-    transition: box-shadow .18s ease, background .18s ease; /* Transiciones suaves */
+  @media (max-width:380px){
+    .page{ padding:8px 8px 0; }
+    .right-handle{ right:8px; --strip-h:160px; }
+    .icon-btn{ width:40px; height:40px; }
+    .volume-slider::-webkit-slider-thumb{ width:14px; height:14px; }
+    .volume-slider::-moz-range-thumb{ width:14px; height:14px; }
   }
-  .right-handle .track:hover {
-    background: #fff4d1;  /* Aclara un poco al hover */
-    box-shadow:
-      inset 0 2px 0 rgba(0,0,0,0.10),
-      0 3px 10px rgba(0,0,0,0.20);
-  }
-  .right-handle .track.stretch { animation: stretch 220ms ease-out; } /* Aplica animación de estirar */
+  @media (max-width:320px){ .right-handle{ display:none; } }
 
-  .right-handle .thumb {
-    position: absolute;   /* Posicionado dentro del riel */
-    left: 50%;            /* Centrado horizontalmente */
-    transform: translateX(-50%); /* Ajuste para quedar centrado exacto */
-    width: var(--thumb);  /* Ancho del círculo */
-    height: var(--thumb); /* Alto del círculo */
-    border-radius: 50%;   /* Lo hace redondo */
-    border: 3px solid #fff; /* Aro blanco */
-    display: grid;        /* Para centrar el icono dentro */
-    place-items: center;  /* Centrado del icono */
-    bottom: calc(-1 * var(--thumb) * 0.5); /* FIJA en la punta inferior */
-    transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 80ms ease; /* Transiciones */
-    cursor: pointer;      /* Cursor de mano */
-    color: #6b4a00;       /* Icono en modo día */
-    background: #ffc400;  /* Amarillo Sol */
-    box-shadow: 0 3px 6px rgba(0,0,0,.25); /* Sombra del botón */
-    pointer-events: auto; /* Este sí acepta clics */
-  }
-  .right-handle .thumb:hover { transform: translateX(-50%) scale(1.03); } /* Efecto de hover suave */
-  .right-handle .thumb svg { width: 18px; height: 18px; display: block; } /* Tamaño del icono */
-
-  /* MODO NOCHE: el círculo NO se mueve; solo cambia aspecto (fondo e icono) */
-  .right-handle.activo .thumb { background: #2e2e2e; color: #ffffff; } /* Fondo oscuro + icono claro */
-
-  /* ===== Capa de oscurecido (solo visual) ===== */
-  .dim-overlay {
-    position: fixed;              /* Fijo cubriendo toda la pantalla */
-    inset: 0;                     /* top/right/bottom/left = 0 */
-    background: rgba(0,0,0,0.45); /* Negro translúcido para “apagar” */
-    opacity: 0;                   /* Invisible por defecto */
-    visibility: hidden;           /* No ocupa eventos al estar oculta */
-    transition: opacity 160ms ease, visibility 160ms ease; /* Transición suave al aparecer/desaparecer */
-    z-index: 25;                  /* Debajo de la barra (20) y tirita (30) */
-    pointer-events: none;         /* deja pasar clics a lo de abajo */
-  }
-  .dim-overlay.activo { opacity: 1; visibility: visible; } /* Se muestra en modo oscuro */
-
-
-
-
-
-
-
-  /* === Mantener GIF y barra con el MISMO ancho === */
-  .frame{
-    width: 100%;
-    max-width: 1200px;      /* límite de ambos */
-    margin-inline: auto;    /* centrado */
-  }
-
-  .frame .img-redondeada,
-  .frame .barra-musica{
-    width: 100%;
-    max-width: none;        /* ahora obedecen solo a .frame */
-    box-sizing: border-box;
-  }
-
-  
-
-
-
-  /* Móvil angosto: sliders a lo ancho y botones arriba */
-  @media (max-width: 520px){
-    .barra-musica{ padding:8px 10px; gap:8px }
-    .icon-btn{ width:36px; height:36px; flex-basis:36px }   /* botones un poco más chicos */
-    .volume-slider{
-      min-width:0px;    /* permite encoger más */
-      max-width:none;    /* que use el espacio disponible */
-    }
-    .volume-slider::-webkit-slider-thumb{ width:12px; height:12px }
-    .volume-slider::-moz-range-thumb{ width:12px; height:12px }
-  }
-
-
-  /* Móvil MUY chico: reduce rellenos y la “tirita” */
-  @media (max-width: 380px){
-    .page{ padding:8px 8px 0 }
-    .right-handle{ right:8px; --strip-h:160px }
-    .icon-btn{ width:40px; height:40px }             /* botones un pelín más chicos */
-    .volume-slider::-webkit-slider-thumb{ width:14px; height:14px }
-    .volume-slider::-moz-range-thumb{ width:14px; height:14px }
-  }
-
-  /* Opcional: escondemos la tirita en ultra-estrecho si molesta el contenido */
-  @media (max-width: 320px){
-    .right-handle{ display:none }
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-  /* ==== Notion embed: sin fondo, sin título, barra horizontal ==== */
-  html.embed-notion, html.embed-notion body{ background: transparent !important; }
-
-  html.embed-notion .page{
-    --bg-url: none !important;      /* quita la imagen de fondo */
-    background: transparent !important;
-    padding: 0 0 0 !important;      /* quita acolchados si molestan */
-  }
-
-  html.embed-notion .title-wrap{ display: none !important; }  /* oculta las letras de arriba */
-  html.embed-notion .right-handle,
-  html.embed-notion .dim-overlay{ display: none !important; } /* oculta la tirita/oscurecido */
-
-  /* Forzar barra HORIZONTAL en Notion (aunque sea móvil) */
-  html.embed-notion .frame{ display: block !important; }
-  html.embed-notion .barra-musica{
-    flex-direction: row !important;
-    width: 100% !important;
-    height: auto !important;
-    padding: 10px 16px !important;
-    gap: 10px !important;
-  }
-  html.embed-notion .volume-slider{
-    transform: none !important;
-    width: auto !important;
-    min-width: 0 !important;   /* antes estaba en 60px */
-    max-width: 220px !important;
-  }
-
-
-
-
-
-
-
-
-
-
-  /* ==== SOLO MÓVIL REAL en VERTICAL (no desktop, no Notion) ==== */
-  @media (max-width: 480px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
-
-    /* layout: GIF a la izquierda, barra vertical a la derecha */
+  /* ===== SOLO móvil real en VERTICAL: barra vertical junto al GIF ===== */
+  @media (max-width:480px) and (orientation:portrait) and (hover:none) and (pointer:coarse){
     .frame{
-      display: grid;
-      grid-template-columns: 1fr 60px; /* ancho de la “pastilla” */
-      align-items: stretch;
-      gap: 10px;
+      display:grid; grid-template-columns:1fr 60px; align-items:stretch; gap:10px;
     }
-
-    /* barra vertical “limpia” */
     .barra-musica{
-      width: 60px;
-      height: 100%;
-      padding: 8px 6px;
-      border-radius: 28px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      box-sizing: border-box;
+      width:60px; height:100%; padding:8px 6px; border-radius:28px;
+      display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:10px;
     }
-
-    .icon-btn{
-      width: 38px; height: 38px; flex-basis: 38px;
-    }
-
-    /* sliders verticales (rotados) */
+    .icon-btn{ width:38px; height:38px; flex-basis:38px; }
     .volume-slider{
-      flex: 0 0 auto;
-      width: 150px;        /* largo tras rotar */
-      height: 28px;        /* alto antes de rotar */
-      transform: rotate(-90deg);
-      transform-origin: 50% 50%;
-      min-width: 0; max-width: none;
+      flex:0 0 auto; width:150px; height:28px;
+      transform:rotate(-90deg); transform-origin:50% 50%;
+      min-width:0; max-width:none;
     }
     .volume-slider::-webkit-slider-thumb,
-    .volume-slider::-moz-range-thumb{ width: 12px; height: 12px; }
-
-    /* mueve un poquito la tirita para que no choque */
-    .right-handle{ right: 6px; }
+    .volume-slider::-moz-range-thumb{ width:12px; height:12px; }
+    .right-handle{ right:6px; } /* para que no choquen */
   }
 
 
 
 
 
-  </style>
+
+
+    /* Quitar el borde/blanco del marco del GIF solo en Notion */
+  html.embed-notion .img-redondeada{
+    border: 0 !important;
+    box-shadow: none !important;
+    /* deja el radio si te gusta redondeado; pon 0 si lo quieres recto: */
+    border-radius: 20px !important; /* o 0 */
+  }
+  /* Opcional: sin borde de la barra dentro de Notion */
+  html.embed-notion .barra-musica{
+    border: 0 !important;
+  }
+
+
+
+
+
+  /* ===== Notion embed: fondo transparente, sin título, y barra horizontal ===== */
+  html.embed-notion, html.embed-notion body{ background:transparent!important; }
+  html.embed-notion .page{ --bg-url:none!important; background:transparent!important; padding:0!important; }
+  html.embed-notion .title-wrap{ display:none!important; }
+  html.embed-notion .right-handle, html.embed-notion .dim-overlay{ display:none!important; }
+  html.embed-notion .frame{ display:block!important; }
+  html.embed-notion .barra-musica{
+    flex-direction:row!important; width:100%!important; height:auto!important; padding:10px 16px!important; gap:10px!important;
+  }
+  html.embed-notion .volume-slider{ transform:none!important; width:auto!important; min-width:0!important; max-width:220px!important; }
+</style>
+
   
 
 
@@ -629,7 +340,7 @@
 
 <!-- ===== Script: API YouTube (Música + Lluvia) y lógica de UI ===== -->
 <script is:inline>
-  const DEFAULT_RAIN_VOL = 60; // el mismo 60% que usabas en el slider
+  const DEFAULT_RAIN_VOL = 45; // el mismo 60% que usabas en el slider
 
   /* =========================
      ICONOS SVG EN STRINGS
@@ -700,7 +411,7 @@
       if (playerMusic?.setVolume) playerMusic.setVolume(Number(volMusic.value)); // Aplica volumen inicial música
       if (playerRain?.setVolume)  playerRain.setVolume(DEFAULT_RAIN_VOL);   // Aplica volumen inicial lluvia
 
-      /* ===== Eventos de los botones ===== */
+      /* ===== Eventos de los botones ===== */  
 
       // Música Play/Pause
       btnMusic.addEventListener('click', () => { // Al hacer click en el botón de música
