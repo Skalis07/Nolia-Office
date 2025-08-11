@@ -12,6 +12,8 @@
   <meta name="generator" content={Astro.generator} /> <!-- Esto lo agrega Astro automáticamente, indica que se utiliza Astro y su versión-->
   <title>Para mi princesa &lt;3</title> <!-- Texto que se ve en la pestaña del navegador, &lt; es el símbolo "<" -->
 
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
   *, *::before, *::after { box-sizing: border-box; }
 
@@ -70,7 +72,10 @@
   /* ===== Fecha/hora ===== */
   .badge-fecha{
     position:absolute; left:0; bottom:0; background:none; color:#fff;
-    font:600 clamp(14px,4vw,20px)/1.2 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-weight: 600; /* conserva la negrita */
+    font-size: clamp(14px,4vw,20px);
+    line-height: 1.2;
     padding:8px 10px; border-top-right-radius:10px; text-align:left;
     white-space:pre-line; user-select:none;
     text-shadow:0 0 3px rgba(0,0,0,.9), 0 0 6px rgba(0,0,0,.7);
@@ -181,68 +186,43 @@
 
 
 
-    /* Quitar el borde/blanco del marco del GIF solo en Notion */
-  html.embed-notion .img-redondeada{
-    border: 0 !important;
-    box-shadow: none !important;
-    /* deja el radio si te gusta redondeado; pon 0 si lo quieres recto: */
-    border-radius: 20px !important; /* o 0 */
-  }
-  /* Notion: sin sombras ni bordes en el reproductor */
-  html.embed-notion .barra-musica{
-    box-shadow: none !important;
-    border: 0 !important;
-  }
-
-  /* por si queda alguna sombra en otros elementos dentro del widget */
-  html.embed-notion .img-redondeada,
-  html.embed-notion .icon-btn{
-    box-shadow: none !important;
-  }
 
 
-
-
-
-  /* ===== Notion embed: fondo transparente, sin título, y barra horizontal ===== */
+  /* ===== Notion embed: limpio y sin cortes ===== */
   html.embed-notion, html.embed-notion body{ background:transparent!important; }
   html.embed-notion .page{ --bg-url:none!important; background:transparent!important; padding:0!important; }
   html.embed-notion .title-wrap{ display:none!important; }
   html.embed-notion .right-handle, html.embed-notion .dim-overlay{ display:none!important; }
-  html.embed-notion .frame{ display:block!important; }
+  html.embed-notion .frame{ display:block!important; max-width:100%!important; min-width:0!important; }
+
+  /* Sin bordes/sombras en Notion */
+  html.embed-notion .img-redondeada{ border:0!important; box-shadow:none!important; border-radius:20px!important; }
+  html.embed-notion .barra-musica{ box-shadow:none!important; border:0!important; }
+  html.embed-notion .img-redondeada, html.embed-notion .icon-btn{ box-shadow:none!important; }
+
+  /* Que la barra NO se corte (puede saltar a 2 filas) */
   html.embed-notion .barra-musica{
-    flex-direction:row!important; width:100%!important; height:auto!important; padding:10px 16px!important; gap:10px!important;
+    flex-wrap:wrap!important;
+    padding:8px 10px!important;
+    gap:8px!important;
+    min-width:0!important;
   }
-  html.embed-notion .volume-slider{ transform:none!important; width:auto!important; min-width:0!important; max-width:220px!important; }
-
-
-
-
-
-
-
-
-
-    /* Notion: sin sombras ni bordes en el reproductor */
-  html.embed-notion .barra-musica{
-    box-shadow: none !important;
-    border: 0 !important;
-  }
-
-  /* por si queda alguna sombra en otros elementos dentro del widget */
-  html.embed-notion .img-redondeada,
   html.embed-notion .icon-btn{
-    box-shadow: none !important;
+    width:36px!important; height:36px!important; flex:0 0 36px!important;
   }
-
-
-
-  /* Ajustes de fecha/hora solo para Notion */
-  html.embed-notion .badge-fecha {
-    font-weight: normal !important;  /* quitar negrita */
-    font-size: clamp(18px, 5vw, 28px) !important; /* agrandar */
+  html.embed-notion .volume-slider{
+    order:2!important; flex:1 1 100%!important; width:100%!important;
+    max-width:none!important; min-width:0!important; transform:none!important;
   }
+  html.embed-notion #musicToggle,
+  html.embed-notion #rainToggle,
+  html.embed-notion #gifShuffle{ order:1!important; }
 
+  /* Fecha/hora en Notion: más grande y sin negrita */
+  html.embed-notion .badge-fecha{
+    font-weight:normal!important;
+    font-size:clamp(18px,5vw,28px)!important;
+  }
 
 
 
