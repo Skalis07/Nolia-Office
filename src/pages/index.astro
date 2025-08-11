@@ -38,7 +38,7 @@
   body {
     /* ===== Fondo de la página ===== */
     /* IMPORTANTE: usamos ruta RELATIVA para que funcione igual en local y en GitHub Pages */
-    background-image: url("fondo.png"); /* Imagen de fondo (en la carpeta /public) */
+    background-image: var(--bg-url); /* Imagen de fondo (en la carpeta /public) */
     background-repeat: repeat;     /* La imagen se repite como mosaico en X e Y */
     background-position: 0 0;      /* Comienza a repetirse desde la esquina superior izquierda */
     background-size: auto;         /* Mantiene el tamaño real de la imagen, sin estirar */
@@ -316,6 +316,13 @@
   }
   .dim-overlay.activo { opacity: 1; visibility: visible; } /* Se muestra en modo oscuro */
   </style>
+  
+  <script is:inline>
+    const base = import.meta.env.BASE_URL || '/';
+    const normalized = base.endsWith('/') ? base : base + '/';
+    document.documentElement.style.setProperty('--bg-url', `url("${normalized}fondo.png")`);
+  </script>
+
 </head>
 
 <!-- NOTA: En Astro, no añadimos <html> ni <body> explícitos. El contenido de la página va directo aquí. -->
