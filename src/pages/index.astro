@@ -12,7 +12,6 @@
   <meta name="generator" content={Astro.generator} /> <!-- Esto lo agrega Astro automáticamente, indica que se utiliza Astro y su versión-->
   <title>Para mi princesa &lt;3</title> <!-- Texto que se ve en la pestaña del navegador, &lt; es el símbolo "<" -->
 
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 
 
 <style>
@@ -26,6 +25,8 @@
     padding-top: 4px;       /* colchón superior */
     position: relative;
     z-index: 10;
+    transition: height 140ms ease-out;
+    will-change: height;
   }
   #pageTitle{
     display:inline-block;
@@ -33,6 +34,8 @@
     transform-origin: left top;
     line-height:1.15;
     font-size: clamp(14px, 4vw, 28px);
+    transition: transform 140ms ease-out;
+    will-change: transform;
   }
 
   /* ===== Página ===== */
@@ -71,19 +74,36 @@
     position:relative; z-index:1;
   }
 
-  /* ===== Fecha/hora ===== */
-  .badge-fecha{
-    position:absolute; left:0; bottom:0; background:none; color:#fff;
-    font-family: 'Roboto', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-    font-weight: 800;                  /* negrita “gordita” */
-    font-size: clamp(14px,4vw,20px);
+  .badge-fecha {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background: none;
+    color: #fff;
+
+    font-family: "Arial Rounded MT Bold", "Arial Rounded MT", Arial, sans-serif;
+    font-weight: 900; /* lo más grueso posible */
+    font-size: clamp(18px, 5vw, 26px); /* más grande que antes */
     line-height: 1.2;
-    letter-spacing: 0.2px;             /* leve, ayuda a la legibilidad */
-    padding:8px 10px; border-top-right-radius:10px; text-align:left;
-    white-space:pre-line; user-select:none;
-    text-shadow:0 0 3px rgba(0,0,0,.9), 0 0 6px rgba(0,0,0,.7);
-    z-index:2;
+    letter-spacing: 0.1px;
+
+    padding: 8px 10px;
+    border-top-right-radius: 10px;
+    text-align: left;
+    white-space: pre-line;
+    user-select: none;
+
+    z-index: 2;
+
+    /* Suavizado */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
+
+
+
+
 
 
   /* ===== iframes ocultos pero reproducibles (visually-hidden) ===== */
@@ -359,7 +379,7 @@
 
 <!-- ===== Script: API YouTube (Música + Lluvia) y lógica de UI ===== -->
 <script is:inline>
-  const DEFAULT_RAIN_VOL = 45; // el mismo 60% que usabas en el slider
+  const DEFAULT_RAIN_VOL = 35; // el mismo 60% que usabas en el slider
 
   /* =========================
      ICONOS SVG EN STRINGS
@@ -621,30 +641,61 @@
 
 
 
+  /* ===== Ajuste automático del título a una línea (versión suavizada) ===== */
+  (() => {
+    try {
+      if (document.documentElement.classList.contains('embed-notion')) return;
 
-  /* ===== Ajuste automático del título a una línea ===== */
-  (function(){
-    const wrap  = document.querySelector('.title-wrap');
-    const title = document.getElementById('pageTitle');
-    if(!wrap || !title) return;
+      const wrap  = document.querySelector('.title-wrap');
+      const title = document.getElementById('pageTitle');
+      if (!wrap || !title) return;
 
-    function fit() {
-      title.style.transform = 'none';                 // reset
-      const avail = wrap.clientWidth;                 // ancho disponible
-      const need  = title.scrollWidth;                // ancho que necesita el texto
-      const scale = Math.max(0.25, Math.min(1, avail / need)); // no bajar de 35% para legibilidad
-      title.style.transform = `scale(${scale})`;
+      let rafId = 0, debounceTimer = 0;
+      let lastAvail = NaN, lastScale = NaN, lastHeight = NaN;
 
-      // fijar altura del contenedor para que el siguiente bloque no “suba”
-      const rect = title.getBoundingClientRect();
-      wrap.style.height = `${rect.height}px`;
+      function computeAndApply(){
+        rafId = 0;
+        const avail = wrap.clientWidth || 0;
+        const need  = title.scrollWidth || 1;
+
+        if (isFinite(lastAvail) && Math.abs(avail - lastAvail) < 1) return;
+        lastAvail = avail;
+
+        const targetScale = Math.max(0.25, Math.min(1, avail / need));
+        if (!isFinite(targetScale)) return;
+
+        if (!isFinite(lastScale) || Math.abs(targetScale - lastScale) > 0.005) {
+          title.style.transform = `scale(${targetScale})`;
+          lastScale = targetScale;
+
+          const h = title.getBoundingClientRect().height;
+          if (!isFinite(lastHeight) || Math.abs(h - lastHeight) > 0.5) {
+            wrap.style.height = h + 'px';
+            lastHeight = h;
+          }
+        }
+      }
+
+      function schedule(){
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          if (rafId) return;
+          rafId = requestAnimationFrame(computeAndApply);
+        }, 40);
+      }
+
+      if (typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver(schedule);
+        ro.observe(wrap);
+      }
+      window.addEventListener('resize', schedule, { passive: true });
+
+      requestAnimationFrame(schedule);
+    } catch (err) {
+      console.error('Title fit error:', err);
     }
-
-    window.addEventListener('resize', fit, { passive:true });
-    const ro = new ResizeObserver(fit);
-    ro.observe(wrap);
-    setTimeout(fit, 0); // primer ajuste
   })();
+
 
 
 
