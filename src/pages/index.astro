@@ -1,0 +1,665 @@
+---
+---
+<html lang="es"> <!-- Indica que el contenido de la página está en español -->
+  <head>
+    <!-- Configuración básica de la página -->
+    <meta charset="utf-8" /> <!-- Tipo de caracteres: UTF-8 permite tildes, ñ y símbolos -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" /> <!-- Icono pequeño que se ve en la pestaña del navegador -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" /> <!-- Hace que la página se adapte a móviles <diseño responsivo> -->
+    <meta name="generator" content={Astro.generator} /> <!-- Esto lo agrega Astro automáticamente, indica que se utiliza Astro y su versión-->
+    <title>Para mi princesa &lt;3</title> <!-- Texto que se ve en la pestaña del navegador, &lt; es el símbolo "<" -->
+
+    <style>
+    /* =====================================================
+       ===============  ESTILOS (CSS)  =====================
+       - Mantuve tus comentarios originales.
+       - Agregué comentarios en CADA línea que no tenía.
+       - Apliqué los cambios pedidos:
+         (1) En modo oscuro, la barra NO se “enciende” al hover.
+         (2) Los GIF verticales ahora se EXPANDEN para rellenar (object-fit: cover).
+    ====================================================== */
+
+    /* ===== Estilos generales para toda la página ===== */
+
+    /* El elemento "html" es la raíz de la página (lo que contiene TODO el contenido)
+       El elemento "body" es el cuerpo visible donde aparece lo que se ve en pantalla.
+       Aquí se le da una altura del 100% de la ventana y quito los márgenes por defecto. */
+    html, body {
+      height: 100%; /* Que ocupen toda la altura de la pantalla */
+      margin: 0;    /* Sin márgenes alrededor */
+      /* NUEVO: ocultamos SOLO el scroll horizontal; el vertical queda libre (bien para zoom). */
+      overflow-x: hidden; /* Evita barra de desplazamiento horizontal que moleste */
+    }
+
+    body {
+      /* ===== Fondo de la página ===== */
+      background-image: url("/fondo.png"); /* Imagen de fondo (en la carpeta /public) */
+      background-repeat: repeat;     /* La imagen se repite como mosaico en X e Y */
+      background-position: 0 0;      /* Comienza a repetirse desde la esquina superior izquierda */
+      background-size: auto;         /* Mantiene el tamaño real de la imagen, sin estirar */
+      background-attachment: scroll; /* El fondo se mueve con el contenido al hacer scroll */
+      background-color: #2a5b3d;     /* Color de respaldo por si la imagen no carga (verde oscuro) */
+
+      /* ===== Ajuste del contenido ===== */
+      text-align: center;            /* Centra horizontalmente todo el texto e imágenes dentro del body */
+      /* EDITADO: quitamos el padding-top del body para eliminar el micro-scroll */
+      /* padding-top: 10px;  <-- removido */
+    }
+
+    /* NUEVO: envoltorio para evitar micro-desbordes y controlar el espacio superior
+       - Usamos layout en columna con un "gap" fijo (sin márgenes sueltos).
+       - min-height: 100vh asegura que, si todo cabe, no aparece scrollbar;
+         si haces zoom o la pantalla es chica, el contenido crece y podrás scrollear.
+       - Aquí movimos el padding superior que antes estaba en body. */
+    .page {
+      min-height: 100vh;                 /* Alto mínimo = alto de ventana */
+      display: flex;                     /* Columna apilada */
+      flex-direction: column;            /* Eje principal vertical */
+      align-items: center;               /* Centra horizontalmente el contenido dentro */
+      gap: 16px;                         /* Separación consistente (evita sumar márgenes que causen 1px extra) */
+      padding: 10px 10px 0;              /* NUEVO: 10px arriba (lo que antes estaba en body) + respiración lateral */
+      box-sizing: border-box;            /* Incluye padding en el cálculo del ancho */
+      position: relative;                /* NUEVO: sirve para controlar z-index locales */
+    }
+
+    /* ===== Estilo del título principal (h1) ===== */
+    h1 {
+      color: rgb(0, 0, 0);           /* Color del texto: negro */
+      margin: 0;                     /* NUEVO: sin margen para evitar desbordes sumando píxeles */
+      font-family: Arial, sans-serif;/* Fuente usada para el texto */
+      font-size: 24px;               /* Tamaño del texto */
+    }
+
+    /* ===== Estilo para imágenes redondeadas =====
+       EDITADO → ahora esta clase se aplicará al CONTENEDOR del GIF (no al <img> directamente)
+       ¿Por qué? Porque así podemos "recortar" cualquier cosa que pongamos encima (como la etiqueta de fecha/hora)
+       respetando los bordes redondeados, gracias a overflow:hidden.
+    */
+    .img-redondeada { /* EDITADO */
+      max-width: 1200px;             /* Ancho máximo total del bloque */
+      width: 100%;                   /* Se adapta al ancho de pantalla */
+      border-radius: 20px;           /* Bordes redondeados del marco */
+      border: 5px solid white;       /* Borde blanco alrededor del marco */
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Sombra suave del marco */
+      overflow: hidden;              /* NUEVO: recorta lo que se salga (la etiqueta quedará "dentro" del marco) */
+      position: relative;            /* NUEVO: referencia para posicionar la etiqueta interna en esquina */
+      /* NUEVO: la altura se resolverá con aspect-ratio vía JS para que los GIFs no “salten” de tamaño */
+    }
+
+    /* La imagen dentro del contenedor: ocupa todo el marco sin deformarse visualmente
+       IMPORTANTE: para cumplir tu pedido, cambiamos a object-fit: cover (rellenar).
+       cover = rellena todo el contenedor aunque deba recortar un poco arriba/abajo o lados. */
+    .img-redondeada img {            /* NUEVO */
+      display: block;               /* Elimina espacios en blanco por ser elemento inline */
+      width: 100%;                  /* La imagen se ajusta al ancho del contenedor */
+      height: 100%;                 /* Ocupa TODO el alto del contenedor (controlado por aspect-ratio) */
+      object-fit: cover;            /* *** Clave para “expandir” y rellenar sin dejar bordes *** */
+	  object-position: center bottom; /* Centrar horizontalmente, pegar al fondo verticalmente */
+      position: relative;           /* NUEVO: para controlar la superposición (z-index) */
+      z-index: 1;                   /* NUEVO: la imagen queda por ENCIMA del iframe oculto */
+    }
+
+	/* ===== Etiqueta de fecha/hora superpuesta =====
+	- Se posiciona dentro del contenedor (.img-redondeada) en la esquina inferior izquierda.
+	- SIN fondo (para que se vea directamente sobre la imagen).
+	- Texto blanco con sombra para que se lea incluso sobre fondos claros.
+    - NUEVO: este bloque solo afecta al "cartelito" de fecha/hora que ponemos encima del GIF.
+	*/
+	.badge-fecha {                    
+	  position: absolute;           /* Posicionamiento relativo al contenedor padre (.img-redondeada) */
+	  left: 0;                      /* Pegado al lado izquierdo del marco */
+	  bottom: 0;                    /* Pegado a la parte inferior del marco */
+	  background: none;             /* SIN fondo, el texto queda flotando sobre el GIF */
+	  color: #fff;                  /* Texto blanco */
+	  font: 600 25px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; /* Fuente legible */
+	  padding: 8px 10px;            /* Espacio interno alrededor del texto */
+	  border-top-right-radius: 10px;/* Redondea solo la esquina superior derecha del área de texto */
+	  /* Nota: el borde inferior-izquierdo ya queda redondo gracias al marco con overflow:hidden */
+	  text-align: left;             /* Alinea el texto a la izquierda dentro del área */
+	  white-space: pre-line;        /* Respeta el salto de línea que pondremos con \n (fecha \n hora) */
+	  user-select: none;            /* Evita que se pueda seleccionar el texto con el ratón */
+	  text-shadow: 0 0 3px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.7); /* Contorno para legibilidad */
+      z-index: 2;                   /* NUEVO: por encima de la imagen */
+	}
+
+    /* ===== NUEVO: Contenedor del reproductor de YouTube “detrás” del GIF (MÚSICA) ===== */
+    #yt-audio {
+      position: absolute; /* Posición absoluta para esconderlo detrás del GIF */
+      left: 0;            /* Coordenada X mínima */
+      top: 0;             /* Coordenada Y mínima */
+      width: 1px;         /* Tamaño mínimo para que exista pero no se vea */
+      height: 1px;        /* Idem arriba */
+      opacity: 0;         /* Totalmente invisible */
+      pointer-events: none; /* no intercepta clics */
+      z-index: 0;           /* Queda DETRÁS de la imagen (que tiene z-index:1) */
+    }
+    #yt-audio iframe { width: 1px !important; height: 1px !important; border: 0 !important; } /* Ajuste del iframe interno */
+
+    /* ===== NUEVO: Segundo contenedor oculto para la LLUVIA ===== */
+    #yt-rain {
+      position: absolute; /* Igual que #yt-audio */
+      left: 0;            /* Pegado a la izquierda */
+      top: 0;             /* Pegado arriba */
+      width: 1px;         /* Mínimo tamaño visible */
+      height: 1px;        /* Mínimo tamaño visible */
+      opacity: 0;         /* Invisible */
+      pointer-events: none; /* No recibe clics */
+      z-index: 0;           /* Detrás del GIF */
+    }
+    #yt-rain iframe { width: 1px !important; height: 1px !important; border: 0 !important; } /* Quita borde y fuerza tamaño */
+
+    /* ===== NUEVO: Barra de control de música (look parecido al ejemplo) ===== */
+    .barra-musica {
+      --turquesa: #5aa7a6;           /* Color base aproximado al de tu imagen */
+      --borde-claro: rgba(255,255,255,0.75); /* Borde sutil translúcido */
+
+      max-width: 1200px;             /* igual que el GIF */
+      width: 100%;                   /* Se adapta al ancho disponible */
+      background-color: var(--turquesa); /* Fondo turquesa */
+      border: 4px solid var(--borde-claro); /* Borde claro */
+      border-radius: 9999px;         /* súper redondeado (pastilla) */
+      padding: 10px 16px;            /* Espaciado interno */
+
+      display: flex;                 /* Usamos flexbox para alinear controles */
+      align-items: center;           /* Centra verticalmente los elementos */
+      justify-content: center;       /* Centra horizontalmente el grupo de controles */
+      gap: 16px;                     /* separación entre controles */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25); /* Sombra para levantar visualmente */
+      position: relative;            /* Posición para controlar z-index y transiciones */
+      z-index: 20;                   /* por encima del oscurecido */
+      transition: opacity .2s ease, filter .2s ease; /* Transición suave de apariencia */
+    }
+    /* NUEVO: en modo oscurito, la barra se “apaga” (se ve tenue)… */
+    .oscuro .barra-musica {
+      opacity: .85;                         /* Un poco más opaca para sensación de apagado */
+      filter: saturate(.75) brightness(.85);/* Menos saturación y brillo */
+    }
+    /* …pero si pasas el mouse o algún control tiene foco, se “enciende” para usarla */
+    /* DESACTIVADO POR REQUERIMIENTO: ya no debe “encenderse” en oscuro. */
+    /* .oscuro .barra-musica:hover,
+       .oscuro .barra-musica:focus-within { opacity: 1; filter: none; } */
+
+    /* ===== Botón icono circular (Play/Pause música, Lluvia y Cambiar GIF) ===== */
+    .icon-btn {
+      width: 44px;                /* Ancho del botón circular */
+      height: 44px;               /* Alto del botón circular */
+      border-radius: 50%;         /* Hace el botón redondo */
+      border: 3px solid #fff;     /* aro blanco un poquito más grueso */
+      background: transparent;    /* Fondo transparente por defecto */
+      color: #fff;                /* Iconos en blanco para contraste */
+      display: grid;              /* Grid para centrar el icono fácil */
+      place-items: center;        /* Centra el icono en ambos ejes */
+      cursor: pointer;            /* Cursor de mano al pasar encima */
+      transition: background-color .2s ease, transform .05s ease, opacity .2s ease; /* Micro animaciones */
+    }
+    .icon-btn:hover { background-color: rgba(255,255,255,0.12); } /* Sutil fondo al pasar el mouse */
+    .icon-btn:active { transform: scale(0.98); }                 /* Pequeño “click” visual */
+    .icon-btn svg { width: 20px; height: 20px; display: block; } /* Tamaño y display del icono SVG */
+    /* NUEVO: estado activo para el botón de lluvia (pequeño indicador) */
+    .icon-btn.active { background-color: rgba(255,255,255,0.18); } /* Se marca cuando la lluvia está encendida */
+
+    /* ===== Barras de volumen horizontales (Música y Lluvia) ===== */
+    .volume-slider {
+      -webkit-appearance: none;   /* Quita estilos por defecto en WebKit */
+      appearance: none;           /* Quita estilos por defecto en otros navegadores */
+      width: 180px;               /* Largo de la barra */
+      height: 6px;                /* Altura de la barra */
+      border-radius: 999px;       /* Borde redondeado completo */
+      background: rgba(255,255,255,0.65); /* Pista clara */
+      outline: none;              /* Sin contorno al enfocar */
+      cursor: pointer;            /* Cursor de mano para interacción */
+    }
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;   /* Quita el estilo por defecto del pulgar (Chrome/Safari) */
+      appearance: none;           /* Quita estilo por defecto general */
+      width: 16px; height: 16px;  /* Tamaño del pulgar */
+      border-radius: 50%;         /* Pulgar redondo */
+      background: #fff;           /* Fondo del pulgar */
+      border: 2px solid var(--turquesa); /* Borde del pulgar con color de barra */
+      box-shadow: 0 1px 2px rgba(0,0,0,.25); /* Sombrita para relieve */
+    }
+    .volume-slider::-moz-range-thumb {
+      width: 16px; height: 16px;  /* Tamaño del pulgar para Firefox */
+      border-radius: 50%;         /* Redondo */
+      background: #fff;           /* Fondo blanco */
+      border: 2px solid var(--turquesa); /* Borde */
+      box-shadow: 0 1px 2px rgba(0,0,0,.25); /* Sombrita */
+    }
+    .volume-slider::-moz-range-track {
+      height: 6px;                /* Altura de la pista en Firefox */
+      border-radius: 999px;       /* Bordes redondos */
+      background: rgba(255,255,255,0.65); /* Color de pista */
+    }
+
+    /* ===== “Tirita” vertical (Sol/Luna fijos en la punta) ===== */
+    @keyframes stretch {
+      0%   { transform: translateZ(0) scaleY(1);    } /* Estado normal */
+      50%  { transform: translateZ(0) scaleY(1.06); } /* Estira un poquito */
+      100% { transform: translateZ(0) scaleY(1);    } /* Vuelve al normal */
+    }
+
+    .right-handle {
+      --thumb: 34px;        /* Tamaño de la bolita Sol/Luna */
+      --strip-h: 220px;     /* ALTURA visible de la tirita */
+      position: fixed;      /* Fijada en la pantalla, no se mueve con el scroll */
+      top: 0;               /* ARRIBA pegada (corte recto) */
+      right: 16px;          /* separada del borde derecho */
+      z-index: 30;          /* encima de todo */
+      pointer-events: none; /* el click lo reciben riel/bolita */
+      display: flex;        /* Flex para ubicar los hijos */
+      align-items: flex-start; /* Alinea arriba */
+      justify-content: center; /* Centra horizontalmente */
+    }
+
+    .right-handle .track {
+      position: relative;   /* Para posicionar el thumb dentro */
+      width: 24px;          /* Ancho del riel */
+      height: var(--strip-h); /* Alto del riel */
+      background: #fff9e8;  /* crema claro */
+      border-radius: 0;     /* corte recto arriba y abajo */
+      margin-bottom: calc(var(--thumb) * 0.5); /* hueco para media bolita */
+      box-shadow:
+        inset 0 2px 0 rgba(0,0,0,0.08),  /* Sombrado interno sutil */
+        0 2px 8px rgba(0,0,0,0.15);      /* Sombrado externo sutil */
+      pointer-events: auto;  /* Este sí recibe clics */
+      transform-origin: top center; /* Origen de la animación stretch */
+      cursor: pointer;       /* Cursor de mano para indicar que es clickeable */
+      transition: box-shadow .18s ease, background .18s ease; /* Transiciones suaves */
+    }
+    .right-handle .track:hover {
+      background: #fff4d1;  /* Aclara un poco al hover */
+      box-shadow:
+        inset 0 2px 0 rgba(0,0,0,0.10),
+        0 3px 10px rgba(0,0,0,0.20);
+    }
+    .right-handle .track.stretch { animation: stretch 220ms ease-out; } /* Aplica animación de estirar */
+
+    .right-handle .thumb {
+      position: absolute;   /* Posicionado dentro del riel */
+      left: 50%;            /* Centrado horizontalmente */
+      transform: translateX(-50%); /* Ajuste para quedar centrado exacto */
+      width: var(--thumb);  /* Ancho del círculo */
+      height: var(--thumb); /* Alto del círculo */
+      border-radius: 50%;   /* Lo hace redondo */
+      border: 3px solid #fff; /* Aro blanco */
+      display: grid;        /* Para centrar el icono dentro */
+      place-items: center;  /* Centrado del icono */
+      bottom: calc(-1 * var(--thumb) * 0.5); /* FIJA en la punta inferior */
+      transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 80ms ease; /* Transiciones */
+      cursor: pointer;      /* Cursor de mano */
+      color: #6b4a00;       /* Icono en modo día */
+      background: #ffc400;  /* Amarillo Sol */
+      box-shadow: 0 3px 6px rgba(0,0,0,.25); /* Sombra del botón */
+      pointer-events: auto; /* Este sí acepta clics */
+    }
+    .right-handle .thumb:hover { transform: translateX(-50%) scale(1.03); } /* Efecto de hover suave */
+    .right-handle .thumb svg { width: 18px; height: 18px; display: block; } /* Tamaño del icono */
+
+    /* MODO NOCHE: el círculo NO se mueve; solo cambia aspecto (fondo e icono) */
+    .right-handle.activo .thumb { background: #2e2e2e; color: #ffffff; } /* Fondo oscuro + icono claro */
+
+    /* ===== Capa de oscurecido (solo visual) ===== */
+    .dim-overlay {
+      position: fixed;              /* Fijo cubriendo toda la pantalla */
+      inset: 0;                     /* top/right/bottom/left = 0 */
+      background: rgba(0,0,0,0.45); /* Negro translúcido para “apagar” */
+      opacity: 0;                   /* Invisible por defecto */
+      visibility: hidden;           /* No ocupa eventos al estar oculta */
+      transition: opacity 160ms ease, visibility 160ms ease; /* Transición suave al aparecer/desaparecer */
+      z-index: 10;                  /* Debajo de la barra (20) y tirita (30) */
+    }
+    .dim-overlay.activo { opacity: 1; visibility: visible; } /* Se muestra en modo oscuro */
+    </style>
+  </head>
+
+  <body>
+    <!-- NUEVO: wrapper que ordena todo en columna y evita micro-scroll al cargar
+         (aquí movimos el padding superior que antes estaba en body) -->
+    <div class="page" data-lighton><!-- NUEVO: data-lighton → clic aquí enciende la “luz” (desactivado en JS) -->
+      <!-- ===== Título principal ===== -->
+      <h1>
+        NOELIA ESTOY HACIENDO MI PÁGINA WEB QUE EMOCIÓN BUENO Y AHORA QUE HAGO
+      </h1>
+      
+      <!-- ===== CONTENEDOR del GIF con marco redondeado =====
+           Aplica .img-redondeada al DIV (marco) para:
+           - Bordes redondeados + sombra + borde blanco en el conjunto
+           - Poder colocar una etiqueta en la esquina y que quede "recortada" correctamente -->
+      <div class="img-redondeada" data-lighton> <!-- EDITADO: ahora también puede encender la luz al clic (pero lo desactivamos) -->
+        <img id="mainGif" src="/1.gif" alt="Gif en el centro"> <!-- NUEVO: id para poder cambiar de GIF -->
+
+        <!-- ===== Etiqueta fecha/hora en la esquina inferior izquierda ===== -->
+        <div id="reloj" class="badge-fecha" aria-live="polite"> <!-- NUEVO: aria-live mejora accesibilidad; el texto puede actualizar -->
+          <!-- El contenido lo rellena el script de abajo (fecha en una línea y hora en la otra) -->
+          <!-- NUEVO: Si JS está desactivado, este div quedará vacío (no es error, solo no se verá la fecha/hora). -->
+        </div>
+
+        <!-- ===== Reproductor de YouTube “escondido” DETRÁS del GIF: MÚSICA ===== -->
+        <div id="yt-audio" aria-hidden="true"><!-- Contenedor invisible --><div id="ytplayerMusic"></div></div> <!-- Nodo donde se crea el player -->
+
+        <!-- ===== Reproductor de YouTube “escondido” DETRÁS del GIF: LLUVIA ===== -->
+        <div id="yt-rain" aria-hidden="true"><!-- Contenedor invisible --><div id="ytplayerRain"></div></div> <!-- Nodo donde se crea el player -->
+      </div>
+
+      <!-- ===== Barra de control ===== -->
+      <div class="barra-musica" id="controlsBar" data-lighton>
+        <!-- Botón MÚSICA -->
+        <button id="musicToggle" class="icon-btn" aria-label="Reproducir música">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg> <!-- Icono Play por defecto -->
+        </button>
+        <!-- Volumen MÚSICA -->
+        <input id="volumeMusic" class="volume-slider" type="range" min="0" max="100" value="100" aria-label="Volumen de música (0 a 100)" />
+
+        <!-- NUEVO: Botón LLUVIA (nube / nube con lluvia) -->
+        <button id="rainToggle" class="icon-btn" aria-label="Activar lluvia" title="Lluvia">
+          <!-- Icono se sustituye dinámicamente -->
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M19 18a4 4 0 0 0 0-8 5 5 0 0 0-9-2 4 4 0 0 0-2 7.5"></path> <!-- Nube base -->
+          </svg>
+        </button>
+        <!-- Volumen LLUVIA -->
+        <input id="volumeRain" class="volume-slider" type="range" min="0" max="100" value="60" aria-label="Volumen de lluvia (0 a 100)" />
+
+        <!-- NUEVO: Botón Cambiar GIF (rotativo 1.gif, 2.gif, …) -->
+        <button id="gifShuffle" class="icon-btn" aria-label="Cambiar GIF" title="Cambiar GIF">
+          <!-- Icono “shuffle” -->
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M4 4h4l4 6-4 6H4l4-6-4-6zm10 0h6v2h-4v4h-2V4zm0 16v-6h2v4h4v2h-6z"/>
+          </svg>
+        </button>
+      </div>
+    </div> <!-- /.page -->
+
+    <!-- Tirita Sol/Luna -->
+    <div id="rightHandle" class="right-handle" aria-hidden="false">
+      <div id="rightTrack" class="track" role="presentation" title="Click para atenuar/encender">
+        <button id="modeThumb" class="thumb" aria-label="Cambiar modo (día/noche)" aria-pressed="false"></button> <!-- Botón redondo Sol/Luna -->
+      </div>
+    </div>
+
+    <!-- Capa de oscurecido -->
+    <div id="dimOverlay" class="dim-overlay" aria-hidden="true"></div>
+
+    <!-- ===== Script: Fecha y Hora ===== -->
+    <script is:inline>
+      (function() { /* IIFE para no ensuciar el scope global */
+        const $reloj = document.getElementById('reloj');   // Busca el DIV donde pondremos fecha/hora
+        if (!$reloj) return;                               // Si no existe, salimos sin error
+        const locale = navigator.language || 'es-ES';      // Idioma del navegador (ej. 'es-CL')
+
+        function actualizarReloj() {                       // Función que arma el texto
+          const ahora = new Date();                        // Fecha/hora actual
+          const fecha = ahora.toLocaleDateString(locale, { // “domingo, 10 de agosto de 2025”
+            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+          });
+          const hora = ahora.toLocaleTimeString(locale, {  // “08:10 p. m.” o “20:10”
+            hour: '2-digit', minute: '2-digit'
+          });
+          $reloj.textContent = `${fecha}\n${hora}`;        // 2 líneas (CSS tiene white-space: pre-line)
+        }
+
+        actualizarReloj();                                 // Pinta de inmediato
+        setInterval(actualizarReloj, 1000 * 30);           // Actualiza cada 30s
+      })();
+    </script>
+
+    <!-- ===== Script: API YouTube (Música + Lluvia) y lógica de UI ===== -->
+    <script is:inline>
+      /* =========================
+         ICONOS SVG EN STRINGS
+         ========================= */
+      const ICON_PLAY  = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>'; // Botón Play
+      const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>'; // Botón Pause
+      /* Nube (inactiva) */
+      const ICON_CLOUD = `
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M19 18a4 4 0 0 0 0-8 5 5 0 0 0-9-2 4 4 0 0 0-2 7.5"/>
+        </svg>`; // SVG de nube simple
+      /* Nube con lluvia (activa) */
+      const ICON_CLOUD_RAIN = `
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M19 18a4 4 0 0 0 0-8 5 5 0 0 0-9-2 4 4 0 0 0-2 7.5"/>
+          <path d="M8 20l1-2M12 20l1-2M16 20l1-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>`; // SVG de nube con “gotas”
+
+      /* =========================
+         YOUTUBE API (audio oculto)
+         ========================= */
+      let playerMusic;          // Reproductor de YouTube para la música
+      let playerRain;           // Reproductor de YouTube para la lluvia
+      let isMusicPlaying = false; // Estado de reproducción de la música
+      let isRainPlaying   = false; // Estado de reproducción de la lluvia
+
+      // Referencias a controles
+      let btnMusic, btnRain, volMusic, volRain, btnShuffle, gifImg; // Variables para guardar elementos del DOM
+
+      // Inyectar API de YouTube (agrega <script> dinámicamente)
+      const ytScript = document.createElement('script'); // Crea un elemento script
+      ytScript.src = "https://www.youtube.com/iframe_api"; // URL oficial de la API IFrame
+      document.head.appendChild(ytScript); // Lo añade al <head> para que cargue
+
+      // La API llamará esto al estar lista (callback global requerido por YouTube)
+      window.onYouTubeIframeAPIReady = function () {
+        // Player de MÚSICA
+        playerMusic = new YT.Player('ytplayerMusic', { // Crea el reproductor dentro del div con ese id
+          videoId: '8kBlKM71pjc',                     // ID del video de música (cámbialo si quieres otra canción)
+          playerVars: { autoplay: 0, controls: 0, rel: 0, playsinline: 1 }, // Configuración: sin controles visibles
+          events: { onReady: onPlayersReady }         // Cuando esté listo, ejecuta onPlayersReady
+        });
+        // Player de LLUVIA
+        playerRain = new YT.Player('ytplayerRain', {  // Crea el reproductor de lluvia
+          videoId: 'q76bMs-NwRk',                     // ID del video de lluvia
+          playerVars: { autoplay: 0, controls: 0, rel: 0, playsinline: 1, loop: 1, playlist: 'q76bMs-NwRk' }, // Loop infinito
+          events: { onReady: onPlayersReady }         // Ejecuta onPlayersReady también cuando esté listo
+        });
+      };
+
+      // Se llama cuando los players están listos (la 1ª vez conectamos eventos y estados)
+      function onPlayersReady() {
+        // Solo inicializamos una vez (cuando btnMusic aún no existe)
+        if (!btnMusic) {
+          // Cacheamos referencias a los controles (una sola vez)
+          btnMusic   = document.getElementById('musicToggle');  // Botón play/pause música
+          btnRain    = document.getElementById('rainToggle');   // Botón toggle lluvia
+          volMusic   = document.getElementById('volumeMusic');  // Slider volumen música
+          volRain    = document.getElementById('volumeRain');   // Slider volumen lluvia
+          btnShuffle = document.getElementById('gifShuffle');   // Botón cambiar GIF
+          gifImg     = document.getElementById('mainGif');      // <img> del GIF principal
+
+          // Inicializa volúmenes con lo que diga el slider (0..100)
+          if (playerMusic?.setVolume) playerMusic.setVolume(Number(volMusic.value)); // Aplica volumen inicial música
+          if (playerRain?.setVolume)  playerRain.setVolume(Number(volRain.value));   // Aplica volumen inicial lluvia
+
+          /* ===== Eventos de los botones ===== */
+
+          // Música Play/Pause
+          btnMusic.addEventListener('click', () => { // Al hacer click en el botón de música
+            if (!isMusicPlaying) {                   // Si NO está reproduciendo...
+              playerMusic.playVideo();               // ...empieza a reproducir
+              btnMusic.innerHTML = ICON_PAUSE;       // Cambia icono a “pause”
+              btnMusic.setAttribute('aria-label','Pausar música'); // Accesibilidad: describe acción actual
+              isMusicPlaying = true;                 // Actualiza estado
+            } else {                                 // Si ya estaba reproduciendo...
+              playerMusic.pauseVideo();              // ...pausa
+              btnMusic.innerHTML = ICON_PLAY;        // Cambia icono a “play”
+              btnMusic.setAttribute('aria-label','Reproducir música'); // Accesibilidad
+              isMusicPlaying = false;                // Actualiza estado
+            }
+          });
+
+          // Volumen música
+          volMusic.addEventListener('input', () => {            // Cuando mueves el slider de música
+            playerMusic?.setVolume(Number(volMusic.value));     // Aplica el nuevo volumen
+          });
+
+          // Lluvia ON/OFF (no pausa global, es ambiente aparte)
+          btnRain.addEventListener('click', () => {             // Click en botón lluvia
+            if (!isRainPlaying) {                               // Si estaba apagada...
+              playerRain.playVideo();                           // ...empieza a reproducir lluvia
+              btnRain.classList.add('active');                  // Marca visualmente el botón
+              btnRain.innerHTML = ICON_CLOUD_RAIN;              // Nube lloviendo
+              btnRain.setAttribute('aria-label','Apagar lluvia'); // Accesibilidad
+              isRainPlaying = true;                             // Actualiza estado
+            } else {                                            // Si estaba encendida...
+              playerRain.pauseVideo();                          // ...pausa la lluvia
+              btnRain.classList.remove('active');               // Quita marca visual
+              btnRain.innerHTML = ICON_CLOUD;                   // Vuelve a nube simple
+              btnRain.setAttribute('aria-label','Activar lluvia'); // Accesibilidad
+              isRainPlaying = false;                            // Actualiza estado
+            }
+          });
+
+          // Volumen lluvia
+          volRain.addEventListener('input', () => {             // Cambio de volumen de lluvia
+            playerRain?.setVolume(Number(volRain.value));       // Aplica el nuevo volumen
+          });
+
+          // ===== NUEVO: Bloquear proporción del marco usando el PRIMER GIF =====
+          lockAspectFrom(gifImg); // Lee naturalWidth/Height y fija aspect-ratio del contenedor
+
+          // ===== NUEVO: Cambiar GIF (rotativo detectando cuántos hay) =====
+          setupGifRotator(btnShuffle, gifImg); // Prepara la lógica que recorre /1.gif, /2.gif, ...
+        }
+      }
+
+      /* =========================
+         MODO OSCURITO (tirita)
+         ========================= */
+      (function(){
+        const handle   = document.getElementById('rightHandle'); // Contenedor fijo de la tirita
+        const track    = document.getElementById('rightTrack');  // Riel clickeable
+        const thumb    = document.getElementById('modeThumb');   // Bolita sol/luna
+        const overlay  = document.getElementById('dimOverlay');  // Capa oscura
+        const page     = document.querySelector('.page');        // Para “encender” al clicar (desactivado)
+        const controls = document.getElementById('controlsBar'); // Barra de controles (no “enciende” ahora)
+        if (!handle || !track || !thumb || !overlay) return;     // Si falta algo, no seguimos
+
+        // Iconos Sol/Luna dentro de la bolita
+        const ICON_SUN = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.76 4.84l-1.8-1.79L3.17 4.84l1.79 1.79 1.8-1.79zM1 13h3v-2H1v2zm10 10h2v-3h-2v3zm9-10v-2h-3v2h3zm-2.93 7.07l1.79 1.79 1.79-1.79-1.79-1.79-1.79 1.79zM12 6a6 6 0 100 12 6 6 0 000-12zm7.24-1.16l-1.8-1.79-1.79 1.79 1.79 1.79 1.8-1.79zM4.84 17.24l-1.79 1.79 1.79 1.79 1.79-1.79-1.79-1.79z"/></svg>'; // Sol
+        const ICON_MOON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>'; // Luna
+
+        let oscuro = false; // false = Día/Sol, true = Noche/Luna
+
+        function aplicarEstado() {                             // Aplica clases y aspecto según 'oscuro'
+          overlay.classList.toggle('activo', oscuro);          // Muestra/oculta oscurecido
+          handle.classList.toggle('activo', oscuro);           // Cambia look de la bolita
+          document.body.classList.toggle('oscuro', oscuro);    // NUEVO: estilo de barra en modo oscuro
+          thumb.setAttribute('aria-pressed', String(oscuro));  // Actualiza atributo accesible
+          thumb.innerHTML = oscuro ? ICON_MOON : ICON_SUN;     // Dibuja icono corrector
+        }
+        function estirarTirita() {                             // Efecto “estirarse” breve
+          track.classList.add('stretch');                      // Agrega clase de animación
+          setTimeout(()=>track.classList.remove('stretch'), 230); // La quita después de 230ms
+        }
+        function alternar() {                                  // Cambia de modo día/noche
+          oscuro = !oscuro;                                    // Alterna el booleano
+          aplicarEstado();                                     // Aplica los cambios visuales
+          estirarTirita();                                     // Ejecuta la animación
+        }
+
+        // Click sobre el riel (toda la tirita)
+        track.addEventListener('click', (e) => {
+          if (e.target === thumb) return; // Si el objetivo fue la bolita, no duplicar acción
+          alternar();                      // Cambia modo
+        });
+        // Click en la bolita
+        thumb.addEventListener('click', (e) => { e.stopPropagation(); alternar(); }); // Evita que burbujee al track
+
+        // Clic fuera (overlay) → **DESACTIVADO**: en oscuro NO vuelve a día con clics
+        // overlay.addEventListener('click', () => { if (oscuro) { oscuro = false; aplicarEstado(); } });
+
+        // NUEVO: si clicas en el contenido/barra (data-lighton), antes encendía solo.
+        // REQUERIMIENTO: en oscuro NO debe volver a día por clic en contenido → desactivado.
+        document.addEventListener('click', (e) => {
+          /* CORREGIDO: antes había un "as HTMLElement" (TypeScript), eso rompe JS.
+             Además, anulamos el auto-encendido en modo oscuro por requerimiento. */
+          const target = e.target; // Elemento real clickeado
+          const wantsLight = target && typeof target.closest === 'function'
+            ? target.closest('[data-lighton]')  // Ancestro con el atributo (contenido clickeable)
+            : null;
+          // if (wantsLight && oscuro) { oscuro = false; aplicarEstado(); } // <-- DESACTIVADO
+        });
+
+        aplicarEstado(); // Estado inicial (día)
+        // Estado inicial icono de lluvia (nube sin lluvia) → ya está en el HTML por defecto
+      })();
+
+      /* =========================
+         BLOQUEAR PROPORCIÓN SEGÚN EL PRIMER GIF
+         - Lee el tamaño natural del <img> inicial (id="mainGif")
+         - Fija aspect-ratio en el contenedor .img-redondeada (alto estable)
+         - Hace que TODOS los GIFs siguientes se ajusten con object-fit: cover
+           (para que rellenen aunque recorten un poquito si son muy verticales/horizontales)
+         ========================= */
+      function lockAspectFrom(imgEl) {
+        if (!imgEl) return; // Guard clause: si no hay imagen, nada que hacer
+        const container = imgEl.closest('.img-redondeada'); // Contenedor marco (borde redondeado)
+        if (!container) return; // Si no encontramos el contenedor, salimos
+
+        const apply = () => {
+          const w = imgEl.naturalWidth;   // Ancho real del GIF cargado (sin escalar)
+          const h = imgEl.naturalHeight;  // Alto real del GIF cargado (sin escalar)
+          if (!w || !h) return;           // Si aún no están, salimos y no rompemos nada
+
+          container.style.aspectRatio = `${w} / ${h}`; // NUEVO: fija relación de aspecto del marco
+          imgEl.style.width  = '100%';                 // La imagen ocupa todo el ancho
+          imgEl.style.height = '100%';                 // …y todo el alto del marco
+          imgEl.style.objectFit = 'cover';             // *** CLAVE: rellena el contenedor ***
+        };
+
+        // Si ya está cargada, aplicamos altiro; si no, esperamos el evento load.
+        if (imgEl.complete) apply();
+        else imgEl.addEventListener('load', apply, { once: true }); // Una sola vez cuando cargue
+      }
+
+      /* =========================
+         ROTADOR DE GIFs
+         - Busca automáticamente /1.gif, /2.gif, … hasta MAX
+         - Se queda con los que EXISTEN (onload) y rota en ciclo
+         - Mantiene la proporción del marco (no hay saltos de tamaño)
+         ========================= */
+      function setupGifRotator(btn, imgEl) {
+        if (!btn || !imgEl) return;              // Si falta botón o imagen, no seguimos
+
+        const MAX_GIFS = 20;                     // Límite superior de pruebas (1..MAX_GIFS)
+        const urls = [];                          // Array final con SOLO los GIFs que existen
+        let completados = 0;                      // Contador de pruebas terminadas (onload/onerror)
+        let actual = 0;                           // Índice del GIF actualmente mostrado (en 'urls')
+
+        // Probar /1.gif .. /MAX_GIFS.gif creando <img> en memoria (no se ven)
+        for (let i = 1; i <= MAX_GIFS; i++) {
+          const test = new Image();              // Imagen auxiliar en memoria
+          const url = `/${i}.gif`;               // Ruta candidata (e.g., "/5.gif")
+          test.onload  = () => { urls.push(url); checkDone(); }; // Si carga, lo guardamos
+          test.onerror = () => { checkDone(); };                 // Si falla, solo contamos
+          test.src = url;                         // Dispara la carga
+        }
+
+        // Se ejecuta cada vez que una prueba termina (éxito o error)
+        function checkDone() {
+          completados++;                          // Avanzamos el contador
+          if (completados === MAX_GIFS) {         // Cuando todas terminaron…
+            if (urls.length === 0) { urls.push('/1.gif'); } // Fallback: aseguramos al menos uno
+            urls.sort();                           // Asegura orden ascendente "/1.gif", "/2.gif", ...
+
+            // Sincroniza 'actual' con el src que ya tiene el <img> en pantalla (si coincide)
+            const currentSrc = imgEl.getAttribute('src'); // e.g., "/1.gif"
+            const found = urls.indexOf(currentSrc || ''); // Índice donde aparece en 'urls' (o -1 si no)
+            actual = found >= 0 ? found : 0;              // Si lo encontró, lo usamos; si no, partimos en 0
+
+            // Click del botón → avanza uno (cíclico)
+            btn.addEventListener('click', () => {
+              actual = (actual + 1) % urls.length; // Incrementa y envuelve al inicio cuando llega al final
+              imgEl.src = urls[actual];            // Cambia el GIF mostrado a la siguiente ruta
+              // IMPORTANTE: mantenemos el relleno completo del marco para TODOS los GIFs
+              imgEl.style.width  = '100%';         // Ocupa todo el ancho del marco
+              imgEl.style.height = '100%';         // Ocupa todo el alto del marco
+              imgEl.style.objectFit = 'cover';     // *** CLAVE: rellena sin bordes (puede recortar un poco) ***
+            });
+          }
+        }
+      }
+    </script>
+
+  </body>
+</html>
