@@ -36,13 +36,7 @@
   }
 
   body {
-    /* ===== Fondo de la página ===== */
-    /* IMPORTANTE: usamos ruta RELATIVA para que funcione igual en local y en GitHub Pages */
-    background-image: var(--bg-url); /* Imagen de fondo (en la carpeta /public) */
-    background-repeat: repeat;     /* La imagen se repite como mosaico en X e Y */
-    background-position: 0 0;      /* Comienza a repetirse desde la esquina superior izquierda */
-    background-size: auto;         /* Mantiene el tamaño real de la imagen, sin estirar */
-    background-attachment: scroll; /* El fondo se mueve con el contenido al hacer scroll */
+
     background-color: #2a5b3d;     /* Color de respaldo por si la imagen no carga (verde oscuro) */
 
     /* ===== Ajuste del contenido ===== */
@@ -57,6 +51,15 @@
        si haces zoom o la pantalla es chica, el contenido crece y podrás scrollear.
      - Aquí movimos el padding superior que antes estaba en body. */
   .page {
+        /* ===== Fondo de la página ===== */
+    /* IMPORTANTE: usamos ruta RELATIVA para que funcione igual en local y en GitHub Pages */
+    background-image: var(--bg-url); /* Imagen de fondo (en la carpeta /public) */
+    background-repeat: repeat;     /* La imagen se repite como mosaico en X e Y */
+    background-position: 0 0;      /* Comienza a repetirse desde la esquina superior izquierda */
+    background-size: auto;         /* Mantiene el tamaño real de la imagen, sin estirar */
+    background-attachment: scroll; /* El fondo se mueve con el contenido al hacer scroll */
+
+
     min-height: 100vh;                 /* Alto mínimo = alto de ventana */
     display: flex;                     /* Columna apilada */
     flex-direction: column;            /* Eje principal vertical */
@@ -317,11 +320,7 @@
   .dim-overlay.activo { opacity: 1; visibility: visible; } /* Se muestra en modo oscuro */
   </style>
   
-  <script is:inline>
-    const base = import.meta.env.BASE_URL || '/';
-    const normalized = base.endsWith('/') ? base : base + '/';
-    document.documentElement.style.setProperty('--bg-url', `url("${normalized}fondo.png")`);
-  </script>
+
 
 </head>
 
@@ -329,7 +328,7 @@
 
 <!-- NUEVO: wrapper que ordena todo en columna y evita micro-scroll al cargar
      (aquí movimos el padding superior que antes estaba en body) -->
-<div class="page" style={`--bg-url: url(${import.meta.env.BASE_URL}fondo.png)`} data-lighton><!-- NUEVO: data-lighton → clic aquí enciende la “luz” (desactivado en JS) -->
+<div  class="page"  style={`--bg-url: url(${import.meta.env.BASE_URL}fondo.png)`}  data-lighton>  
   <!-- ===== Título principal ===== -->
   <h1>
     NOELIA ESTOY HACIENDO MI PÁGINA WEB QUE EMOCIÓN BUENO Y AHORA QUE HAGO
