@@ -12,7 +12,8 @@
   <meta name="generator" content={Astro.generator} /> <!-- Esto lo agrega Astro automáticamente, indica que se utiliza Astro y su versión-->
   <title>Para mi princesa &lt;3</title> <!-- Texto que se ve en la pestaña del navegador, &lt; es el símbolo "<" -->
 
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
 
 <style>
 
@@ -74,7 +75,7 @@
   .badge-fecha{
     position:absolute; left:0; bottom:0; background:none; color:#fff;
     font-family: 'Roboto', Arial, sans-serif;
-    font-weight: 700; /* NEGRITA en la página */
+    font-weight: 400; /* o 700 si quieres en negrita */
     font-size: clamp(14px,4vw,20px);
     line-height: 1.2;
     padding:8px 10px; border-top-right-radius:10px; text-align:left;
@@ -218,8 +219,8 @@
 
   /* Fecha/hora en Notion: NEGRITA y tamaño */
   html.embed-notion .badge-fecha{
-    font-weight:700!important;
-    font-size:clamp(18px,5vw,28px)!important;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-weight: 400; /* o 700 si quieres en negrita */
   }
 
   /* Notion: esconder por completo los iframes de audio/lluvia para que no “aparezcan” */
