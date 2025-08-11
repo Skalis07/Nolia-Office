@@ -75,7 +75,7 @@
     color: rgb(0, 0, 0);           /* Color del texto: negro */
     margin: 0;                     /* NUEVO: sin margen para evitar desbordes sumando píxeles */
     font-family: Arial, sans-serif;/* Fuente usada para el texto */
-    font-size: 24px;               /* Tamaño del texto */
+    font-size:clamp(1rem,6vw,1.75rem); /* se achica en pantallas chicas */               /* Tamaño del texto */
   }
 
   /* ===== Estilo para imágenes redondeadas =====
@@ -119,7 +119,7 @@
     bottom: 0;                    /* Pegado a la parte inferior del marco */
     background: none;             /* SIN fondo, el texto queda flotando sobre el GIF */
     color: #fff;                  /* Texto blanco */
-    font: 600 25px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; /* Fuente legible */
+    font: 600 clamp(14px,4vw,20px)/1.2 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; /* Fuente legible */
     padding: 8px 10px;            /* Espacio interno alrededor del texto */
     border-top-right-radius: 10px;/* Redondea solo la esquina superior derecha del área de texto */
     /* Nota: el borde inferior-izquierdo ya queda redondo gracias al marco con overflow:hidden */
@@ -171,7 +171,10 @@
     display: flex;                 /* Usamos flexbox para alinear controles */
     align-items: center;           /* Centra verticalmente los elementos */
     justify-content: center;       /* Centra horizontalmente el grupo de controles */
-    gap: 16px;                     /* separación entre controles */
+
+    flex-wrap:wrap;         /* ★ permite bajar a otra línea en móvil */
+    
+    gap: 12px;                     /* separación entre controles */
     box-shadow: 0 4px 12px rgba(0,0,0,0.25); /* Sombra para levantar visualmente */
     position: relative;            /* Posición para controlar z-index y transiciones */
     z-index: 20;                   /* por encima del oscurecido */
@@ -199,6 +202,9 @@
     place-items: center;        /* Centra el icono en ambos ejes */
     cursor: pointer;            /* Cursor de mano al pasar encima */
     transition: background-color .2s ease, transform .05s ease, opacity .2s ease; /* Micro animaciones */
+
+    flex: 0 0 44px; /* ancho fijo del botón para que los sliders ocupen el resto */
+
   }
   .icon-btn:hover { background-color: rgba(255,255,255,0.12); } /* Sutil fondo al pasar el mouse */
   .icon-btn:active { transform: scale(0.98); }                 /* Pequeño “click” visual */
@@ -210,7 +216,7 @@
   .volume-slider {
     -webkit-appearance: none;   /* Quita estilos por defecto en WebKit */
     appearance: none;           /* Quita estilos por defecto en otros navegadores */
-    width: 180px;               /* Largo de la barra */
+    width: clamp(120px, 35vw, 220px);  /* relativo al ancho de pantalla */               /* Largo de la barra */
     height: 6px;                /* Altura de la barra */
     border-radius: 999px;       /* Borde redondeado completo */
     background: rgba(255,255,255,0.65); /* Pista clara */
@@ -318,6 +324,34 @@
     pointer-events: none;         /* deja pasar clics a lo de abajo */
   }
   .dim-overlay.activo { opacity: 1; visibility: visible; } /* Se muestra en modo oscuro */
+
+
+  
+  /* Móvil angosto: sliders a lo ancho y botones arriba */
+  @media (max-width: 520px){
+    .barra-musica{ padding:12px }
+    .volume-slider{ 
+      flex:1 1 100%;
+      width:100%;
+      max-width:none;
+    }
+  }
+
+  /* Móvil MUY chico: reduce rellenos y la “tirita” */
+  @media (max-width: 380px){
+    .page{ padding:8px 8px 0 }
+    .right-handle{ right:8px; --strip-h:160px }
+    .icon-btn{ width:40px; height:40px }             /* botones un pelín más chicos */
+    .volume-slider::-webkit-slider-thumb{ width:14px; height:14px }
+    .volume-slider::-moz-range-thumb{ width:14px; height:14px }
+  }
+
+  /* Opcional: escondemos la tirita en ultra-estrecho si molesta el contenido */
+  @media (max-width: 320px){
+    .right-handle{ display:none }
+  }
+
+
   </style>
   
 
