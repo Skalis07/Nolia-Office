@@ -1,43 +1,34 @@
-# Astro Starter Kit: Minimal
+# NoliaOffice
 
-```sh
-npm create astro@latest -- --template minimal
-```
+**NoliaOffice** es una página web creada por **Skalis07** como un espacio virtual para relajarse, estudiar o trabajar de forma tranquila.  
+Está inspirada en [NookOffice](https://vijiatjack.github.io/nookoffice/) y utiliza elementos visuales temáticos de *Animal Crossing* para crear un ambiente cálido y acogedor.  
+El código ha sido desarrollado desde cero, incorporando cambios estéticos pequeños y mejoras funcionales.  
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Este proyecto nació con dos objetivos principales:  
+1. Proporcionar un lugar digital para estudiar y relajarse a mi novia, pudiendo agregar o editar cosas que necesite y hecho por mi.  
+2. Realizar un ejercicio práctico de desarrollo web, ya que hasta ahora no había trabajado en un proyecto completo, y aprovecharlo para aprender, practicar y demostrar habilidades.
 
-## 🚀 Project Structure
+---
 
-Inside of your Astro project, you'll see the following folders and files:
+## ✨ Características
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+- Música de fondo reproducida desde YouTube.
+- Imágenes y GIFs temáticos extraídos de *Animal Crossing*.
+- Elementos visuales e interfaz adaptados para un ambiente más relajante y enfocado al estudio.
+- Funciones: sonidos ambientales, modos visuales y personalización estética.
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+---
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## 🎯 Enfoque
 
-Any static assets, like images, can be placed in the `public/` directory.
+Aunque usa la estética de *Animal Crossing*, el objetivo principal de NoliaOffice es ofrecer un entorno digital para **chillear** y mantener la concentración durante el estudio o el trabajo.
 
-## 🧞 Commands
+---
 
-All commands are run from the root of the project, from a terminal:
+## ⚖️ Aviso Legal
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+Este es un proyecto personal inspirado en el concepto de NookOffice y no está afiliado, respaldado ni patrocinado por Nintendo o por la franquicia *Animal Crossing*.  
+Las marcas comerciales, logotipos, imágenes y música pertenecen a sus respectivos dueños.  
+El uso es únicamente con fines no comerciales.
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+---
