@@ -13,6 +13,21 @@
   <title>Para mi princesa &lt;3</title> <!-- Texto que se ve en la pestaña del navegador, &lt; es el símbolo "<" -->
 
   <style>
+  *, *::before, *::after { box-sizing: border-box; }
+  .title-wrap{
+    width:100%;
+    max-width:1200px;
+    overflow:hidden;           /* oculta cualquier resto sin scroll */
+  }
+
+  #pageTitle{
+    display:inline-block;       /* necesario para poder escalar */
+    white-space:nowrap;         /* fuerza UNA sola línea */
+    transform-origin: left center;
+    line-height:1.15;
+    font-size: clamp(14px, 4vw, 28px); /* tamaño base razonable */
+  }
+
   /* =====================================================
      ===============  ESTILOS (CSS)  =====================
      - Mantuve tus comentarios originales.
@@ -176,7 +191,8 @@
     justify-content: center;       /* Centra horizontalmente el grupo de controles */
 
     flex-wrap: nowrap;      /* siempre en una sola fila */         /* ★ permite bajar a otra línea en móvil */
-    
+    box-sizing: border-box;   /* <- evita que el borde “empuje” fuera y se corte */
+
     gap: 10px;                     /* separación entre controles */
     box-shadow: 0 4px 12px rgba(0,0,0,0.25); /* Sombra para levantar visualmente */
     position: relative;            /* Posición para controlar z-index y transiciones */
@@ -379,9 +395,10 @@
      (aquí movimos el padding superior que antes estaba en body) -->
 <div  class="page"  style={`--bg-url: url(${import.meta.env.BASE_URL}fondo.png)`}  data-lighton>  
   <!-- ===== Título principal ===== -->
-  <h1>
-    NOELIA ESTOY HACIENDO MI PÁGINA WEB QUE EMOCIÓN BUENO Y AHORA QUE HAGO
-  </h1>
+  <div class="title-wrap">
+    <h1 id="pageTitle">NOELIA ESTOY HACIENDO MI PÁGINA WEB QUE EMOCIÓN BUENO Y AHORA QUE HAGO</h1>
+  </div>
+
   
   <!-- ===== CONTENEDOR del GIF con marco redondeado =====
        Aplica .img-redondeada al DIV (marco) para:
@@ -727,4 +744,34 @@
       }
     }
   }
+  
+
+
+  (function(){
+    const wrap  = document.querySelector('.title-wrap');
+    const title = document.getElementById('pageTitle');
+    if(!wrap || !title) return;
+
+    function fit() {
+      // reset para medir tamaño “natural”
+      title.style.transform = 'none';
+      // cuánto espacio hay vs. cuánto necesita
+      const avail = wrap.clientWidth;
+      const need  = title.scrollWidth;
+      // escala mínima para no volverlo ilegible (ajusta si hace falta)
+      const scale = Math.max(0.35, Math.min(1, avail / need));
+      title.style.transform = `scale(${scale})`;
+
+      // corrige la altura del contenedor para que el layout no se “pise”
+      const rect = title.getBoundingClientRect();
+      wrap.style.height = `${rect.height}px`;
+    }
+
+    // corre al cargar y cada vez que cambie el ancho
+    window.addEventListener('resize', fit, { passive:true });
+    const ro = new ResizeObserver(fit);
+    ro.observe(wrap);
+    // primer ajuste
+    setTimeout(fit, 0);
+  })();
 </script>
