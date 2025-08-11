@@ -75,7 +75,10 @@
     color: rgb(0, 0, 0);           /* Color del texto: negro */
     margin: 0;                     /* NUEVO: sin margen para evitar desbordes sumando píxeles */
     font-family: Arial, sans-serif;/* Fuente usada para el texto */
-    font-size:clamp(1rem,6vw,1.75rem); /* se achica en pantallas chicas */               /* Tamaño del texto */
+    
+    font-size: clamp(14px, 8vw, 28px); /* tamaño fluido más agresivo para que quepa */
+    white-space: nowrap; /* fuerza una sola línea y evita el salto */
+    /*font-size:clamp(1rem,6vw,1.75rem); /* se achica en pantallas chicas */               /* Tamaño del texto */
   }
 
   /* ===== Estilo para imágenes redondeadas =====
@@ -172,9 +175,9 @@
     align-items: center;           /* Centra verticalmente los elementos */
     justify-content: center;       /* Centra horizontalmente el grupo de controles */
 
-    flex-wrap:wrap;         /* ★ permite bajar a otra línea en móvil */
+    flex-wrap: nowrap;      /* siempre en una sola fila */         /* ★ permite bajar a otra línea en móvil */
     
-    gap: 12px;                     /* separación entre controles */
+    gap: 10px;                     /* separación entre controles */
     box-shadow: 0 4px 12px rgba(0,0,0,0.25); /* Sombra para levantar visualmente */
     position: relative;            /* Posición para controlar z-index y transiciones */
     z-index: 20;                   /* por encima del oscurecido */
@@ -216,12 +219,21 @@
   .volume-slider {
     -webkit-appearance: none;   /* Quita estilos por defecto en WebKit */
     appearance: none;           /* Quita estilos por defecto en otros navegadores */
-    width: clamp(120px, 35vw, 220px);  /* relativo al ancho de pantalla */               /* Largo de la barra */
-    height: 6px;                /* Altura de la barra */
-    border-radius: 999px;       /* Borde redondeado completo */
-    background: rgba(255,255,255,0.65); /* Pista clara */
-    outline: none;              /* Sin contorno al enfocar */
-    cursor: pointer;            /* Cursor de mano para interacción */
+    flex: 1 1 0%;
+    min-width: 60px;       /* puede encogerse hasta aquí en pantallas chicas */
+    max-width: 220px;      /* pero no más grande que esto en grandes */
+    width:auto;            /* clave para respetar el flex */
+    height: 6px;
+    border-radius:999px;
+    background: rgba(255,255,255,0.65);
+    outline:none;
+    cursor:pointer;
+    /*width: clamp(120px, 35vw, 220px);  /* relativo al ancho de pantalla */               /* Largo de la barra */
+    /*height: 6px;                /* Altura de la barra */
+    /*border-radius: 999px;       /* Borde redondeado completo */
+    /*background: rgba(255,255,255,0.65); /* Pista clara */
+    /*outline: none;              /* Sin contorno al enfocar */
+    /*cursor: pointer;            /* Cursor de mano para interacción */
   }
   .volume-slider::-webkit-slider-thumb {
     -webkit-appearance: none;   /* Quita el estilo por defecto del pulgar (Chrome/Safari) */
@@ -329,13 +341,16 @@
   
   /* Móvil angosto: sliders a lo ancho y botones arriba */
   @media (max-width: 520px){
-    .barra-musica{ padding:12px }
-    .volume-slider{ 
-      flex:1 1 100%;
-      width:100%;
-      max-width:none;
+    .barra-musica{ padding:8px 10px; gap:8px }
+    .icon-btn{ width:36px; height:36px; flex-basis:36px }   /* botones un poco más chicos */
+    .volume-slider{
+      min-width:48px;    /* permite encoger más */
+      max-width:none;    /* que use el espacio disponible */
     }
+    .volume-slider::-webkit-slider-thumb{ width:12px; height:12px }
+    .volume-slider::-moz-range-thumb{ width:12px; height:12px }
   }
+
 
   /* Móvil MUY chico: reduce rellenos y la “tirita” */
   @media (max-width: 380px){
