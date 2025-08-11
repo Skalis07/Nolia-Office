@@ -73,7 +73,7 @@
   .badge-fecha{
     position:absolute; left:0; bottom:0; background:none; color:#fff;
     font-family: 'Roboto', Arial, sans-serif;
-    font-weight: 600; /* conserva la negrita */
+    font-weight: 700; /* conserva la negrita */
     font-size: clamp(14px,4vw,20px);
     line-height: 1.2;
     padding:8px 10px; border-top-right-radius:10px; text-align:left;
@@ -161,6 +161,18 @@
   .frame{ width:100%; max-width:1200px; margin-inline:auto; }
   .frame .img-redondeada, .frame .barra-musica{ width:100%; max-width:none; box-sizing:border-box; }
 
+    /* global: separa la barra del GIF */
+  .frame .barra-musica{
+    margin-top: 12px;   /* ajusta a gusto: 8–16px suele verse bien */
+  }
+
+  /* Notion: por si alguna regla lo pisa, lo forzamos */
+  html.embed-notion .barra-musica{
+    margin-top: 12px !important;
+  }
+
+
+
   /* ===== Ajustes móviles generales ===== */
   @media (max-width:520px){
     .barra-musica{ padding:8px 10px; gap:8px; }
@@ -220,8 +232,8 @@
 
   /* Fecha/hora en Notion: más grande y sin negrita */
   html.embed-notion .badge-fecha{
-    font-weight:normal!important;
-    font-size:clamp(18px,5vw,28px)!important;
+    font-weight:700!important;                 /* ahora sí en negrita */
+    font-size:clamp(18px,5vw,28px)!important;  /* conserva tamaño grande */
   }
 
 
