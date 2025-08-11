@@ -1,50 +1,50 @@
-name: Deploy Astro to GitHub Pages         # Nombre de la receta
+name: Deploy Astro to GitHub Pages
 
-on:                                        # ¿Cuándo corre?
-  push:                                    # Cuando hagas git push…
-    branches: [ "main" ]                   # …a la rama main
-  workflow_dispatch:                       # Y también si lo ejecutas a mano (botón Run)
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
 
 permissions:
-  contents: read                           # Permiso para leer tu repo
-  pages: write                             # Permiso para publicar en Pages
-  id-token: write                          # Permiso para autenticarse
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: "pages"                           # Evita builds en paralelo
-  cancel-in-progress: true                 # Cancela el build anterior si empujas de nuevo
+  group: "pages"
+  cancel-in-progress: true
 
-jobs:                                      # Trabajos a ejecutar
-  build:                                   # 1) Construir el sitio
-    runs-on: ubuntu-latest                 # Corre en Linux de GitHub
+jobs:
+  build:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4          # Baja tu código
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v4        # Instala Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 20                 # Versión de Node
-          cache: 'npm'                     # Cachea dependencias para que sea más rápido
+          node-version: 20
+          cache: 'npm'
 
       - name: Install deps
-        run: npm ci                        # Instala dependencias (limpio y rápido)
+        run: npm ci
 
       - name: Build
-        run: npm run build                 # Compila tu proyecto Astro → genera /dist
+        run: npm run build   # 👉 Aquí Astro compila src/pages/*.astro → dist/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist                     # Sube la carpeta /dist como “artifact” para Pages
+          path: ./dist        # 👉 MUY IMPORTANTE: publicar SOLO la carpeta dist
 
-  deploy:                                  # 2) Publicar el sitio
-    needs: build                           # Espera a que termine "build"
+  deploy:
+    needs: build
     runs-on: ubuntu-latest
     environment:
-      name: github-pages                   # Entorno especial de Pages
-      url: ${{ steps.deployment.outputs.page_url }}  # URL final (la muestra al terminar)
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4      # Publica ese artifact en GitHub Pages
+        uses: actions/deploy-pages@v4
