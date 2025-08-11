@@ -223,21 +223,31 @@
 
 
 
-    /* ===== Ajustes especiales solo para Notion ===== */
-  html.embed-notion .barra-musica {
-    box-shadow: none !important;      /* sin sombra */
-    border: 0 !important;              /* sin borde */
-    font-weight: normal !important;    /* sin negrita */
-    transform: scale(1.15);            /* agranda la barra */
-    transform-origin: center center;   /* que crezca pareja */
+    /* Notion: sin sombras ni bordes en el reproductor */
+  html.embed-notion .barra-musica{
+    box-shadow: none !important;
+    border: 0 !important;
   }
 
-  /* También eliminamos sombras internas o de botones */
+  /* por si queda alguna sombra en otros elementos dentro del widget */
   html.embed-notion .img-redondeada,
-  html.embed-notion .icon-btn {
+  html.embed-notion .icon-btn{
     box-shadow: none !important;
-    font-weight: normal !important;
   }
+
+
+
+  /* Ajustes de fecha/hora solo para Notion */
+  html.embed-notion .badge-fecha {
+    font-weight: normal !important;  /* quitar negrita */
+    font-size: clamp(18px, 5vw, 28px) !important; /* agrandar */
+  }
+
+
+
+
+
+
 
 </style>
 
