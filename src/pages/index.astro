@@ -173,25 +173,7 @@
   }
   @media (max-width:320px){ .right-handle{ display:none; } }
 
-  /* ===== SOLO móvil real en VERTICAL: barra vertical junto al GIF ===== */
-  @media (max-width:480px) and (orientation:portrait) and (hover:none) and (pointer:coarse){
-    .frame{
-      display:grid; grid-template-columns:1fr 60px; align-items:stretch; gap:10px;
-    }
-    .barra-musica{
-      width:60px; height:100%; padding:8px 6px; border-radius:28px;
-      display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:10px;
-    }
-    .icon-btn{ width:38px; height:38px; flex-basis:38px; }
-    .volume-slider{
-      flex:0 0 auto; width:150px; height:28px;
-      transform:rotate(-90deg); transform-origin:50% 50%;
-      min-width:0; max-width:none;
-    }
-    .volume-slider::-webkit-slider-thumb,
-    .volume-slider::-moz-range-thumb{ width:12px; height:12px; }
-    .right-handle{ right:6px; } /* para que no choquen */
-  }
+
 
 
 
@@ -206,9 +188,16 @@
     /* deja el radio si te gusta redondeado; pon 0 si lo quieres recto: */
     border-radius: 20px !important; /* o 0 */
   }
-  /* Opcional: sin borde de la barra dentro de Notion */
+  /* Notion: sin sombras ni bordes en el reproductor */
   html.embed-notion .barra-musica{
+    box-shadow: none !important;
     border: 0 !important;
+  }
+
+  /* por si queda alguna sombra en otros elementos dentro del widget */
+  html.embed-notion .img-redondeada,
+  html.embed-notion .icon-btn{
+    box-shadow: none !important;
   }
 
 
@@ -225,6 +214,31 @@
     flex-direction:row!important; width:100%!important; height:auto!important; padding:10px 16px!important; gap:10px!important;
   }
   html.embed-notion .volume-slider{ transform:none!important; width:auto!important; min-width:0!important; max-width:220px!important; }
+
+
+
+
+
+
+
+
+
+    /* ===== Ajustes especiales solo para Notion ===== */
+  html.embed-notion .barra-musica {
+    box-shadow: none !important;      /* sin sombra */
+    border: 0 !important;              /* sin borde */
+    font-weight: normal !important;    /* sin negrita */
+    transform: scale(1.15);            /* agranda la barra */
+    transform-origin: center center;   /* que crezca pareja */
+  }
+
+  /* También eliminamos sombras internas o de botones */
+  html.embed-notion .img-redondeada,
+  html.embed-notion .icon-btn {
+    box-shadow: none !important;
+    font-weight: normal !important;
+  }
+
 </style>
 
   
