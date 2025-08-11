@@ -18,6 +18,8 @@
     width:100%;
     max-width:1200px;
     overflow:hidden;           /* oculta cualquier resto sin scroll */
+    position: relative;
+    z-index: 10;               /* por si algo se superpone */
   }
 
   #pageTitle{
@@ -179,7 +181,10 @@
     --turquesa: #5aa7a6;           /* Color base aproximado al de tu imagen */
     --borde-claro: rgba(255,255,255,0.75); /* Borde sutil translúcido */
 
-    max-width: 1200px;             /* igual que el GIF */
+
+    max-width: 100%;
+    margin-inline: auto;   /* centra y evita recortes laterales */
+    /*max-width: 1200px;             /* igual que el GIF */
     width: 100%;                   /* Se adapta al ancho disponible */
     background-color: var(--turquesa); /* Fondo turquesa */
     border: 4px solid var(--borde-claro); /* Borde claro */
@@ -393,11 +398,12 @@
 
 <!-- NUEVO: wrapper que ordena todo en columna y evita micro-scroll al cargar
      (aquí movimos el padding superior que antes estaba en body) -->
-<div  class="page"  style={`--bg-url: url(${import.meta.env.BASE_URL}fondo.png)`}  data-lighton>  
+  <div  class="page"  style={`--bg-url: url(${import.meta.env.BASE_URL}fondo.png)`}  data-lighton>  
   <!-- ===== Título principal ===== -->
   <div class="title-wrap">
     <h1 id="pageTitle">NOELIA ESTOY HACIENDO MI PÁGINA WEB QUE EMOCIÓN BUENO Y AHORA QUE HAGO</h1>
   </div>
+
 
   
   <!-- ===== CONTENEDOR del GIF con marco redondeado =====
@@ -774,4 +780,33 @@
     // primer ajuste
     setTimeout(fit, 0);
   })();
+
+
+
+
+
+  /* ===== Ajuste automático del título a una línea ===== */
+  (function(){
+    const wrap  = document.querySelector('.title-wrap');
+    const title = document.getElementById('pageTitle');
+    if(!wrap || !title) return;
+
+    function fit() {
+      title.style.transform = 'none';                 // reset
+      const avail = wrap.clientWidth;                 // ancho disponible
+      const need  = title.scrollWidth;                // ancho que necesita el texto
+      const scale = Math.max(0.35, Math.min(1, avail / need)); // no bajar de 35% para legibilidad
+      title.style.transform = `scale(${scale})`;
+
+      // fijar altura del contenedor para que el siguiente bloque no “suba”
+      const rect = title.getBoundingClientRect();
+      wrap.style.height = `${rect.height}px`;
+    }
+
+    window.addEventListener('resize', fit, { passive:true });
+    const ro = new ResizeObserver(fit);
+    ro.observe(wrap);
+    setTimeout(fit, 0); // primer ajuste
+  })();
+
 </script>
