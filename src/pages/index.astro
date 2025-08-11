@@ -35,7 +35,6 @@
     overflow-x: hidden; /* Evita barra de desplazamiento horizontal que moleste */
   }
 
-  :root { --bg-url: url("${import.meta.env.BASE_URL}fondo.png"); } /* NUEVO: construye la URL correcta */
   body {
     /* ===== Fondo de la página ===== */
     /* IMPORTANTE: usamos ruta RELATIVA para que funcione igual en local y en GitHub Pages */
@@ -330,7 +329,7 @@
 
 <!-- NUEVO: wrapper que ordena todo en columna y evita micro-scroll al cargar
      (aquí movimos el padding superior que antes estaba en body) -->
-<div class="page" data-lighton><!-- NUEVO: data-lighton → clic aquí enciende la “luz” (desactivado en JS) -->
+<div class="page" style={`--bg-url: url(${import.meta.env.BASE_URL}fondo.png)`} data-lighton><!-- NUEVO: data-lighton → clic aquí enciende la “luz” (desactivado en JS) -->
   <!-- ===== Título principal ===== -->
   <h1>
     NOELIA ESTOY HACIENDO MI PÁGINA WEB QUE EMOCIÓN BUENO Y AHORA QUE HAGO
