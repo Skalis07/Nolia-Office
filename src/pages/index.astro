@@ -86,9 +86,26 @@
   }
 
 
-  /* ===== iframes ocultos (por defecto) ===== */
-  #yt-audio,#yt-rain{ position:absolute; left:0; top:0; width:1px; height:1px; opacity:0; pointer-events:none; z-index:0; }
-  #yt-audio iframe,#yt-rain iframe{ width:1px!important; height:1px!important; border:0!important; }
+  /* ===== iframes ocultos (en todos lados, incluido Notion) ===== */
+  #yt-audio,
+  #yt-rain{
+    position: fixed !important;
+    left: -9999px !important;
+    top: -9999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    z-index: -1 !important;
+  }
+  #yt-audio iframe,
+  #yt-rain iframe{
+    width: 1px !important;
+    height: 1px !important;
+    border: 0 !important;
+    display: block !important;
+  }
+
 
   /* ===== Barra música ===== */
   .barra-musica{
@@ -219,22 +236,6 @@
   html.embed-notion #rainToggle,
   html.embed-notion #gifShuffle{ order:1!important; }
 
-  /* Notion: esconder por completo los iframes de audio/lluvia para que no “aparezcan” */
-  html.embed-notion #yt-audio,
-  html.embed-notion #yt-rain{
-    position: fixed !important;
-    width: 1px !important;
-    height: 1px !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    z-index: -1 !important;
-  }
-  html.embed-notion #yt-audio iframe,
-  html.embed-notion #yt-rain iframe{
-    width: 1px !important;
-    height: 1px !important;
-    border: 0 !important;
-  }
 
 
 </style>
