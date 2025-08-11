@@ -1,0 +1,50 @@
+name: Deploy Astro to GitHub Pages         # Nombre de la receta
+
+on:                                        # ¿Cuándo corre?
+  push:                                    # Cuando hagas git push…
+    branches: [ "main" ]                   # …a la rama main
+  workflow_dispatch:                       # Y también si lo ejecutas a mano (botón Run)
+
+permissions:
+  contents: read                           # Permiso para leer tu repo
+  pages: write                             # Permiso para publicar en Pages
+  id-token: write                          # Permiso para autenticarse
+
+concurrency:
+  group: "pages"                           # Evita builds en paralelo
+  cancel-in-progress: true                 # Cancela el build anterior si empujas de nuevo
+
+jobs:                                      # Trabajos a ejecutar
+  build:                                   # 1) Construir el sitio
+    runs-on: ubuntu-latest                 # Corre en Linux de GitHub
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4          # Baja tu código
+
+      - name: Setup Node
+        uses: actions/setup-node@v4        # Instala Node
+        with:
+          node-version: 20                 # Versión de Node
+          cache: 'npm'                     # Cachea dependencias para que sea más rápido
+
+      - name: Install deps
+        run: npm ci                        # Instala dependencias (limpio y rápido)
+
+      - name: Build
+        run: npm run build                 # Compila tu proyecto Astro → genera /dist
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist                     # Sube la carpeta /dist como “artifact” para Pages
+
+  deploy:                                  # 2) Publicar el sitio
+    needs: build                           # Espera a que termine "build"
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages                   # Entorno especial de Pages
+      url: ${{ steps.deployment.outputs.page_url }}  # URL final (la muestra al terminar)
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4      # Publica ese artifact en GitHub Pages
