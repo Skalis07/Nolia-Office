@@ -239,24 +239,18 @@
   .icon-btn.active { background-color: rgba(255,255,255,0.18); } /* Se marca cuando la lluvia está encendida */
 
   /* ===== Barras de volumen horizontales (Música y Lluvia) ===== */
-  .volume-slider {
-    -webkit-appearance: none;   /* Quita estilos por defecto en WebKit */
-    appearance: none;           /* Quita estilos por defecto en otros navegadores */
-    flex: 1 1 0%;
-    min-width: 60px;       /* puede encogerse hasta aquí en pantallas chicas */
-    max-width: 220px;      /* pero no más grande que esto en grandes */
-    width:auto;            /* clave para respetar el flex */
+  .volume-slider{
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1 1 160px;   /* base razonable, pero flexible */
+    min-width: 0;      /* CLAVE: permite encoger de verdad */
+    max-width: 320px;  /* en grande puede estirarse un poco más */
+    width: auto;
     height: 6px;
-    border-radius:999px;
+    border-radius: 999px;
     background: rgba(255,255,255,0.65);
-    outline:none;
-    cursor:pointer;
-    /*width: clamp(120px, 35vw, 220px);  /* relativo al ancho de pantalla */               /* Largo de la barra */
-    /*height: 6px;                /* Altura de la barra */
-    /*border-radius: 999px;       /* Borde redondeado completo */
-    /*background: rgba(255,255,255,0.65); /* Pista clara */
-    /*outline: none;              /* Sin contorno al enfocar */
-    /*cursor: pointer;            /* Cursor de mano para interacción */
+    outline: none;
+    cursor: pointer;
   }
   .volume-slider::-webkit-slider-thumb {
     -webkit-appearance: none;   /* Quita el estilo por defecto del pulgar (Chrome/Safari) */
@@ -389,7 +383,7 @@
     .barra-musica{ padding:8px 10px; gap:8px }
     .icon-btn{ width:36px; height:36px; flex-basis:36px }   /* botones un poco más chicos */
     .volume-slider{
-      min-width:48px;    /* permite encoger más */
+      min-width:0px;    /* permite encoger más */
       max-width:none;    /* que use el espacio disponible */
     }
     .volume-slider::-webkit-slider-thumb{ width:12px; height:12px }
@@ -459,8 +453,10 @@
   html.embed-notion .volume-slider{
     transform: none !important;
     width: auto !important;
-    min-width: 60px; max-width: 220px;
+    min-width: 0 !important;   /* antes estaba en 60px */
+    max-width: 220px !important;
   }
+
 
 
 
@@ -585,7 +581,6 @@
         </svg>
       </button>
 
-      <input id="volumeRain" class="volume-slider" type="range" min="0" max="100" value="60" aria-label="Volumen de lluvia (0 a 100)" />
 
       <button id="gifShuffle" class="icon-btn" aria-label="Cambiar GIF" title="Cambiar GIF">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -634,6 +629,8 @@
 
 <!-- ===== Script: API YouTube (Música + Lluvia) y lógica de UI ===== -->
 <script is:inline>
+  const DEFAULT_RAIN_VOL = 60; // el mismo 60% que usabas en el slider
+
   /* =========================
      ICONOS SVG EN STRINGS
      ========================= */
@@ -665,7 +662,7 @@
   let isRainPlaying   = false; // Estado de reproducción de la lluvia
 
   // Referencias a controles
-  let btnMusic, btnRain, volMusic, volRain, btnShuffle, gifImg; // Variables para guardar elementos del DOM
+  let btnMusic, btnRain, volMusic, btnShuffle, gifImg; // Variables para guardar elementos del DOM
 
   // Inyectar API de YouTube (agrega <script> dinámicamente)
   const ytScript = document.createElement('script'); // Crea un elemento script
@@ -696,13 +693,12 @@
       btnMusic   = document.getElementById('musicToggle');  // Botón play/pause música
       btnRain    = document.getElementById('rainToggle');   // Botón toggle lluvia
       volMusic   = document.getElementById('volumeMusic');  // Slider volumen música
-      volRain    = document.getElementById('volumeRain');   // Slider volumen lluvia
       btnShuffle = document.getElementById('gifShuffle');   // Botón cambiar GIF
       gifImg     = document.getElementById('mainGif');      // <img> del GIF principal
 
       // Inicializa volúmenes con lo que diga el slider (0..100)
       if (playerMusic?.setVolume) playerMusic.setVolume(Number(volMusic.value)); // Aplica volumen inicial música
-      if (playerRain?.setVolume)  playerRain.setVolume(Number(volRain.value));   // Aplica volumen inicial lluvia
+      if (playerRain?.setVolume)  playerRain.setVolume(DEFAULT_RAIN_VOL);   // Aplica volumen inicial lluvia
 
       /* ===== Eventos de los botones ===== */
 
@@ -743,10 +739,7 @@
         }
       });
 
-      // Volumen lluvia
-      volRain.addEventListener('input', () => {             // Cambio de volumen de lluvia
-        playerRain?.setVolume(Number(volRain.value));       // Aplica el nuevo volumen
-      });
+
 
       // ===== NUEVO: Bloquear proporción del marco usando el PRIMER GIF =====
       lockAspectFrom(gifImg); // Lee naturalWidth/Height y fija aspect-ratio del contenedor
