@@ -415,95 +415,56 @@
 
 
 
-  /* ==== CELULAR EN VERTICAL: barra a la derecha, en columna ==== */
-  /* Condiciones:
-    - ancho chico
-    - orientación vertical
-    - dispositivo táctil (para no afectar Notion/desktop) */
-
-    /* La .frame se vuelve un grid de 2 columnas:
-      GIF a la izquierda, barra vertical a la derecha */
-    .frame{
-      display: grid;
-      grid-template-columns: 1fr 68px;  /* 68px de “pastilla” a la derecha */
-      align-items: stretch;
-      gap: 12px;
-    }
-
-    /* La barra ahora es una “pastilla” vertical que ocupa la altura del GIF */
-    .barra-musica{
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      width: 68px;                 /* debe coincidir con la 2ª columna */
-      padding: 8px;
-      height: 100%;                /* iguala la altura del GIF */
-      border-radius: 9999px;
-      overflow: visible;           /* por si algo rota y se sale unos px */
-      gap: 10px;
-    }
-
-    /* Botones un pelín más compactos */
-    .icon-btn{
-      width: 40px;
-      height: 40px;
-      flex-basis: 40px;
-    }
-
-    /* Sliders en vertical:
-      - los rotamos
-      - les damos largo “real” con width
-      - y un alto pequeñito para que parezca pista vertical */
-    .volume-slider{
-      flex: 0 0 auto;
-      width: 160px;            /* largo de la barra una vez rotada */
-      height: 28px;            /* “alto” del control antes de rotar */
-      transform: rotate(-90deg);
-      transform-origin: 50% 50%;
-      min-width: 0;
-      max-width: none;
-    }
-    .volume-slider::-moz-range-track { height: 6px; }
-    .volume-slider::-webkit-slider-thumb,
-    .volume-slider::-moz-range-thumb{
-      width: 14px; height: 14px; /* un poco más chico en móvil */
-    }
-
-    /* (Opcional) mueve un pelín la tirita para que no choque con la barra */
-    .right-handle{ right: 6px; }
-  }
 
 
 
 
 
 
-  /* ==== Modo Notion: fondo transparente + sin título + barra horizontal ==== */
-  .embed-notion, .embed-notion body{ background:transparent !important; }
-  .embed-notion .page{
-    --bg-url: none;              /* quita la imagen de fondo */
-    background:transparent !important;
-  }
-  .embed-notion .title-wrap{ display:none !important; }       /* oculta el texto grande */
-  .embed-notion .right-handle,                                  /* opcional: oculta “tirita” */
-  .embed-notion .dim-overlay{ display:none !important; }
 
-  /* Forzar barras HORIZONTALES dentro de Notion, aunque sea móvil */
-  .embed-notion .frame{ display:block !important; }
-  .embed-notion .barra-musica{
-    flex-direction:row !important;
-    width:100% !important; height:auto !important;
-    padding:10px 16px !important; gap:10px !important;
-  }
-  .embed-notion .volume-slider{
-    transform:none !important;
-    width:auto !important; min-width:60px; max-width:220px;
-  }
 
 
 
 
   
+
+
+
+
+
+
+
+  /* ==== Notion embed: sin fondo, sin título, barra horizontal ==== */
+  html.embed-notion, html.embed-notion body{ background: transparent !important; }
+
+  html.embed-notion .page{
+    --bg-url: none !important;      /* quita la imagen de fondo */
+    background: transparent !important;
+    padding: 0 0 0 !important;      /* quita acolchados si molestan */
+  }
+
+  html.embed-notion .title-wrap{ display: none !important; }  /* oculta las letras de arriba */
+  html.embed-notion .right-handle,
+  html.embed-notion .dim-overlay{ display: none !important; } /* oculta la tirita/oscurecido */
+
+  /* Forzar barra HORIZONTAL en Notion (aunque sea móvil) */
+  html.embed-notion .frame{ display: block !important; }
+  html.embed-notion .barra-musica{
+    flex-direction: row !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 10px 16px !important;
+    gap: 10px !important;
+  }
+  html.embed-notion .volume-slider{
+    transform: none !important;
+    width: auto !important;
+    min-width: 60px; max-width: 220px;
+  }
+
+
+
+
 
 
 
@@ -554,37 +515,6 @@
     .right-handle{ right: 6px; }
   }
 
-
-
-
-
-  /* ==== Notion embed: sin fondo, sin título, barra horizontal ==== */
-  html.embed-notion, html.embed-notion body{ background: transparent !important; }
-
-  html.embed-notion .page{
-    --bg-url: none !important;      /* quita la imagen de fondo */
-    background: transparent !important;
-    padding: 0 0 0 !important;      /* quita acolchados si molestan */
-  }
-
-  html.embed-notion .title-wrap{ display: none !important; }  /* oculta las letras de arriba */
-  html.embed-notion .right-handle,
-  html.embed-notion .dim-overlay{ display: none !important; } /* oculta la tirita/oscurecido */
-
-  /* Forzar barra HORIZONTAL en Notion (aunque sea móvil) */
-  html.embed-notion .frame{ display: block !important; }
-  html.embed-notion .barra-musica{
-    flex-direction: row !important;
-    width: 100% !important;
-    height: auto !important;
-    padding: 10px 16px !important;
-    gap: 10px !important;
-  }
-  html.embed-notion .volume-slider{
-    transform: none !important;
-    width: auto !important;
-    min-width: 60px; max-width: 220px;
-  }
 
 
 
