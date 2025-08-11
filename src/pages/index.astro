@@ -12,7 +12,7 @@
   <meta name="generator" content={Astro.generator} /> <!-- Esto lo agrega Astro automáticamente, indica que se utiliza Astro y su versión-->
   <title>Para mi princesa &lt;3</title> <!-- Texto que se ve en la pestaña del navegador, &lt; es el símbolo "<" -->
 
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
 
 
 <style>
@@ -74,15 +74,17 @@
   /* ===== Fecha/hora ===== */
   .badge-fecha{
     position:absolute; left:0; bottom:0; background:none; color:#fff;
-    font-family: 'Roboto', Arial, sans-serif;
-    font-weight: 400; /* o 700 si quieres en negrita */
+    font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-weight: 800;                  /* negrita “gordita” */
     font-size: clamp(14px,4vw,20px);
     line-height: 1.2;
+    letter-spacing: 0.2px;             /* leve, ayuda a la legibilidad */
     padding:8px 10px; border-top-right-radius:10px; text-align:left;
     white-space:pre-line; user-select:none;
     text-shadow:0 0 3px rgba(0,0,0,.9), 0 0 6px rgba(0,0,0,.7);
     z-index:2;
   }
+
 
   /* ===== iframes ocultos (por defecto) ===== */
   #yt-audio,#yt-rain{ position:absolute; left:0; top:0; width:1px; height:1px; opacity:0; pointer-events:none; z-index:0; }
@@ -216,12 +218,6 @@
   html.embed-notion #musicToggle,
   html.embed-notion #rainToggle,
   html.embed-notion #gifShuffle{ order:1!important; }
-
-  /* Fecha/hora en Notion: NEGRITA y tamaño */
-  html.embed-notion .badge-fecha{
-    font-family: 'Roboto', Arial, sans-serif;
-    font-weight: 400; /* o 700 si quieres en negrita */
-  }
 
   /* Notion: esconder por completo los iframes de audio/lluvia para que no “aparezcan” */
   html.embed-notion #yt-audio,
