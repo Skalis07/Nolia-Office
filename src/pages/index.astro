@@ -420,7 +420,6 @@
     - ancho chico
     - orientación vertical
     - dispositivo táctil (para no afectar Notion/desktop) */
-  @media (max-width: 640px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
 
     /* La .frame se vuelve un grid de 2 columnas:
       GIF a la izquierda, barra vertical a la derecha */
@@ -506,6 +505,90 @@
 
   
 
+
+
+
+
+  /* ==== SOLO MÓVIL REAL en VERTICAL (no desktop, no Notion) ==== */
+  @media (max-width: 480px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
+
+    /* layout: GIF a la izquierda, barra vertical a la derecha */
+    .frame{
+      display: grid;
+      grid-template-columns: 1fr 60px; /* ancho de la “pastilla” */
+      align-items: stretch;
+      gap: 10px;
+    }
+
+    /* barra vertical “limpia” */
+    .barra-musica{
+      width: 60px;
+      height: 100%;
+      padding: 8px 6px;
+      border-radius: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-sizing: border-box;
+    }
+
+    .icon-btn{
+      width: 38px; height: 38px; flex-basis: 38px;
+    }
+
+    /* sliders verticales (rotados) */
+    .volume-slider{
+      flex: 0 0 auto;
+      width: 150px;        /* largo tras rotar */
+      height: 28px;        /* alto antes de rotar */
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      min-width: 0; max-width: none;
+    }
+    .volume-slider::-webkit-slider-thumb,
+    .volume-slider::-moz-range-thumb{ width: 12px; height: 12px; }
+
+    /* mueve un poquito la tirita para que no choque */
+    .right-handle{ right: 6px; }
+  }
+
+
+
+
+
+  /* ==== Notion embed: sin fondo, sin título, barra horizontal ==== */
+  html.embed-notion, html.embed-notion body{ background: transparent !important; }
+
+  html.embed-notion .page{
+    --bg-url: none !important;      /* quita la imagen de fondo */
+    background: transparent !important;
+    padding: 0 0 0 !important;      /* quita acolchados si molestan */
+  }
+
+  html.embed-notion .title-wrap{ display: none !important; }  /* oculta las letras de arriba */
+  html.embed-notion .right-handle,
+  html.embed-notion .dim-overlay{ display: none !important; } /* oculta la tirita/oscurecido */
+
+  /* Forzar barra HORIZONTAL en Notion (aunque sea móvil) */
+  html.embed-notion .frame{ display: block !important; }
+  html.embed-notion .barra-musica{
+    flex-direction: row !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 10px 16px !important;
+    gap: 10px !important;
+  }
+  html.embed-notion .volume-slider{
+    transform: none !important;
+    width: auto !important;
+    min-width: 60px; max-width: 220px;
+  }
+
+
+
+
   </style>
   
 
@@ -517,12 +600,14 @@
   <script is:inline>
     (function(){
       const qs = new URLSearchParams(location.search);
-      const ref = document.referrer || "";
       const inIframe = (()=>{ try{ return window.self !== window.top }catch(_){ return true }})();
-      const isNotion = /notion\.so|notion\.site/i.test(ref) || qs.has("notion");
-      if(inIframe && isNotion){ document.documentElement.classList.add("embed-notion"); }
+      const isNotion = qs.has('notion') || /notion\.so|notion\.site/i.test(document.referrer || '');
+      if(inIframe && isNotion){
+        document.documentElement.classList.add('embed-notion');
+      }
     })();
   </script>
+
 
 
 
