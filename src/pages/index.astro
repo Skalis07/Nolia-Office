@@ -359,7 +359,29 @@
   .dim-overlay.activo { opacity: 1; visibility: visible; } /* Se muestra en modo oscuro */
 
 
+
+
+
+
+
+  /* === Mantener GIF y barra con el MISMO ancho === */
+  .frame{
+    width: 100%;
+    max-width: 1200px;      /* límite de ambos */
+    margin-inline: auto;    /* centrado */
+  }
+
+  .frame .img-redondeada,
+  .frame .barra-musica{
+    width: 100%;
+    max-width: none;        /* ahora obedecen solo a .frame */
+    box-sizing: border-box;
+  }
+
   
+
+
+
   /* Móvil angosto: sliders a lo ancho y botones arriba */
   @media (max-width: 520px){
     .barra-musica{ padding:8px 10px; gap:8px }
@@ -406,53 +428,45 @@
 
 
   
-  <!-- ===== CONTENEDOR del GIF con marco redondeado =====
-       Aplica .img-redondeada al DIV (marco) para:
-       - Bordes redondeados + sombra + borde blanco en el conjunto
-       - Poder colocar una etiqueta en la esquina y que quede "recortada" correctamente -->
-  <div class="img-redondeada" data-lighton> <!-- EDITADO: ahora también puede encender la luz al clic (pero lo desactivamos) -->
-    <img id="mainGif" src={`${import.meta.env.BASE_URL}1.gif`} alt="Gif en el centro"> <!-- NUEVO: id para poder cambiar de GIF (BASE_URL) -->
+  <!-- ===== CONTENEDOR del GIF con marco redondeado ===== -->
 
-    <!-- ===== Etiqueta fecha/hora en la esquina inferior izquierda ===== -->
-    <div id="reloj" class="badge-fecha" aria-live="polite"> <!-- NUEVO: aria-live mejora accesibilidad; el texto puede actualizar -->
-      <!-- El contenido lo rellena el script de abajo (fecha en una línea y hora en la otra) -->
-      <!-- NUEVO: Si JS está desactivado, este div quedará vacío (no es error, solo no se verá la fecha/hora). -->
+  <div class="frame">
+    <!-- ===== CONTENEDOR del GIF con marco redondeado ===== -->
+    <div class="img-redondeada" data-lighton>
+      <img id="mainGif" src={`${import.meta.env.BASE_URL}1.gif`} alt="Gif en el centro">
+
+      <div id="reloj" class="badge-fecha" aria-live="polite"></div>
+
+      <div id="yt-audio" aria-hidden="true"><div id="ytplayerMusic"></div></div>
+      <div id="yt-rain"  aria-hidden="true"><div id="ytplayerRain"></div></div>
     </div>
 
-    <!-- ===== Reproductor de YouTube “escondido” DETRÁS del GIF: MÚSICA ===== -->
-    <div id="yt-audio" aria-hidden="true"><!-- Contenedor invisible --><div id="ytplayerMusic"></div></div> <!-- Nodo donde se crea el player -->
+    <!-- ===== Barra de control ===== -->
+    <div class="barra-musica" id="controlsBar" data-lighton>
+      <button id="musicToggle" class="icon-btn" aria-label="Reproducir música">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      </button>
 
-    <!-- ===== Reproductor de YouTube “escondido” DETRÁS del GIF: LLUVIA ===== -->
-    <div id="yt-rain" aria-hidden="true"><!-- Contenedor invisible --><div id="ytplayerRain"></div></div> <!-- Nodo donde se crea el player -->
+      <input id="volumeMusic" class="volume-slider" type="range" min="0" max="100" value="100" aria-label="Volumen de música (0 a 100)" />
+
+      <button id="rainToggle" class="icon-btn" aria-label="Activar lluvia" title="Lluvia">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M19 18a4 4 0 0 0 0-8 5 5 0 0 0-9-2 4 4 0 0 0-2 7.5"></path>
+        </svg>
+      </button>
+
+      <input id="volumeRain" class="volume-slider" type="range" min="0" max="100" value="60" aria-label="Volumen de lluvia (0 a 100)" />
+
+      <button id="gifShuffle" class="icon-btn" aria-label="Cambiar GIF" title="Cambiar GIF">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M4 4h4l4 6-4 6H4l4-6-4-6zm10 0h6v2h-4v4h-2V4zm0 16v-6h2v4h4v2h-6z"/>
+        </svg>
+      </button>
+    </div>
   </div>
 
-  <!-- ===== Barra de control ===== -->
-  <div class="barra-musica" id="controlsBar" data-lighton>
-    <!-- Botón MÚSICA -->
-    <button id="musicToggle" class="icon-btn" aria-label="Reproducir música">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg> <!-- Icono Play por defecto -->
-    </button>
-    <!-- Volumen MÚSICA -->
-    <input id="volumeMusic" class="volume-slider" type="range" min="0" max="100" value="100" aria-label="Volumen de música (0 a 100)" />
 
-    <!-- NUEVO: Botón LLUVIA (nube / nube con lluvia) -->
-    <button id="rainToggle" class="icon-btn" aria-label="Activar lluvia" title="Lluvia">
-      <!-- Icono se sustituye dinámicamente -->
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M19 18a4 4 0 0 0 0-8 5 5 0 0 0-9-2 4 4 0 0 0-2 7.5"></path> <!-- Nube base -->
-      </svg>
-    </button>
-    <!-- Volumen LLUVIA -->
-    <input id="volumeRain" class="volume-slider" type="range" min="0" max="100" value="60" aria-label="Volumen de lluvia (0 a 100)" />
 
-    <!-- NUEVO: Botón Cambiar GIF (rotativo 1.gif, 2.gif, …) -->
-    <button id="gifShuffle" class="icon-btn" aria-label="Cambiar GIF" title="Cambiar GIF">
-      <!-- Icono “shuffle” -->
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M4 4h4l4 6-4 6H4l4-6-4-6zm10 0h6v2h-4v4h-2V4zm0 16v-6h2v4h4v2h-6z"/>
-      </svg>
-    </button>
-  </div>
 </div> <!-- /.page -->
 
 <!-- Tirita Sol/Luna -->
@@ -753,36 +767,6 @@
   
 
 
-  (function(){
-    const wrap  = document.querySelector('.title-wrap');
-    const title = document.getElementById('pageTitle');
-    if(!wrap || !title) return;
-
-    function fit() {
-      // reset para medir tamaño “natural”
-      title.style.transform = 'none';
-      // cuánto espacio hay vs. cuánto necesita
-      const avail = wrap.clientWidth;
-      const need  = title.scrollWidth;
-      // escala mínima para no volverlo ilegible (ajusta si hace falta)
-      const scale = Math.max(0.35, Math.min(1, avail / need));
-      title.style.transform = `scale(${scale})`;
-
-      // corrige la altura del contenedor para que el layout no se “pise”
-      const rect = title.getBoundingClientRect();
-      wrap.style.height = `${rect.height}px`;
-    }
-
-    // corre al cargar y cada vez que cambie el ancho
-    window.addEventListener('resize', fit, { passive:true });
-    const ro = new ResizeObserver(fit);
-    ro.observe(wrap);
-    // primer ajuste
-    setTimeout(fit, 0);
-  })();
-
-
-
 
 
   /* ===== Ajuste automático del título a una línea ===== */
@@ -808,5 +792,9 @@
     ro.observe(wrap);
     setTimeout(fit, 0); // primer ajuste
   })();
+
+
+
+
 
 </script>
