@@ -1,6 +1,6 @@
-# NoliaOffice
+# Nolia Office
 
-**NoliaOffice** es una página web creada por **Skalis07** como un espacio virtual para relajarse, estudiar o trabajar de forma tranquila.  
+**Nolia Office** es una página web creada por **Skalis07** como un espacio virtual para relajarse, estudiar o trabajar de forma tranquila.  
 Está inspirada en [NookOffice](https://vijiatjack.github.io/nookoffice/) y utiliza elementos visuales temáticos de *Animal Crossing* para crear un ambiente cálido y acogedor.  
 El código ha sido desarrollado desde cero, incorporando cambios estéticos pequeños y mejoras funcionales.  
 
