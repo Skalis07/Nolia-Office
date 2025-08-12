@@ -379,7 +379,7 @@
 
 <!-- ===== Script: API YouTube (Música + Lluvia) y lógica de UI ===== -->
 <script is:inline>
-  const DEFAULT_RAIN_VOL = 35; // el mismo 60% que usabas en el slider
+  const DEFAULT_RAIN_VOL = 70; // el mismo 60% que usabas en el slider
 
   /* =========================
      ICONOS SVG EN STRINGS
@@ -435,131 +435,153 @@
     });
   };
 
-  // Se llama cuando los players están listos (la 1ª vez conectamos eventos y estados)
-  function onPlayersReady() {
-    // Solo inicializamos una vez (cuando btnMusic aún no existe)
-    if (!btnMusic) {
-      // Cacheamos referencias a los controles (una sola vez)
-      btnMusic   = document.getElementById('musicToggle');  // Botón play/pause música
-      btnRain    = document.getElementById('rainToggle');   // Botón toggle lluvia
-      volMusic   = document.getElementById('volumeMusic');  // Slider volumen música
-      btnShuffle = document.getElementById('gifShuffle');   // Botón cambiar GIF
-      gifImg     = document.getElementById('mainGif');      // <img> del GIF principal
-
-      // Inicializa volúmenes con lo que diga el slider (0..100)
-      if (playerMusic?.setVolume) playerMusic.setVolume(Number(volMusic.value)); // Aplica volumen inicial música
-      if (playerRain?.setVolume)  playerRain.setVolume(DEFAULT_RAIN_VOL);   // Aplica volumen inicial lluvia
-
-      /* ===== Eventos de los botones ===== */  
-
-      // Música Play/Pause
-      btnMusic.addEventListener('click', () => { // Al hacer click en el botón de música
-        if (!isMusicPlaying) {                   // Si NO está reproduciendo...
-          playerMusic.playVideo();               // ...empieza a reproducir
-          btnMusic.innerHTML = ICON_PAUSE;       // Cambia icono a “pause”
-          btnMusic.setAttribute('aria-label','Pausar música'); // Accesibilidad: describe acción actual
-          isMusicPlaying = true;                 // Actualiza estado
-        } else {                                 // Si ya estaba reproduciendo...
-          playerMusic.pauseVideo();              // ...pausa
-          btnMusic.innerHTML = ICON_PLAY;        // Cambia icono a “play”
-          btnMusic.setAttribute('aria-label','Reproducir música'); // Accesibilidad
-          isMusicPlaying = false;                // Actualiza estado
-        }
-      });
-
-      // Volumen música
-      volMusic.addEventListener('input', () => {            // Cuando mueves el slider de música
-        playerMusic?.setVolume(Number(volMusic.value));     // Aplica el nuevo volumen
-      });
-
-      // Lluvia ON/OFF (no pausa global, es ambiente aparte)
-      btnRain.addEventListener('click', () => {             // Click en botón lluvia
-        if (!isRainPlaying) {                               // Si estaba apagada...
-          playerRain.playVideo();                           // ...empieza a reproducir lluvia
-          btnRain.classList.add('active');                  // Marca visualmente el botón
-          btnRain.innerHTML = ICON_CLOUD_RAIN;              // Nube lloviendo
-          btnRain.setAttribute('aria-label','Apagar lluvia'); // Accesibilidad
-          isRainPlaying = true;                             // Actualiza estado
-        } else {                                            // Si estaba encendida...
-          playerRain.pauseVideo();                          // ...pausa la lluvia
-          btnRain.classList.remove('active');               // Quita marca visual
-          btnRain.innerHTML = ICON_CLOUD;                   // Vuelve a nube simple
-          btnRain.setAttribute('aria-label','Activar lluvia'); // Accesibilidad
-          isRainPlaying = false;                            // Actualiza estado
-        }
-      });
 
 
 
-      // ===== NUEVO: Bloquear proporción del marco usando el PRIMER GIF =====
-      lockAspectFrom(gifImg); // Lee naturalWidth/Height y fija aspect-ratio del contenedor
+    function onPlayersReady() {
+    // 1) SIEMPRE aplica volúmenes cada vez que se ready-ea algún player
+    try {
+      const volEl = document.getElementById('volumeMusic');
+      const volValue = volEl ? Number(volEl.value) : 100;
+      if (playerMusic && typeof playerMusic.setVolume === 'function') {
+        playerMusic.setVolume(volValue);
+      }
+    } catch (e) {}
 
-      // ===== NUEVO: Cambiar GIF (rotativo detectando cuántos hay) =====
-      setupGifRotator(btnShuffle, gifImg); // Prepara la lógica que recorre /1.gif, /2.gif, ...
-    }
+    try {
+      if (playerRain && typeof playerRain.setVolume === 'function') {
+        playerRain.setVolume(DEFAULT_RAIN_VOL); // p.ej. 35
+      }
+    } catch (e) {}
+
+    // 2) Solo haz el "wiring" de controles UNA VEZ
+    if (typeof btnMusic !== 'undefined' && btnMusic) return;
+
+    // Cachea referencias y eventos una sola vez
+    btnMusic   = document.getElementById('musicToggle');
+    btnRain    = document.getElementById('rainToggle');
+    volMusic   = document.getElementById('volumeMusic');
+    btnShuffle = document.getElementById('gifShuffle');
+    gifImg     = document.getElementById('mainGif');
+
+    /* ===== Eventos ===== */
+    btnMusic.addEventListener('click', () => {
+      if (!isMusicPlaying) {
+        playerMusic.playVideo();
+        btnMusic.innerHTML = ICON_PAUSE;
+        btnMusic.setAttribute('aria-label','Pausar música');
+        isMusicPlaying = true;
+      } else {
+        playerMusic.pauseVideo();
+        btnMusic.innerHTML = ICON_PLAY;
+        btnMusic.setAttribute('aria-label','Reproducir música');
+        isMusicPlaying = false;
+      }
+    });
+
+    volMusic.addEventListener('input', () => {
+      if (playerMusic && typeof playerMusic.setVolume === 'function') {
+        playerMusic.setVolume(Number(volMusic.value));
+      }
+    });
+
+    btnRain.addEventListener('click', () => {
+      if (!isRainPlaying) {
+        playerRain.playVideo();
+        btnRain.classList.add('active');
+        btnRain.innerHTML = ICON_CLOUD_RAIN;
+        btnRain.setAttribute('aria-label','Apagar lluvia');
+        isRainPlaying = true;
+      } else {
+        playerRain.pauseVideo();
+        btnRain.classList.remove('active');
+        btnRain.innerHTML = ICON_CLOUD;
+        btnRain.setAttribute('aria-label','Activar lluvia');
+        isRainPlaying = false;
+      }
+    });
+
+    // Mantén tus llamadas:
+    lockAspectFrom(gifImg);
+    setupGifRotator(btnShuffle, gifImg);
   }
 
-  /* =========================
+
+    /* =========================
      MODO OSCURITO (tirita)
-     ========================= */
-  (function(){
-    const handle   = document.getElementById('rightHandle'); // Contenedor fijo de la tirita
-    const track    = document.getElementById('rightTrack');  // Riel clickeable
-    const thumb    = document.getElementById('modeThumb');   // Bolita sol/luna
-    const overlay  = document.getElementById('dimOverlay');  // Capa oscura
-    const page     = document.querySelector('.page');        // Para “encender” al clicar (desactivado)
-    const controls = document.getElementById('controlsBar'); // Barra de controles (no “enciende” ahora)
-    if (!handle || !track || !thumb || !overlay) return;     // Si falta algo, no seguimos
+    ========================= */
+    (function(){
+      const handle   = document.getElementById('rightHandle'); // Contenedor fijo de la tirita
+      const track    = document.getElementById('rightTrack');  // Riel clickeable
+      const thumb    = document.getElementById('modeThumb');   // Bolita sol/luna
+      const overlay  = document.getElementById('dimOverlay');  // Capa oscura
+      const page     = document.querySelector('.page');        // Para “encender” al clicar (desactivado)
+      const controls = document.getElementById('controlsBar'); // Barra de controles (no “enciende” ahora)
+      if (!handle || !track || !thumb || !overlay) return;     // Si falta algo, no seguimos
 
-    // Iconos Sol/Luna dentro de la bolita
-    const ICON_SUN = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.76 4.84l-1.8-1.79L3.17 4.84l1.79 1.79 1.8-1.79zM1 13h3v-2H1v2zm10 10h2v-3h-2v3zm9-10v-2h-3v2h3zm-2.93 7.07l1.79 1.79 1.79-1.79-1.79-1.79-1.79 1.79zM12 6a6 6 0 100 12 6 6 0 000-12zm7.24-1.16l-1.8-1.79-1.79 1.79 1.79 1.79 1.8-1.79zM4.84 17.24l-1.79 1.79 1.79 1.79 1.79-1.79-1.79-1.79z"/></svg>'; // Sol
-    const ICON_MOON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>'; // Luna
+      // Iconos Sol/Luna dentro de la bolita
+      const ICON_SUN = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.76 4.84l-1.8-1.79L3.17 4.84l1.79 1.79 1.8-1.79zM1 13h3v-2H1v2zm10 10h2v-3h-2v3zm9-10v-2h-3v2h3zm-2.93 7.07l1.79 1.79 1.79-1.79-1.79-1.79-1.79 1.79zM12 6a6 6 0 100 12 6 6 0 000-12zm7.24-1.16l-1.8-1.79-1.79 1.79 1.79 1.79 1.8-1.79zM4.84 17.24l-1.79 1.79 1.79 1.79 1.79-1.79-1.79-1.79z"/></svg>'; // Sol
+      const ICON_MOON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>'; // Luna
 
-    let oscuro = false; // false = Día/Sol, true = Noche/Luna
+      // ===== Sonido del interruptor =====
+      // Resuelve correctamente en local y en GitHub Pages (respeta subcarpetas)
+      const SWITCH_URL = new URL('light_switch.mp3', window.location.href).href;
 
-    function aplicarEstado() {                             // Aplica clases y aspecto según 'oscuro'
-      overlay.classList.toggle('activo', oscuro);          // Muestra/oculta oscurecido
-      handle.classList.toggle('activo', oscuro);           // Cambia look de la bolita
-      document.body.classList.toggle('oscuro', oscuro);    // NUEVO: estilo de barra en modo oscuro
-      thumb.setAttribute('aria-pressed', String(oscuro));  // Actualiza atributo accesible
-      thumb.innerHTML = oscuro ? ICON_MOON : ICON_SUN;     // Dibuja icono corrector
-    }
-    function estirarTirita() {                             // Efecto “estirarse” breve
-      track.classList.add('stretch');                      // Agrega clase de animación
-      setTimeout(()=>track.classList.remove('stretch'), 230); // La quita después de 230ms
-    }
-    function alternar() {                                  // Cambia de modo día/noche
-      oscuro = !oscuro;                                    // Alterna el booleano
-      aplicarEstado();                                     // Aplica los cambios visuales
-      estirarTirita();                                     // Ejecuta la animación
-    }
+      const switchSfx  = new Audio(SWITCH_URL);
+      switchSfx.preload = 'auto';
+      switchSfx.volume  = 0.7;       // ajusta a gusto (0.0 - 1.0)
+      switchSfx.playbackRate = 1.0;  // 1.0 normal
 
-    // Click sobre el riel (toda la tirita)
-    track.addEventListener('click', (e) => {
-      if (e.target === thumb) return; // Si el objetivo fue la bolita, no duplicar acción
-      alternar();                      // Cambia modo
-    });
-    // Click en la bolita
-    thumb.addEventListener('click', (e) => { e.stopPropagation(); alternar(); }); // Evita que burbujee al track
+      function playSwitch() {
+        try {
+          // Reinicia para que suene completo en toques seguidos
+          switchSfx.currentTime = 0;
+          // Llamamos play() dentro del gesto de usuario → no debería bloquearse
+          const p = switchSfx.play();
+          if (p && typeof p.catch === 'function') p.catch(() => {});
+        } catch (_) {}
+      }
 
-    // Clic fuera (overlay) → **DESACTIVADO**: en oscuro NO vuelve a día con clics
-    // overlay.addEventListener('click', () => { if (oscuro) { oscuro = false; aplicarEstado(); } });
+      let oscuro = false; // false = Día/Sol, true = Noche/Luna
 
-    // NUEVO: si clicas en el contenido/barra (data-lighton), antes encendía solo.
-    // REQUERIMIENTO: en oscuro NO debe volver a día por clic en contenido → desactivado.
-    document.addEventListener('click', (e) => {
-      /* CORREGIDO: antes había un "as HTMLElement" (TypeScript), eso rompe JS.
-         Además, anulamos el auto-encendido en modo oscuro por requerimiento. */
-      const target = e.target; // Elemento real clickeado
-      const wantsLight = target && typeof target.closest === 'function'
-        ? target.closest('[data-lighton]')  // Ancestro con el atributo (contenido clickeable)
-        : null;
-      // if (wantsLight && oscuro) { oscuro = false; aplicarEstado(); } // <-- DESACTIVADO
-    });
+      function aplicarEstado() {                             // Aplica clases y aspecto según 'oscuro'
+        overlay.classList.toggle('activo', oscuro);          // Muestra/oculta oscurecido
+        handle.classList.toggle('activo', oscuro);           // Cambia look de la bolita
+        document.body.classList.toggle('oscuro', oscuro);    // Estilo de barra en modo oscuro
+        thumb.setAttribute('aria-pressed', String(oscuro));  // Accesibilidad
+        thumb.innerHTML = oscuro ? ICON_MOON : ICON_SUN;     // Icono
+      }
+      function estirarTirita() {                             // Efecto “estirarse” breve
+        track.classList.add('stretch');
+        setTimeout(()=>track.classList.remove('stretch'), 230);
+      }
+      function alternar() {                                  // Cambia de modo día/noche
+        oscuro = !oscuro;
+        aplicarEstado();
+        estirarTirita();
+        playSwitch();                                        // <<< SONIDO AQUÍ
+      }
 
-    aplicarEstado(); // Estado inicial (día)
-    // Estado inicial icono de lluvia (nube sin lluvia) → ya está en el HTML por defecto
-  })();
+      // Click sobre el riel (toda la tirita)
+      track.addEventListener('click', (e) => {
+        if (e.target === thumb) return; // Si el objetivo fue la bolita, no duplicar acción
+        alternar();
+      });
+      // Click en la bolita
+      thumb.addEventListener('click', (e) => { e.stopPropagation(); alternar(); });
+
+      // Clics en contenido ya no “encienden” en oscuro (requerimiento)
+      document.addEventListener('click', (e) => {
+        const target = e.target;
+        const wantsLight = target && typeof target.closest === 'function'
+          ? target.closest('[data-lighton]')
+          : null;
+        // if (wantsLight && oscuro) { oscuro = false; aplicarEstado(); } // desactivado
+      });
+
+      aplicarEstado(); // Estado inicial (día)
+    })();
+
 
   /* =========================
      BLOQUEAR PROPORCIÓN SEGÚN EL PRIMER GIF
