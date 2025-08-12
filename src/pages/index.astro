@@ -524,13 +524,29 @@
       const ICON_MOON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>'; // Luna
 
       // ===== Sonido del interruptor =====
-      // Resuelve correctamente en local y en GitHub Pages (respeta subcarpetas)
-      const SWITCH_URL = new URL('light_switch.mp3', window.location.href).href;
+      // BASE robusto que funciona en local, user site y project pages
+      const BASE = (() => {
+        // 1) intenta deducir desde el favicon (Astro lo resuelve bien en Pages)
+        const icon = document.querySelector('link[rel="icon"]')?.href;
+        if (icon) return new URL('.', icon).href;
+
+        // 2) si no hay favicon, usa el src del GIF principal (ya resuelto con BASE_URL)
+        const gif = document.getElementById('mainGif')?.src;
+        if (gif) return new URL('.', gif).href;
+
+        // 3) heurística por si acaso: primer segmento del path en Project Pages
+        const parts = location.pathname.split('/').filter(Boolean);
+        return parts.length ? `/${parts[0]}/` : '/';
+      })();
+
+      // Opcional: agrega ?v=1 para evitar caché dura de Pages al cambiar el archivo
+      const SWITCH_URL = new URL('light_switch.mp3?v=1', BASE).href;
 
       const switchSfx  = new Audio(SWITCH_URL);
       switchSfx.preload = 'auto';
       switchSfx.volume  = 0.7;       // ajusta a gusto (0.0 - 1.0)
       switchSfx.playbackRate = 1.0;  // 1.0 normal
+
 
       function playSwitch() {
         try {
