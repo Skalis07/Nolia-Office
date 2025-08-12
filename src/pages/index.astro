@@ -223,6 +223,20 @@
     .volume-slider{ min-width:0; max-width:none; }
     .volume-slider::-webkit-slider-thumb{ width:12px; height:12px; }
     .volume-slider::-moz-range-thumb{ width:12px; height:12px; }
+
+        /* --- Alto tipo “vertical” en móviles --- */
+    .frame .img-redondeada{
+      height: 72vh;            /* ocupa ~72% de la altura de la pantalla */
+      max-height: 80vh;        /* límite por si pantallas muy altas */
+      width: 100%;
+    }
+
+    .frame .img-redondeada img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;       /* recorta lados, llena hacia abajo */
+      object-position: center; /* centrado */
+    }
   }
   @media (max-width:380px){
     .page{ padding:8px 8px 0; }
@@ -524,29 +538,13 @@
       const ICON_MOON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>'; // Luna
 
       // ===== Sonido del interruptor =====
-      // BASE robusto que funciona en local, user site y project pages
-      const BASE = (() => {
-        // 1) intenta deducir desde el favicon (Astro lo resuelve bien en Pages)
-        const icon = document.querySelector('link[rel="icon"]')?.href;
-        if (icon) return new URL('.', icon).href;
-
-        // 2) si no hay favicon, usa el src del GIF principal (ya resuelto con BASE_URL)
-        const gif = document.getElementById('mainGif')?.src;
-        if (gif) return new URL('.', gif).href;
-
-        // 3) heurística por si acaso: primer segmento del path en Project Pages
-        const parts = location.pathname.split('/').filter(Boolean);
-        return parts.length ? `/${parts[0]}/` : '/';
-      })();
-
-      // Opcional: agrega ?v=1 para evitar caché dura de Pages al cambiar el archivo
-      const SWITCH_URL = new URL('light_switch.mp3?v=1', BASE).href;
+      // Resuelve correctamente en local y en GitHub Pages (respeta subcarpetas)
+      const SWITCH_URL = new URL('light_switch.mp3', window.location.href).href;
 
       const switchSfx  = new Audio(SWITCH_URL);
       switchSfx.preload = 'auto';
       switchSfx.volume  = 0.7;       // ajusta a gusto (0.0 - 1.0)
       switchSfx.playbackRate = 1.0;  // 1.0 normal
-
 
       function playSwitch() {
         try {
@@ -607,25 +605,37 @@
        (para que rellenen aunque recorten un poquito si son muy verticales/horizontales)
      ========================= */
   function lockAspectFrom(imgEl) {
-    if (!imgEl) return; // Guard clause: si no hay imagen, nada que hacer
-    const container = imgEl.closest('.img-redondeada'); // Contenedor marco (borde redondeado)
-    if (!container) return; // Si no encontramos el contenedor, salimos
+    if (!imgEl) return;
+    const container = imgEl.closest('.img-redondeada');
+    if (!container) return;
 
     const apply = () => {
-      const w = imgEl.naturalWidth;   // Ancho real del GIF cargado (sin escalar)
-      const h = imgEl.naturalHeight;  // Alto real del GIF cargado (sin escalar)
-      if (!w || !h) return;           // Si aún no están, salimos y no rompemos nada
+      // En móviles: NO fijamos aspect-ratio, dejamos que el CSS (vh) mande
+      if (window.matchMedia('(max-width: 520px)').matches) {
+        container.style.aspectRatio = '';   // limpia por si quedó algo inline
+        // no seteamos height aquí; lo maneja el CSS con 72vh
+        imgEl.style.width  = '100%';
+        imgEl.style.height = '100%';
+        imgEl.style.objectFit = 'cover';
+        return;
+      }
 
-      container.style.aspectRatio = `${w} / ${h}`; // NUEVO: fija relación de aspecto del marco
-      imgEl.style.width  = '100%';                 // La imagen ocupa todo el ancho
-      imgEl.style.height = '100%';                 // …y todo el alto del marco
-      imgEl.style.objectFit = 'cover';             // *** CLAVE: rellena el contenedor ***
+      // En escritorio: mantenemos tu comportamiento original (aspect-ratio fijo)
+      const w = imgEl.naturalWidth;
+      const h = imgEl.naturalHeight;
+      if (!w || !h) return;
+
+      container.style.height = '';               // por si venías de móvil
+      container.style.aspectRatio = `${w} / ${h}`;
+      imgEl.style.width  = '100%';
+      imgEl.style.height = '100%';
+      imgEl.style.objectFit = 'cover';
     };
 
-    // Si ya está cargada, aplicamos altiro; si no, esperamos el evento load.
     if (imgEl.complete) apply();
-    else imgEl.addEventListener('load', apply, { once: true }); // Una sola vez cuando cargue
+    else imgEl.addEventListener('load', apply, { once: true });
   }
+
 
   /* =========================
      ROTADOR DE GIFs
