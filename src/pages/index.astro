@@ -107,8 +107,7 @@
 
 
   /* ===== iframes ocultos pero reproducibles (visually-hidden) ===== */
-  #yt-audio,
-  #yt-rain{
+  #yt-audio{
     position: absolute !important;
     left: 0 !important;
     top: 0 !important;
@@ -124,13 +123,13 @@
     clip: rect(0 0 0 0) !important;
     clip-path: inset(50%) !important;
   }
-  #yt-audio iframe,
-  #yt-rain iframe{
+  #yt-audio iframe{
     width: 1px !important;
     height: 1px !important;
     border: 0 !important;
     display: block !important;
   }
+
 
 
   /* ===== Barra música ===== */
@@ -328,7 +327,7 @@
       <div id="reloj" class="badge-fecha" aria-live="polite"></div>
 
       <div id="yt-audio" aria-hidden="true"><div id="ytplayerMusic"></div></div>
-      <div id="yt-rain"  aria-hidden="true"><div id="ytplayerRain"></div></div>
+      <audio id="rainAudio" src={`${import.meta.env.BASE_URL}rain.mp3`} preload="auto" loop></audio>
     </div>
 
     <!-- ===== Barra de control ===== -->
@@ -391,7 +390,7 @@
   })();
 </script>
 
-<!-- ===== Script: API YouTube (Música + Lluvia) y lógica de UI ===== -->
+<!-- ===== Script: Música (YouTube) + Lluvia (MP3) y lógica de UI ===== -->
 <script is:inline>
   const DEFAULT_RAIN_VOL = 60; // el mismo 60% que usabas en el slider
 
@@ -421,9 +420,10 @@
      YOUTUBE API (audio oculto)
      ========================= */
   let playerMusic;          // Reproductor de YouTube para la música
-  let playerRain;           // Reproductor de YouTube para la lluvia
-  let isMusicPlaying = false; // Estado de reproducción de la música
-  let isRainPlaying   = false; // Estado de reproducción de la lluvia
+  let isMusicPlaying = false;
+  let isRainPlaying   = false;
+  let rainAudio;           // <audio> nativo para lluvia
+
 
   // Referencias a controles
   let btnMusic, btnRain, volMusic, btnShuffle, gifImg; // Variables para guardar elementos del DOM
@@ -435,19 +435,14 @@
 
   // La API llamará esto al estar lista (callback global requerido por YouTube)
   window.onYouTubeIframeAPIReady = function () {
-    // Player de MÚSICA
-    playerMusic = new YT.Player('ytplayerMusic', { // Crea el reproductor dentro del div con ese id
-      videoId: '8kBlKM71pjc',                     // ID del video de música (cámbialo si quieres otra canción)
-      playerVars: { autoplay: 0, controls: 0, rel: 0, playsinline: 1 }, // Configuración: sin controles visibles
-      events: { onReady: onPlayersReady }         // Cuando esté listo, ejecuta onPlayersReady
-    });
-    // Player de LLUVIA
-    playerRain = new YT.Player('ytplayerRain', {  // Crea el reproductor de lluvia
-      videoId: 'q76bMs-NwRk',                     // ID del video de lluvia
-      playerVars: { autoplay: 0, controls: 0, rel: 0, playsinline: 1, loop: 1, playlist: 'q76bMs-NwRk' }, // Loop infinito
-      events: { onReady: onPlayersReady }         // Ejecuta onPlayersReady también cuando esté listo
+    // Player de MÚSICA (YouTube)
+    playerMusic = new YT.Player('ytplayerMusic', {
+      videoId: '8kBlKM71pjc',
+      playerVars: { autoplay: 0, controls: 0, rel: 0, playsinline: 1 },
+      events: { onReady: onPlayersReady }
     });
   };
+
 
 
 
@@ -462,11 +457,11 @@
       }
     } catch (e) {}
 
-    try {
-      if (playerRain && typeof playerRain.setVolume === 'function') {
-        playerRain.setVolume(DEFAULT_RAIN_VOL); // p.ej. 35
-      }
-    } catch (e) {}
+    // 🔹 NUEVO: volumen inicial del audio local de lluvia
+    rainAudio = document.getElementById('rainAudio');
+    if (rainAudio) {
+      rainAudio.volume = DEFAULT_RAIN_VOL / 100; // convertir 60 → 0.6
+    }
 
     // 2) Solo haz el "wiring" de controles UNA VEZ
     if (typeof btnMusic !== 'undefined' && btnMusic) return;
@@ -500,20 +495,24 @@
     });
 
     btnRain.addEventListener('click', () => {
+      if (!rainAudio) return;
       if (!isRainPlaying) {
-        playerRain.playVideo();
+        // En algunos móviles, la primera reproducción requiere gesto de usuario (este click)
+        rainAudio.currentTime = 0; // opcional: desde el inicio
+        rainAudio.play();
         btnRain.classList.add('active');
         btnRain.innerHTML = ICON_CLOUD_RAIN;
         btnRain.setAttribute('aria-label','Apagar lluvia');
         isRainPlaying = true;
       } else {
-        playerRain.pauseVideo();
+        rainAudio.pause();
         btnRain.classList.remove('active');
         btnRain.innerHTML = ICON_CLOUD;
         btnRain.setAttribute('aria-label','Activar lluvia');
         isRainPlaying = false;
       }
     });
+
 
     // Mantén tus llamadas:
     lockAspectFrom(gifImg);
