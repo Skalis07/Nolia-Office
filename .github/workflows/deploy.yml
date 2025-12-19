@@ -1,50 +1,77 @@
+# 🚀 Nombre del workflow — aparecerá en la pestaña “Actions” de GitHub
 name: Deploy Astro to GitHub Pages
 
+# 📦 Evento que dispara el workflow
 on:
+  # 1️⃣ Se ejecuta automáticamente cada vez que se hace push a la rama “main”
   push:
     branches: [ "main" ]
+  # 2️⃣ También se puede ejecutar manualmente desde GitHub (botón “Run workflow”)
   workflow_dispatch:
 
+# 🔒 Permisos mínimos que necesita para desplegar en GitHub Pages
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: read # Puede leer el contenido del repositorio
+  pages: write # Puede subir archivos al sistema de GitHub Pages
+  id-token: write # Permite autenticarse de forma segura con OIDC
 
+
+# ⚙️ Controla la concurrencia: si se hacen varios pushes seguidos, cancela los anteriores para no sobrecargar los despliegues.
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
+# 🧱 Definición de los trabajos (“jobs”) del pipeline
 jobs:
+
+  # --- JOB 1: Build ---
   build:
+    # 🔧 Sistema operativo donde se ejecutarán los comandos
     runs-on: ubuntu-latest
+
+    # 🧱 Pasos del job de build
     steps:
+      # Paso 1️⃣ — Descarga el código del repositorio
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Paso 2️⃣ — Configura Node.js (versión 20) y habilita cache automático para acelerar instalaciones
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
 
+      # Paso 3️⃣ — Instala dependencias según el package-lock.json
       - name: Install deps
         run: npm ci
 
+      # Paso 4️⃣ — Compila el sitio Astro → genera la carpeta /dist
       - name: Build
         run: npm run build   # 👉 Aquí Astro compila src/pages/*.astro → dist/
 
+      # Paso 5️⃣ — Empaqueta el resultado para pasarlo al siguiente job (deploy)
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist        # 👉 MUY IMPORTANTE: publicar SOLO la carpeta dist
 
+  # --- JOB 2: Deploy ---
   deploy:
+    # 🔗 Espera a que el job “build” termine correctamente
     needs: build
+
+    # Se ejecuta en el mismo sistema (Ubuntu)
     runs-on: ubuntu-latest
+
+    # 📍 Define el entorno de despliegue (aparece en la pestaña “Environments”)
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
+    # 🧱 Pasos del job de deploy
     steps:
+      # Paso único — Publica el artefacto anterior en GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
