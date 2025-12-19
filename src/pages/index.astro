@@ -1156,46 +1156,63 @@
   }
 
 
-  /* ===========================================================================
-     ROTADOR DE GIFs
-     - Usa una lista PREGENERADA (gifs.json) creada en build.
-     - NO prueba archivos ni genera 404.
-     - Rota en ciclo al hacer clic en el botón.
-     - Mantiene la proporción del contenedor (sin saltos de layout).
-     =========================================================================== */
-  async function setupGifRotator(btn, imgEl) {
+  /* ===================================================================
+    ROTADOR DE GIFs — V3 (PRO)
+    - El primer GIF carga instantáneo
+    - gifs.json se carga en background
+    - Todos los GIFs se precargan
+    - Cambio de GIF SIEMPRE instantáneo
+    =================================================================== */
+  function setupGifRotator(btn, imgEl) {
     if (!btn || !imgEl) return;
 
-    try {
-      // 1) Pedir la lista real de gifs (no adivinar)
-      const res = await fetch(asset("gifs.json"), { cache: "no-store" });
-      if (!res.ok) throw new Error("No se pudo cargar gifs.json");
+    let urls = [];
+    let actual = 0;
+    let ready = false;
 
-      const files = await res.json(); // ["1.gif","2.gif",...]
-      if (!Array.isArray(files) || files.length === 0) return;
+    // Deshabilita el botón hasta que todo esté listo
+    btn.disabled = true;
+    btn.style.opacity = "0.5";
 
-      // 2) Convertir a URLs correctas (respeta BASE)
-      const urls = files.map((f) => asset(f));
+    // Carga la lista en background (no bloquea render)
+    fetch(asset("gifs.json"), { cache: "no-store" })
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(files => {
+        if (!Array.isArray(files) || files.length === 0) return;
 
-      // 3) Cetectar cuál gif está puesto ahora
-      const currentSrc = new URL(imgEl.getAttribute("src"), location.href).href;
-      let actual = urls.indexOf(currentSrc);
-      if (actual < 0) actual = 0;
+        urls = files.map(f => asset(f));
 
-      // 4) click = siguiente gif
-      btn.addEventListener("click", () => {
-        actual = (actual + 1) % urls.length;
-        imgEl.src = urls[actual];
+        // Detectar GIF actual
+        const current = new URL(imgEl.getAttribute("src"), location.href).href;
+        const idx = urls.indexOf(current);
+        actual = idx >= 0 ? idx : 0;
 
-        imgEl.style.width = "100%";
-        imgEl.style.height = "100%";
-        imgEl.style.objectFit = "cover";
+        // 🔥 PRE-CARGA REAL
+        urls.forEach((url) => {
+          const img = new Image();
+          img.src = url;
+        });
+
+        ready = true;
+        btn.disabled = false;
+        btn.style.opacity = "1";
+      })
+      .catch(() => {
+        console.warn("GIF rotator: gifs.json no disponible");
       });
 
-    } catch (e) {
-      console.warn("GIF rotator disabled (optional feature):", e);
-    }
+    // Click → siguiente GIF (solo si está listo)
+    btn.addEventListener("click", () => {
+      if (!ready || urls.length === 0) return;
+
+      actual = (actual + 1) % urls.length;
+      imgEl.src = urls[actual];
+      imgEl.style.width = "100%";
+      imgEl.style.height = "100%";
+      imgEl.style.objectFit = "cover";
+    });
   }
+
 
 
   /* ===========================================================================
