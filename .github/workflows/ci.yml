@@ -20,6 +20,7 @@ permissions:
 jobs:
   # --- JOB ÚNICO: Lint + Build ---
   lint-and-build:
+    name: lint-and-build
     # 🔧 Sistema operativo donde se ejecutará el CI
     runs-on: ubuntu-latest
 
