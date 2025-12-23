@@ -42,4 +42,19 @@ export default defineConfig([
       globals: globals.node,
     },
   },
+
+  // =========================
+  // Configuración Node.js (Astro, ESLint, Vite, etc.)
+  // =========================
+  {
+    files: [
+      "astro.config.*",
+      "vite.config.*",
+      "eslint.config.*",
+    ],
+
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
 ]);
