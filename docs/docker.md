@@ -11,7 +11,7 @@ el sitio vive bajo el subpath `/Nolia-Office/`.
 
 ## Requisitos
 - Docker Desktop instalado y corriendo (Windows)
-- Puerto **4321** disponible en la máquina local
+- Puerto **8080** disponible en la máquina local
 
 ---
 
