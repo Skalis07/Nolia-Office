@@ -1,4 +1,4 @@
-# Contributing — Nolia Office #test
+# Contributing — Nolia Office
 
 Este es un proyecto personal, pero sigue un flujo de trabajo profesional para mantener calidad y evitar regresiones.
 
