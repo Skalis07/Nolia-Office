@@ -4,21 +4,20 @@ import { defineConfig } from "astro/config";
 /**
  * Detección automática de entorno:
  * - GitHub Pages  → subpath /Nolia-Office/
- * - Vercel Preview → raíz /
- * - Docker / local → raíz /
+ * - Vercel (Preview/Production) → raíz /
+ * - Docker / local → subpath /Nolia-Office/ (si estás replicando GH Pages)
+ *
+ * Nota: BASE_PATH permite override explícito.
  */
 
 // 1. Override explícito (máxima prioridad)
 const baseFromEnv = process.env.BASE_PATH;
 
-// 2. Detección de Vercel Preview
+// 2. Detección de Vercel (preview o production)
 const isVercel = process.env.VERCEL === "1";
-const isVercelPreview = isVercel && process.env.VERCEL_ENV === "preview";
 
 // 3. Base final
-const base =
-  baseFromEnv ??
-  (isVercelPreview ? "/" : "/Nolia-Office/");
+const base = baseFromEnv ?? (isVercel ? "/" : "/Nolia-Office/");
 
 export default defineConfig({
   site: "https://Skalis07.github.io/Nolia-Office",
