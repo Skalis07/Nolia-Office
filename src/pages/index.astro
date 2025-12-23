@@ -852,7 +852,9 @@
           autoplay: 0,   // No reproducir automáticamente
           controls: 0,   // Ocultar controles nativos
           rel: 0,        // No mostrar videos relacionados
-          playsinline: 1 // Reproducir inline en móviles
+          playsinline: 1, // Reproducir inline en móviles
+          enablejsapi: 1,     // Fuerza la JS API (extra seguro en iframes)
+          origin: location.origin // A veces requerido/útil dentro de iframes
         },
         events: {
           onReady: onPlayersReady // Se dispara cuando el player está listo
@@ -869,6 +871,9 @@
        - Inicializa helpers del GIF.
        =========================================================================== */
     function onPlayersReady() {
+
+      const IS_NOTION = document.documentElement.classList.contains('embed-notion');
+      if (IS_NOTION) console.log('[Notion] YouTube player ready');
 
       /* -------------------------------------------------------------------------
          1) APLICAR SIEMPRE EL VOLUMEN ACTUAL AL PLAYER DE YOUTUBE
@@ -926,18 +931,111 @@
          BOTÓN PLAY / PAUSE DE LA MÚSICA (YouTube)
          ------------------------------------------------------------------------- */
       btnMusic.addEventListener('click', () => {
-        if (!isMusicPlaying) {
-          playerMusic.playVideo();                          // Reproduce música
-          btnMusic.innerHTML = ICON_PAUSE;                  // Cambia icono
-          btnMusic.setAttribute('aria-label','Pausar música'); // Accesibilidad
-          isMusicPlaying = true;                            // Actualiza estado
-        } else {
-          playerMusic.pauseVideo();                         // Pausa música
-          btnMusic.innerHTML = ICON_PLAY;                   // Cambia icono
-          btnMusic.setAttribute('aria-label','Reproducir música');
-          isMusicPlaying = false;                           // Actualiza estado
+
+      // Detecta si la página está siendo embebida dentro de Notion
+      // (la clase embed-notion se agrega al cargar si estamos en iframe + Notion)
+      const IS_NOTION = document.documentElement.classList.contains('embed-notion');
+
+      /* -----------------------------------------------------------------------
+        DEBUG PREVIO (SOLO EN NOTION)
+        - No afecta a producción normal.
+        - Sirve para entender qué estado tiene el player ANTES del click.
+        ----------------------------------------------------------------------- */
+      if (IS_NOTION) {
+        try {
+          console.log('[Notion][YT] before click', {
+            ready: !!playerMusic,                         // ¿Existe el player?
+            state: playerMusic?.getPlayerState?.(),       // Estado interno de YouTube
+            muted: playerMusic?.isMuted?.(),              // ¿Está muteado?
+            volume: playerMusic?.getVolume?.(),            // Volumen actual (0–100)
+          });
+        } catch (_) {
+          // Silencioso a propósito: debug nunca debe romper la UI
         }
-      });
+      }
+
+      /* -----------------------------------------------------------------------
+        CASO 1: LA MÚSICA NO ESTÁ SONANDO → INTENTAR REPRODUCIR
+        ----------------------------------------------------------------------- */
+      if (!isMusicPlaying) {
+
+        /* ---------------------------------------------------------------------
+          WORKAROUND PARA IFRAmes (NOTION)
+          - Algunos iframes NO permiten play con audio directo.
+          - Estrategia:
+            1) Mutear primero
+            2) Llamar playVideo()
+            3) Desmutear luego de un pequeño delay
+          - Todo ocurre dentro de un gesto de usuario (click).
+          --------------------------------------------------------------------- */
+        try {
+          if (IS_NOTION && playerMusic?.mute) {
+            playerMusic.mute();          // 1) Fuerza mute antes del play
+          }
+
+          playerMusic.playVideo();       // 2) Intenta reproducir el video
+
+          if (IS_NOTION && playerMusic?.unMute) {
+            // 3) Desmutea después de un pequeño delay
+            setTimeout(() => playerMusic.unMute(), 150);
+          }
+        } catch (_) {
+          // Ignorado: si YouTube bloquea algo, no rompemos la UI
+        }
+
+        // Actualiza el icono del botón a "pause"
+        btnMusic.innerHTML = ICON_PAUSE;
+
+        // Actualiza accesibilidad
+        btnMusic.setAttribute('aria-label','Pausar música');
+
+        // Estado interno: música encendida
+        isMusicPlaying = true;
+
+      /* -----------------------------------------------------------------------
+        CASO 2: LA MÚSICA YA ESTÁ SONANDO → PAUSAR
+        ----------------------------------------------------------------------- */
+      } else {
+
+        try {
+          playerMusic.pauseVideo();      // Pausa el reproductor de YouTube
+        } catch (_) {
+          // Ignorado intencionalmente
+        }
+
+        // Vuelve el icono a "play"
+        btnMusic.innerHTML = ICON_PLAY;
+
+        // Actualiza accesibilidad
+        btnMusic.setAttribute('aria-label','Reproducir música');
+
+        // Estado interno: música apagada
+        isMusicPlaying = false;
+      }
+
+      /* -----------------------------------------------------------------------
+        DEBUG POSTERIOR (SOLO EN NOTION)
+        - Se ejecuta un poco después para ver el estado REAL tras el click.
+        - Ayuda a detectar:
+          - si el estado cambió
+          - si quedó muteado
+          - si el volumen es válido
+        ----------------------------------------------------------------------- */
+      if (IS_NOTION) {
+        setTimeout(() => {
+          try {
+            console.log('[Notion][YT] after click', {
+              state: playerMusic?.getPlayerState?.(), // Estado después del intento
+              muted: playerMusic?.isMuted?.(),        // ¿Sigue muteado?
+              volume: playerMusic?.getVolume?.(),     // Volumen final
+            });
+          } catch (_) {
+            // Debug defensivo
+          }
+        }, 250); // Delay pequeño para dejar que YouTube actualice estado
+      }
+
+    });
 
       /* -------------------------------------------------------------------------
          SLIDER DE VOLUMEN DE LA MÚSICA (YouTube)
