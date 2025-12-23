@@ -759,6 +759,8 @@
       BASE_URL (Astro) - helper ÚNICO para rutas (local + GitHub Pages)
       - Usa data-base={import.meta.env.BASE_URL} que ya pusiste en <div class="page">
       - asset("x.png") => URL absoluta correcta, incluso si el sitio vive en /Nolia-Office/
+      - FIX Notion/iframes: NO usar location.origin (en Notion sería notion.so)
+        y resolver relativo a la URL real del documento con document.baseURI.
       --------------------------------------------------------------------------- */
     const baseRaw = document.querySelector('.page')?.dataset.base || '/'; // BASE desde Astro (fallback "/")
     const BASE = baseRaw.endsWith('/') ? baseRaw : baseRaw + '/';         // Asegura slash final
