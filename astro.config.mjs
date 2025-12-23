@@ -1,25 +1,8 @@
 // @ts-check
-import { defineConfig } from "astro/config";
+import { defineConfig } from 'astro/config';
 
-/**
- * Detección automática de entorno:
- * - GitHub Pages  → subpath /Nolia-Office/
- * - Vercel (Preview/Production) → raíz /
- * - Docker / local → subpath /Nolia-Office/ (si estás replicando GH Pages)
- *
- * Nota: BASE_PATH permite override explícito.
- */
-
-// 1. Override explícito (máxima prioridad)
-const baseFromEnv = process.env.BASE_PATH;
-
-// 2. Detección de Vercel (preview o production)
-const isVercel = process.env.VERCEL === "1";
-
-// 3. Base final
-const base = baseFromEnv ?? (isVercel ? "/" : "/Nolia-Office/");
-
+// Configuración de Astro para despliegue en GitHub Pages
 export default defineConfig({
-  site: "https://Skalis07.github.io/Nolia-Office",
-  base,
+  site: 'https://Skalis07.github.io/Nolia-Office', // URL completa de la página
+  base: '/Nolia-Office/', // Nombre del repositorio como base
 });

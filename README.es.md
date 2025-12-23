@@ -1,7 +1,7 @@
 # 🌿 Nolia Office
 
 **Nolia Office** es una página web creada por **Skalis07** como un espacio virtual para relajarse, estudiar o trabajar de forma tranquila.
-Está inspirada en [NookOffice](https://github.com/VijiatJack/nookoffice) y utiliza elementos visuales temáticos de _Animal Crossing_ para crear un ambiente cálido y acogedor.
+Está inspirada en [NookOffice](https://github.com/VijiatJack/nookoffice) y utiliza elementos visuales temáticos de *Animal Crossing* para crear un ambiente cálido y acogedor.
 El código ha sido desarrollado desde cero, incorporando cambios estéticos y mejoras funcionales.
 
 ---
@@ -14,9 +14,9 @@ El código ha sido desarrollado desde cero, incorporando cambios estéticos y me
 
 ## 💡 Inspiración y Origen
 
-Este proyecto nació con dos objetivos principales:
+Este proyecto nació con dos objetivos principales:  
 
-1. Proporcionar un lugar digital para estudiar y relajarse a mi novia, pudiendo agregar o editar cosas que necesite y hecho por mí.
+1. Proporcionar un lugar digital para estudiar y relajarse a mi novia, pudiendo agregar o editar cosas que necesite y hecho por mí.  
 2. Realizar un ejercicio práctico de desarrollo web, ya que hasta ahora no había trabajado en un proyecto completo, así puedo aprovecharlo para aprender, practicar y demostrar habilidades.
 
 ---
@@ -25,7 +25,7 @@ Este proyecto nació con dos objetivos principales:
 
 - 🎵 **Música de fondo** reproducida desde YouTube.
 - 🌧️ **Sonidos ambientales** (lluvia).
-- 🖼️ **Imágenes y GIFs temáticos** de _Animal Crossing_.
+- 🖼️ **Imágenes y GIFs temáticos** de *Animal Crossing*.
 - 🎨 **Diseño adaptado** para un ambiente relajante y enfocado al estudio.
 - 🌓 **Modos visuales** (día/noche) con un interruptor interactivo.
 - 📱 **Diseño responsive**, apto para móviles y escritorio.
@@ -59,18 +59,18 @@ En el cliente, JavaScript se encarga de:
 
 ## 🎨 Créditos y Recursos
 
-- **Inspiración y concepto original:** [NookOffice](https://vijiatjack.github.io/nookoffice/)
-- **Inspiración visual:** _Animal Crossing_ (Nintendo)
-- **Desarrollador:** Skalis07
-- **Música:** De _Animal Crossing_, reproducida vía YouTube.
-- **Sonidos ambientales:** Efecto de lluvia de libre uso por **DRAGON-STUDIO** en [Pixabay](https://pixabay.com/sound-effects/copyright-free-rain-sounds-331497/).
-- **Icono del navegador:** Basado en recursos gratuitos de Figma inspirados en _Animal Crossing_, creados por [Ashley Gaunt-Seo](https://www.figma.com/community/file/882693668626621042/animal-crossing-icons).
+- **Inspiración y concepto original:** [NookOffice](https://vijiatjack.github.io/nookoffice/)  
+- **Inspiración visual:** *Animal Crossing* (Nintendo)  
+- **Desarrollador:** Skalis07  
+- **Música:** De *Animal Crossing*, reproducida vía YouTube.  
+- **Sonidos ambientales:** Efecto de lluvia de libre uso por **DRAGON-STUDIO** en [Pixabay](https://pixabay.com/sound-effects/copyright-free-rain-sounds-331497/).  
+- **Icono del navegador:** Basado en recursos gratuitos de Figma inspirados en *Animal Crossing*, creados por [Ashley Gaunt-Seo](https://www.figma.com/community/file/882693668626621042/animal-crossing-icons).  
 
 ---
 
 ## ⚖️ Aviso Legal
 
-Este es un proyecto personal inspirado en el concepto de NookOffice y no está afiliado, respaldado ni patrocinado por Nintendo o por la franquicia _Animal Crossing_.  
+Este es un proyecto personal inspirado en el concepto de NookOffice y no está afiliado, respaldado ni patrocinado por Nintendo o por la franquicia *Animal Crossing*.  
 Las marcas comerciales, logotipos, imágenes y música pertenecen a sus respectivos dueños.  
 El uso es únicamente con fines no comerciales.
 
