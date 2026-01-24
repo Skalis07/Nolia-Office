@@ -25,14 +25,45 @@
 
     *, *::before, *::after { box-sizing: border-box; } /* Evita que el padding/border agranden el tamaño real (está principalmente por estándar y buena práctica) */
 
+    :root{
+      --frame-max:1200px; /* Ancho base compartido por título y frame */
+      --page-pad:10px; /* Padding horizontal/vertical base de la página */
+      --color-bg:#2a5b3d; /* Fondo principal */
+      --color-text:#000; /* Texto principal */
+      --color-white:#fff; /* Blanco base */
+      --color-bar:#5aa7a6; /* Barra de música */
+      --color-bar-border:rgba(255,255,255,.75); /* Borde de barra */
+      --white-65:rgba(255,255,255,.65); /* Blancos con transparencia */
+      --white-18:rgba(255,255,255,.18);
+      --white-12:rgba(255,255,255,.12);
+      --radius-lg:20px; /* Radio grande */
+      --radius-pill:9999px; /* Radio tipo pastilla */
+      --border-thick:5px; /* Borde grueso */
+      --border-btn:3px; /* Borde de botones/bolita */
+      --shadow-card:0 4px 15px rgba(0,0,0,.3);
+      --shadow-bar:0 4px 12px rgba(0,0,0,.25);
+      --shadow-thumb:0 1px 2px rgba(0,0,0,.25);
+      --shadow-thumb-lg:0 3px 6px rgba(0,0,0,.25);
+      --shadow-handle:inset 0 2px 0 rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.15);
+      --shadow-handle-hover:inset 0 2px 0 rgba(0,0,0,.1), 0 3px 10px rgba(0,0,0,.2);
+      --slider-track-h:6px; /* Alto de la barra del volumen */
+      --slider-thumb:16px; /* Tamaño del circulito */
+      --bar-pad:10px 16px; /* Padding base de la barra */
+      --bar-pad-compact:8px 10px; /* Padding en pantallas chicas/Notion */
+      --bar-gap:10px; /* Separación base de íconos */
+      --bar-gap-compact:8px; /* Separación compacta */
+      --frame-gap:12px; /* Espacio entre GIF y barra */
+    }
+
     .title-wrap{ /* Selector CSS '.title-wrap': aplica a cualquier elemento con esa clase */
       width:100%; /* La caja ocupa todo el ancho disponible de su contenedor padre. */
-      max-width:1200px; /* Ancho máximo */
+      max-width:var(--frame-max); /* Ancho máximo */
+      margin-inline:auto; /* Centrado para que calce con el frame */
       overflow: visible; /* Permite que el contenido que sobresalga (por ejemplo, un título escalado con transform) siga siendo visible y no se recorte */
       padding-top: 4px; /* Colchón (espacio) superior */
       position: relative; /* Mantiene la posición normal del elemento, pero permite usar desplazamientos (top/left/etc.) */
       z-index: 10; /* Asegura que esta capa quede por encima de otros elementos con z-index menor. En tu página ayuda a que el título no quede tapado por overlays o fondos animados. */
-      transition: height 140ms ease-out; /* Hace que los cambios de altura sean suaves, por ejemplo cuando el título se escala o el contenedor ajusta su tamaño. */
+      transition: none; /* Evita animaciones raras: ajuste instantáneo */
       will-change: height; /* Indica al navegador que la altura probablemente cambiará pronto, optimizando el renderizado (mejora el rendimiento de animaciones). */
     }
     
@@ -42,7 +73,7 @@
       transform-origin: left top; /* Punto de origen de las transformaciones (scale, etc.) en la esquina superior izquierda del título. */
       line-height:1.15; /* Ajusta el espacio vertical entre líneas para que el título se vea más compacto y legible. */
       font-size: clamp(14px, 4vw, 28px); /* Tamaño de fuente fluido: mínimo 14px, máximo 28px, creciendo según el ancho de la ventana (4vw). */
-      transition: transform 140ms ease-out; /* Hace que los cambios en 'transform' (por ejemplo escalado) sean suaves y rápidos. */
+      transition: none; /* Evita animaciones raras: ajuste instantáneo */
       will-change: transform; /* Le avisa al navegador que 'transform' cambiará, optimizando el renderizado de la animación. */
     }
 
@@ -53,15 +84,14 @@
     }
     body{
       text-align:center; /* Centra el texto de forma horizontal por defecto dentro del body. */
-      background:#2a5b3d; /* Color de fondo base de la página (verde oscuro). */
+      background:var(--color-bg); /* Color de fondo base de la página (verde oscuro). */
     }
 
     .page{
-      background-image: var(--bg-url); /* Usa la variable CSS --bg-url como imagen de fondo (definida en otro lugar). */
-      background-repeat:repeat; /* Repite la imagen de fondo en mosaico para cubrir toda el área. */
-      background-position:0 0; /* Posiciona la imagen de fondo en la esquina superior izquierda. */
-      background-size:auto; /* Mantiene el tamaño original de la imagen de fondo. */
-      background-attachment:scroll; /* El fondo se desplaza junto con el contenido al hacer scroll. */
+      background-image:var(--bg-url); /* Patrón directo en la página */
+      background-repeat:repeat; /* Repite el mosaico */
+      background-position:0 0; /* Ancla el patrón en la esquina superior izquierda */
+      background-size:auto; /* Mantiene el tamaño original del tile */
 
       min-height:100vh; /* La sección .page siempre mide al menos el alto completo de la ventana (viewport). */
 
@@ -70,24 +100,24 @@
       align-items:center; /* Centra horizontalmente los elementos hijos dentro del contenedor. */
 
       gap:16px; /* Espacio de 16px entre los elementos hijos (separación vertical en este caso). */
-      padding:10px 10px 0; /* Relleno: 10px arriba y a los lados, 0 abajo. */
+      padding:var(--page-pad) var(--page-pad) 0; /* Relleno: 10px arriba y a los lados, 0 abajo. */
       position:relative; /* Mantiene la posición normal, pero permite posicionar hijos de forma absoluta dentro de .page. */
     }
 
     /* ===== Título principal ===== */
     h1{
       margin:0; /* Elimina el margen superior e inferior que los <h1> traen por defecto. */
-      color:#000; /* Color del texto: negro. */
+      color:var(--color-text); /* Color del texto: negro. */
       font-family:Arial, sans-serif; /* Usa Arial, o si no existe, otra fuente sans-serif. */
     }
 
     /* ===== Marco del GIF (Contenedor) ===== */
     .img-redondeada{ /* Contenedor del GIF (o imagen) con bordes redondeados y estilo de tarjeta. */
-      max-width:1200px; /* Limita el ancho máximo para que no se haga demasiado grande en pantallas grandes. */
+      max-width:var(--frame-max); /* Limita el ancho máximo para que no se haga demasiado grande en pantallas grandes. */
       width:100%; /* Ocupa el 100% del espacio disponible hasta el máximo. */
-      border-radius:20px; /* Esquinas redondeadas del marco. */
-      border:5px solid #fff; /* Borde blanco grueso alrededor del GIF. */
-      box-shadow:0 4px 15px rgba(0,0,0,.3); /* Sombra para dar sensación de elevación/3D. */
+      border-radius:var(--radius-lg); /* Esquinas redondeadas del marco. */
+      border:var(--border-thick) solid var(--color-white); /* Borde blanco grueso alrededor del GIF. */
+      box-shadow:var(--shadow-card); /* Sombra para dar sensación de elevación/3D. */
       overflow:hidden; /* Recorta lo que sobresalga de los bordes redondeados. */
       position:relative; /* Necesario para que elementos hijos (como la fecha) se posicionen de forma absoluta dentro. */
     }
@@ -107,7 +137,7 @@
       position: absolute; /* Se posiciona libremente dentro del contenedor (.img-redondeada). */
       left: 0; bottom: 0; /* Ubicación exacta: esquina inferior izquierda. */
       background: none; /* Sin fondo sólido (puede superponerse directamente sobre el GIF). */
-      color: #fff; /* Texto blanco para contrastar con el GIF. */
+      color: var(--color-white); /* Texto blanco para contrastar con el GIF. */
 
       font-family: "Arial Rounded MT Bold", "Arial Rounded MT", Arial, sans-serif; /* Fuente más amigable y redondeada. */
       font-weight: 900; /* Peso muy grueso: texto fuerte y destacado. */
@@ -150,17 +180,16 @@
 
     /* ===== Barra música ===== */
     .barra-musica{
-      --turquesa:#5aa7a6; --borde-claro:rgba(255,255,255,.75); /* Variables internas del componente */
+      --turquesa:var(--color-bar); --borde-claro:var(--color-bar-border); /* Variables internas del componente */
       width:100%; margin-inline:auto; /* Centrado y responsivo */
       background:var(--turquesa); /* Color del fondo */
       border:4px solid var(--borde-claro); /* Contorno claro */
-      border-radius:9999px; /* Bordes súper redondeados (pastilla) */
-      padding:10px 16px; /* Separación interna para que no quede apretado. */
+      border-radius:var(--radius-pill); /* Bordes súper redondeados (pastilla) */
+      padding:var(--bar-pad); /* Separación interna para que no quede apretado. */
       display:flex; align-items:center; justify-content:center; /* Alineación */
       flex-wrap:nowrap; /* Los botones no saltan de línea */
-      box-sizing:border-box; /* Seguridad de layout */
-      gap:10px; /* Separación entre items */
-      box-shadow:0 4px 12px rgba(0,0,0,.25); /* Sombra elegante */
+      gap:var(--bar-gap); /* Separación entre items */
+      box-shadow:var(--shadow-bar); /* Sombra elegante */
       position:relative; z-index:20; /* Se mantiene sobre otros elementos */
       transition:opacity .2s, filter .2s; /* Animación suave al cambiar de modo oscuro o cuando algo afecte opacity. */
     }
@@ -173,16 +202,16 @@
     .icon-btn{
       width:44px; height:44px; flex:0 0 44px; /* Botón cuadrado, tamaño fijo */
       border-radius:50%; /* Botón redondo */
-      border:3px solid #fff; background:transparent; color:#fff; /* Estilo visual del borde + color del icono. */
+      border:var(--border-btn) solid var(--color-white); background:transparent; color:var(--color-white); /* Estilo visual del borde + color del icono. */
       display:grid; place-items:center; /* Centrado perfecto del SVG */
       cursor:pointer; /* Manito mouse */
       transition:background-color .2s, transform .05s, opacity .2s; /* Animación suave del hover, active y cualquier cambio de opacidad. */
     }
 
-    .icon-btn:hover{ background-color:rgba(255,255,255,.12); } /* Hover: cuando el mouse pasa encima del botón, se ilumina levemente */
+    .icon-btn:hover{ background-color:var(--white-12); } /* Hover: cuando el mouse pasa encima del botón, se ilumina levemente */
     .icon-btn:active{ transform:scale(.98); } /* Active (pseudo): mientras se hace clic o se mantiene presionado, el botón se “hunde” */
     .icon-btn svg{ width:20px; height:20px; display:block; } /* Tamaño del ícono SVG y display:block evita espacios indeseados */
-    .icon-btn.active{ background-color:rgba(255,255,255,.18); } /* Clase .active: estado «encendido» cuando lo activa el JS */
+    .icon-btn.active{ background-color:var(--white-18); } /* Clase .active: estado «encendido» cuando lo activa el JS */
 
     /* ===== Slider volumen (MÚSICA) ===== */
     .volume-slider{
@@ -190,8 +219,8 @@
       flex:1 1 160px; /* Se estira, puede reducirse, base 160px: funciona bien en flexbox */
       min-width:0; /* CLAVE para que no rompa el layout dentro de flex */
       max-width:320px; /* En pantallas grandes crece hasta 320px */
-      width:auto; height:6px; border-radius:999px; /* Barra larga, muy redondeada */
-      background:rgba(255,255,255,.65); /* Color de la barra */
+      height:var(--slider-track-h); border-radius:var(--radius-pill); /* Barra larga, muy redondeada */
+      background:var(--white-65); /* Color de la barra */
       outline:none; /* Elimina contorno feo al enfocarse */
       cursor:pointer; /* Manito para indicar que es interactivo */
     }
@@ -199,20 +228,20 @@
     /* Thumb (punto que se arrastra) */
     .volume-slider::-webkit-slider-thumb{
       -webkit-appearance:none; appearance:none; /* Elimina estilo por defecto */
-      width:16px; height:16px; border-radius:50%; background:#fff; /* Circulito blanco */
+      width:var(--slider-thumb); height:var(--slider-thumb); border-radius:50%; background:var(--color-white); /* Circulito blanco */
       border:2px solid var(--turquesa); /* Borde del color del tema */
-      box-shadow:0 1px 2px rgba(0,0,0,.25); /* Sombra ligera */
+      box-shadow:var(--shadow-thumb); /* Sombra ligera */
     }
 
     /* Thumb — Firefox */
     .volume-slider::-moz-range-thumb{
-      width:16px; height:16px; border-radius:50%; background:#fff;
-      border:2px solid var(--turquesa); box-shadow:0 1px 2px rgba(0,0,0,.25);
+      width:var(--slider-thumb); height:var(--slider-thumb); border-radius:50%; background:var(--color-white);
+      border:2px solid var(--turquesa); box-shadow:var(--shadow-thumb);
     }
     
     /* Track — Firefox */
     .volume-slider::-moz-range-track{
-      height:6px; border-radius:999px; background:rgba(255,255,255,.65);
+      height:var(--slider-track-h); border-radius:var(--radius-pill); background:var(--white-65);
     }
 
     /* ======= Tirita sol/luna ======= */
@@ -241,7 +270,7 @@
       background:#fff9e8; /* Color crema */
       border-radius:0; 
       margin-bottom:calc(var(--thumb)*.5); /* Espacio para que el botón no se corte */
-      box-shadow:inset 0 2px 0 rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.15); /* Sombras dobles */
+      box-shadow:var(--shadow-handle); /* Sombras dobles */
       pointer-events:auto; /* Esta parte sí recibe clics */
       transform-origin:top center; /* Punto de origen para la animación stretch */
       cursor:pointer; 
@@ -251,7 +280,7 @@
     /* Hover en la barra */
     .right-handle .track:hover{ 
       background:#fff4d1; /* Más clarito */
-      box-shadow:inset 0 2px 0 rgba(0,0,0,.1), 0 3px 10px rgba(0,0,0,.2); 
+      box-shadow:var(--shadow-handle-hover); 
     }
 
     /* Cuando se activa la animación stretch */
@@ -265,13 +294,13 @@
       left:50%; transform:translateX(-50%); /* Centrado horizontal */
       width:var(--thumb); height:var(--thumb); /* Tamaño según variable */
       border-radius:50%; /* Perfectamente redondo */
-      border:3px solid #fff; 
+      border:var(--border-btn) solid var(--color-white); 
       display:grid; place-items:center; /* Centra el ícono SVG */
       bottom:calc(-1 * var(--thumb) * .5); /* Sale “medio afuera” de la tirita */
       transition:background 160ms, color 160ms, box-shadow 160ms, transform 80ms; /* Animaciones */
       cursor:pointer; 
       color:#6b4a00; background:#ffc400; /* Color de “sol” */
-      box-shadow:0 3px 6px rgba(0,0,0,.25);
+      box-shadow:var(--shadow-thumb-lg);
       pointer-events:auto; /* Sí recibe clics */
     }
     
@@ -288,7 +317,7 @@
     /* Estado “modo oscuro” (cuando la clase .activo está activada) */
     .right-handle.activo .thumb{ 
       background:#2e2e2e; /* Fondo oscuro */
-      color:#fff; /* Ícono blanco */
+      color:var(--color-white); /* Ícono blanco */
     }
 
     /* ===== Oscurecido ===== */
@@ -312,13 +341,13 @@
     /* ===== Frame: mismo ancho para GIF y barra ===== */
     .frame{ 
       width:100%; 
-      max-width:1200px; /* Límite de ancho */
+      max-width:var(--frame-max); /* Límite de ancho */
       margin-inline:auto; /* Centrado */
     }
 
     /* ===== Fullscreen (F11 / Fullscreen API) ===== */
-    html.browser-fullscreen .frame{
-      max-width:min(1400px, 92vw); /* Expansión suave solo en fullscreen */
+    html.browser-fullscreen{
+      --frame-max:min(1400px, 92vw); /* Expansión suave solo en fullscreen */
     }
 
     /* Asegura que GIF y barra tengan el mismo ancho */
@@ -326,25 +355,24 @@
     .frame .barra-musica{ 
       width:100%; 
       max-width:none; 
-      box-sizing:border-box; 
     }
 
     /* --- separación entre GIF y barra (página y Notion) --- */
     .frame .barra-musica{
-      margin-top: 12px; /* espacio extra debajo del GIF */
+      margin-top: var(--frame-gap); /* espacio extra debajo del GIF */
     }
 
     /* En embeds de Notion — a veces hay CSS que pisa el tuyo */
     html.embed-notion .barra-musica{
-      margin-top: 12px !important; /* Se fuerza para evitar bugs */
+      margin-top: var(--frame-gap) !important; /* Se fuerza para evitar bugs */
     }
 
     /* ===== Ajustes móviles generales ===== */
     @media (max-width:520px){
 
       .barra-musica{ 
-        padding:8px 10px; /* Menos padding para pantallas pequeñas */
-        gap:8px; /* Menor separación entre íconos */
+        padding:var(--bar-pad-compact); /* Menos padding para pantallas pequeñas */
+        gap:var(--bar-gap-compact); /* Menor separación entre íconos */
       }
 
       .icon-btn{ 
@@ -427,19 +455,18 @@
     }
 
     /* Quita bordes y sombras que se ven mal en el embed */
-    html.embed-notion .img-redondeada{ 
-      border:0!important; 
-      box-shadow:none!important; 
-      border-radius:20px!important; 
-    }
-
+    html.embed-notion .img-redondeada,
     html.embed-notion .barra-musica{ 
-      box-shadow:none!important; 
       border:0!important; 
     }
 
-    /* Extra: evita sombras en botones dentro de Notion */
+    html.embed-notion .img-redondeada{ 
+      border-radius:var(--radius-lg)!important; 
+    }
+
+    /* Extra: evita sombras en Notion */
     html.embed-notion .img-redondeada, 
+    html.embed-notion .barra-musica, 
     html.embed-notion .icon-btn{ 
       box-shadow:none!important; 
     }
@@ -447,8 +474,8 @@
     /* La barra NO se debe cortar: permite que pase a 2 filas */
     html.embed-notion .barra-musica{
       flex-wrap:wrap!important; /* Permite salto a otra línea */
-      padding:8px 10px!important; /* Más compacto */
-      gap:8px!important; /* Menos separación */
+      padding:var(--bar-pad-compact)!important; /* Más compacto */
+      gap:var(--bar-gap-compact)!important; /* Menos separación */
       min-width:0!important; /* Previene cortes raros con flex */
     }
 
@@ -563,7 +590,7 @@
          - Si active === false => se elimina la clase
          
          Esta clase activa tu CSS:
-         html.browser-fullscreen .frame { max-width: ... } */
+         html.browser-fullscreen { --frame-max: ... } */
       root.classList.toggle('browser-fullscreen', active);
     }
 
@@ -998,6 +1025,29 @@
       // Guardia: evita crash si algún elemento falta (IDs cambiados, embed, etc.)
       if (!btnMusic || !btnRain || !volMusic || !btnShuffle || !gifImg) return;
 
+      /* -------------------------------------------------------------------------
+         HELPERS DE ESTADO (UI)
+         - Centraliza cambios de icono/aria/estado sin tocar la lógica.
+         ------------------------------------------------------------------------- */
+      function setMusicState(playing) {
+        btnMusic.innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
+        btnMusic.setAttribute('aria-label', playing ? 'Pausar música' : 'Reproducir música');
+        isMusicPlaying = playing;
+      }
+
+      function setRainState(playing) {
+        if (playing) {
+          btnRain.classList.add('active');
+          btnRain.innerHTML = ICON_CLOUD_RAIN;
+          btnRain.setAttribute('aria-label','Apagar lluvia');
+        } else {
+          btnRain.classList.remove('active');
+          btnRain.innerHTML = ICON_CLOUD;
+          btnRain.setAttribute('aria-label','Activar lluvia');
+        }
+        isRainPlaying = playing;
+      }
+
 
       /* ===========================================================================
          EVENTOS DE INTERFAZ
@@ -1009,14 +1059,10 @@
       btnMusic.addEventListener('click', () => {
         if (!isMusicPlaying) {
           playerMusic.playVideo();                          // Reproduce música
-          btnMusic.innerHTML = ICON_PAUSE;                  // Cambia icono
-          btnMusic.setAttribute('aria-label','Pausar música'); // Accesibilidad
-          isMusicPlaying = true;                            // Actualiza estado
+          setMusicState(true);                              // Actualiza estado/UI
         } else {
           playerMusic.pauseVideo();                         // Pausa música
-          btnMusic.innerHTML = ICON_PLAY;                   // Cambia icono
-          btnMusic.setAttribute('aria-label','Reproducir música');
-          isMusicPlaying = false;                           // Actualiza estado
+          setMusicState(false);
         }
       });
 
@@ -1042,16 +1088,10 @@
           // En móviles, el primer play requiere gesto del usuario (este click)
           rainAudio.currentTime = 0;            // (Opcional) reinicia audio
           rainAudio.play();                     // Reproduce lluvia
-          btnRain.classList.add('active');      // Estado visual activo
-          btnRain.innerHTML = ICON_CLOUD_RAIN;  // Icono nube con lluvia
-          btnRain.setAttribute('aria-label','Apagar lluvia');
-          isRainPlaying = true;                 // Actualiza estado
+          setRainState(true);                   // Actualiza estado/UI
         } else {
           rainAudio.pause();                    // Pausa lluvia
-          btnRain.classList.remove('active');   // Quita estado visual
-          btnRain.innerHTML = ICON_CLOUD;       // Icono nube simple
-          btnRain.setAttribute('aria-label','Activar lluvia');
-          isRainPlaying = false;                // Actualiza estado
+          setRainState(false);
         }
       });
 
@@ -1209,9 +1249,7 @@
          ----------------------------------------------------------------------- */
       if (window.matchMedia('(max-width: 520px)').matches) {
         container.style.aspectRatio = '';    // Limpia ratio inline si existía
-        imgEl.style.width  = '100%';         // Imagen ocupa todo el ancho
-        imgEl.style.height = '100%';          // Imagen ocupa toda la altura
-        imgEl.style.objectFit = 'cover';      // Rellena recortando
+        setCover(imgEl);                      // Imagen cubre el contenedor
         return;
       }
 
@@ -1224,9 +1262,7 @@
 
       container.style.height = '';            // Limpia height previo
       container.style.aspectRatio = `${w} / ${h}`; // Fija proporción
-      imgEl.style.width  = '100%';            // Ajuste completo
-      imgEl.style.height = '100%';
-      imgEl.style.objectFit = 'cover';
+      setCover(imgEl);
     };
 
     // Si la imagen ya cargó, aplica de inmediato
@@ -1238,6 +1274,14 @@
     }
   }
 
+
+  // Aplica el modo "cover" al <img> de forma consistente
+  function setCover(imgEl) {
+    if (!imgEl) return;
+    imgEl.style.width = "100%";
+    imgEl.style.height = "100%";
+    imgEl.style.objectFit = "cover";
+  }
 
   /* ===================================================================
     ROTADOR DE GIFs — V3 (PRO)
@@ -1290,9 +1334,7 @@
 
       actual = (actual + 1) % urls.length;
       imgEl.src = urls[actual];
-      imgEl.style.width = "100%";
-      imgEl.style.height = "100%";
-      imgEl.style.objectFit = "cover";
+      setCover(imgEl);
     });
   }
 
@@ -1316,6 +1358,7 @@
       /* -----------------------------------------------------------------------
          REFERENCIAS AL DOM
          ----------------------------------------------------------------------- */
+      const root  = document.documentElement;             // <html> (clases globales)
       const wrap  = document.querySelector('.title-wrap'); // Contenedor del título
       const title = document.getElementById('pageTitle');  // <h1> principal
       if (!wrap || !title) return;                         // Seguridad
@@ -1324,11 +1367,12 @@
          VARIABLES DE CONTROL Y CACHÉ
          ----------------------------------------------------------------------- */
       let rafId = 0;            // ID del requestAnimationFrame activo
-      let debounceTimer = 0;    // Timer para suavizar recalculados
 
       let lastAvail  = NaN;     // Último ancho disponible medido
       let lastScale  = NaN;     // Última escala aplicada
+      let lastSpacing = NaN;    // Última separación entre letras aplicada
       let lastHeight = NaN;     // Última altura aplicada al contenedor
+      let lastFull   = null;    // Último estado fullscreen (browser-fullscreen)
 
       /* -----------------------------------------------------------------------
          CÁLCULO Y APLICACIÓN DEL ESCALADO
@@ -1337,20 +1381,56 @@
         rafId = 0;                                  // Libera el RAF actual
 
         const avail = wrap.clientWidth || 0;        // Ancho disponible
-        const need  = title.scrollWidth || 1;       // Ancho real del texto
+        const isFull = root.classList.contains('browser-fullscreen');
 
-        // Evita recalcular si el ancho no cambió de forma significativa
-        if (isFinite(lastAvail) && Math.abs(avail - lastAvail) < 1) return;
+        // Evita recalcular si el ancho no cambió y el modo no cambió
+        const modeUnchanged = lastFull !== null && isFull === lastFull;
+        if (modeUnchanged && isFinite(lastAvail) && Math.abs(avail - lastAvail) < 1) return;
         lastAvail = avail;
+        lastFull = isFull;
 
-        // Calcula escala necesaria (limitada entre 0.25 y 1)
-        const targetScale = Math.max(0.25, Math.min(1, avail / need));
-        if (!isFinite(targetScale)) return;
+        // Medida base sin letter-spacing para calcular expansión sin distorsión
+        const prevLetter = title.style.letterSpacing;
+        title.style.letterSpacing = '0px';
+        const base = title.scrollWidth || 1;        // Ancho real del texto (sin spacing)
+        title.style.letterSpacing = prevLetter;
+        if (!isFinite(base)) return;
+
+        const textLen = (title.textContent || '').length;
+        const gaps = Math.max(1, textLen - 1);
+
+        let spacing = 0;
+        let scale = 1;
+        let origin = 'left top';
+
+        if (avail >= base) {
+          // En fullscreen, abrimos con letter-spacing y luego ajustamos con un scale leve
+          if (isFull) {
+            const neededSpacing = (avail - base) / gaps;
+            const spacingWeight = 0.45; // reparte expansión entre spacing y scale
+            const maxSpacing = 3.5; // px: evita separación excesiva
+            spacing = Math.min(maxSpacing, Math.max(0, neededSpacing * spacingWeight));
+
+            const expanded = base + spacing * gaps;
+            if (expanded > 0 && expanded < avail) {
+              const maxExpandScale = 1.18; // expansión leve, sin deformar demasiado
+              scale = Math.min(maxExpandScale, avail / expanded);
+              if (scale > 1) origin = 'center top';
+            }
+          }
+        } else {
+          // Si no cabe, reducimos con scaleX (no hay alternativa sin romper línea)
+          spacing = 0;
+          scale = Math.max(0.25, avail / base);
+        }
 
         // Solo aplica si el cambio es perceptible
-        if (!isFinite(lastScale) || Math.abs(targetScale - lastScale) > 0.005) {
-          title.style.transform = `scaleX(${targetScale})`; // Escala horizontal
-          lastScale = targetScale;
+        if (!isFinite(lastScale) || Math.abs(scale - lastScale) > 0.005 || Math.abs(spacing - lastSpacing) > 0.25) {
+          title.style.letterSpacing = spacing ? `${spacing}px` : '0px';
+          title.style.transformOrigin = origin;
+          title.style.transform = `scaleX(${scale})`;
+          lastScale = scale;
+          lastSpacing = spacing;
 
           // Ajusta la altura del wrapper según el título escalado
           const h = title.getBoundingClientRect().height;
@@ -1365,12 +1445,8 @@
          PLANIFICACIÓN SUAVIZADA DEL RECÁLCULO
          ----------------------------------------------------------------------- */
       function schedule() {
-        if (debounceTimer) clearTimeout(debounceTimer);
-
-        debounceTimer = setTimeout(() => {
-          if (rafId) return;                      // Evita múltiples RAF simultáneos
-          rafId = requestAnimationFrame(computeAndApply);
-        }, 40);                                  // Delay suave (debounce)
+        if (rafId) return;                       // Evita múltiples RAF simultáneos
+        rafId = requestAnimationFrame(computeAndApply);
       }
 
       /* -----------------------------------------------------------------------
@@ -1382,6 +1458,13 @@
       }
 
       window.addEventListener('resize', schedule, { passive: true }); // Fallback
+      document.addEventListener('fullscreenchange', schedule);        // API fullscreen
+
+      // Si cambia la clase en <html>, recalcula (ej: F11 detectado por script)
+      if (typeof MutationObserver !== 'undefined') {
+        const mo = new MutationObserver(() => schedule());
+        mo.observe(root, { attributes: true, attributeFilter: ['class'] });
+      }
 
       // Primera ejecución inicial
       schedule();
@@ -1391,3 +1474,10 @@
     }
   })();
 </script>
+
+
+<script>
+const   foo = 1
+</script>
+
+
