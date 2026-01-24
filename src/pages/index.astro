@@ -316,6 +316,11 @@
       margin-inline:auto; /* Centrado */
     }
 
+    /* ===== Fullscreen (F11 / Fullscreen API) ===== */
+    html.browser-fullscreen .frame{
+      max-width:min(1400px, 92vw); /* Expansión suave solo en fullscreen */
+    }
+
     /* Asegura que GIF y barra tengan el mismo ancho */
     .frame .img-redondeada, 
     .frame .barra-musica{ 
@@ -500,6 +505,83 @@
           para activar todos los estilos especiales CSS que creaste. */
       })();
   </script>
+
+  
+<!-- ===== Script: Detecta fullscreen del navegador (F11) ===== -->
+<script is:inline>
+  (function(){
+    /* IIFE (Immediately Invoked Function Expression)
+       - Se ejecuta inmediatamente al cargarse el script.
+       - Evita contaminar el scope global (no crea variables globales innecesarias). */
+
+    const root = document.documentElement;
+    /* document.documentElement === <html>
+       - Guardamos el elemento raíz para poder agregar/quitar clases CSS. */
+
+    const threshold = 8; // px de tolerancia
+    /* Umbral de tolerancia en píxeles:
+       - A veces el tamaño de la ventana no coincide EXACTO con screen.width/screen.height
+         (por barras, scroll, zoom, o comportamiento del navegador).
+       - Por eso usamos ±8px como margen de error. */
+
+    function isDesktop() {
+      /* Detecta si estamos en un entorno "desktop real":
+         - (hover: hover) => el dispositivo permite hover (mouse)
+         - (pointer: fine) => puntero preciso (mouse)
+         Esto ayuda a evitar falsos positivos en móviles/tablets. */
+      return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    }
+
+    function detectFullscreen() {
+
+      /* Si estamos embebidos en Notion (iframe), no aplicamos fullscreen.
+         - embed-notion se añade por tu otro script de detección de Notion.
+         - Dentro de iframes fullscreen normalmente no aplica o no tiene sentido. */
+      if (root.classList.contains('embed-notion')) return;
+
+      /* 1) Fullscreen API real:
+         - document.fullscreenElement es distinto de null cuando
+           un elemento entró a fullscreen usando requestFullscreen().
+         - Esto NO siempre ocurre con F11. */
+      const apiFullscreen = !!document.fullscreenElement;
+
+      /* 2) Fullscreen por F11 (modo “casi pantalla completa”)
+         - F11 muchas veces no activa Fullscreen API.
+         - Entonces detectamos si el tamaño de la ventana ≈ tamaño real de pantalla.
+         - Si coincide (dentro del threshold), asumimos fullscreen. */
+      const nearScreen =
+        Math.abs(window.innerWidth - screen.width) <= threshold &&
+        Math.abs(window.innerHeight - screen.height) <= threshold;
+
+      /* Fullscreen activo si:
+         - Hay fullscreen por API, o
+         - estamos en desktop y la ventana ocupa prácticamente toda la pantalla (F11). */
+      const active = apiFullscreen || (isDesktop() && nearScreen);
+
+      /* Agrega o quita la clase en <html>:
+         - Si active === true => <html class="browser-fullscreen">
+         - Si active === false => se elimina la clase
+         
+         Esta clase activa tu CSS:
+         html.browser-fullscreen .frame { max-width: ... } */
+      root.classList.toggle('browser-fullscreen', active);
+    }
+
+    /* Cuando se cambia el tamaño de la ventana (incluye entrar/salir F11),
+       se recalcula si estamos en fullscreen.
+       passive:true = mejora performance porque el listener no bloquea scroll */
+    window.addEventListener('resize', detectFullscreen, { passive: true });
+
+    /* Cuando cambia el fullscreen usando Fullscreen API (requestFullscreen / exitFullscreen),
+       se vuelve a detectar */
+    document.addEventListener('fullscreenchange', detectFullscreen);
+
+    /* Al cargar la página por primera vez, detecta el estado inicial */
+    window.addEventListener('load', detectFullscreen, { once: true });
+
+  })();
+</script>
+
 
 </head>
 
