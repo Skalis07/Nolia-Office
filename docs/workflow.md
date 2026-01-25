@@ -52,21 +52,29 @@ Regla práctica:
 - Si el PR es **solo docs/ci/chore** y no afecta runtime → golden paths opcional, CI siempre.
 
 ## Rollback (revertir un PR)
+> Regla: con `main` protegido, el revert **siempre** entra vía PR (no push directo a `main`).
+
 ### Opción A — GitHub (recomendado)
 1. Abre el PR que ya fue mergeado.
 2. Presiona **Revert**.
-3. GitHub crea un PR con el revert.
+3. GitHub crea una rama y un PR con el revert.
 4. CI corre.
 5. Merge del PR de revert.
 
-### Opción B — Terminal (cuando no usas el botón)
+### Opción B — Terminal + PR (cuando no usas el botón)
 > Nota: si el merge fue un “merge commit”, normalmente necesitas `-m 1`.
 
-- Revertir un merge commit:
+- Crear rama de revert:
   - `git checkout main`
   - `git pull`
+  - `git checkout -b revert/<pr-o-sha>`
+
+- Revertir un merge commit:
   - `git revert -m 1 <SHA_DEL_MERGE_COMMIT>`
-  - `git push origin main`
+
+- Push y PR:
+  - `git push -u origin revert/<pr-o-sha>`
+  - Abrir PR hacia `main` y esperar CI
 
 - Revertir varios PRs:
-  - Revertir en orden inverso (del más reciente al más antiguo).
+  - Revertir en orden inverso (del más reciente al más antiguo) en la misma rama de revert.
