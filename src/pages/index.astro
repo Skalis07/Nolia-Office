@@ -1,14 +1,11 @@
-<!-- ========================================================================================================================================================-->
-<!-- ========================================================================================================================================================-->
-
+<!--=====================================================================================-->
+<!--=====================================================================================-->
 
 <!-- Archivo: src/pages/index.astro -->
 <!-- Página Astro que funciona en local y en GitHub Pages usando import.meta.env.BASE_URL -->
 
-
-<!-- ========================================================================================================================================================-->
-<!-- ========================================================================================================================================================-->
-
+<!--=====================================================================================-->
+<!--=====================================================================================-->
 
 <!-- Abre la cabecera del documento. -->
 <head>
@@ -532,7 +529,6 @@
           para activar todos los estilos especiales CSS que creaste. */
       })();
   </script>
-
   
 <!-- ===== Script: Detecta fullscreen del navegador (F11) ===== -->
 <script is:inline>
@@ -609,13 +605,10 @@
   })();
 </script>
 
-
 </head>
 
-
-<!-- ========================================================================================================================================================-->
-<!-- ========================================================================================================================================================-->
-
+<!--=====================================================================================-->
+<!--=====================================================================================-->
 
 <!-- NOTA: En Astro, no se añade <html> ni <body> explícitos. El contenido de la página va directo aquí. -->
 
@@ -858,254 +851,254 @@
      =========================================================================== -->
 <script is:inline>
 
-    /* ---------------------------------------------------------------------------
-       VOLUMEN POR DEFECTO DE LA LLUVIA
-       - Valor en porcentaje (0–100).
-       - Se convierte luego a rango 0.0–1.0 para el elemento <audio>.
-       --------------------------------------------------------------------------- */
-    const DEFAULT_RAIN_VOL = 60; // mismo 60% que usa el slider visual
+  /* ---------------------------------------------------------------------------
+     VOLUMEN POR DEFECTO DE LA LLUVIA
+     - Valor en porcentaje (0–100).
+     - Se convierte luego a rango 0.0–1.0 para el elemento <audio>.
+     --------------------------------------------------------------------------- */
+  const DEFAULT_RAIN_VOL = 60; // mismo 60% que usa el slider visual
 
-    /* ---------------------------------------------------------------------------
-      BASE_URL (Astro) - helper ÚNICO para rutas (local + GitHub Pages)
-      - Usa data-base={import.meta.env.BASE_URL} que ya pusiste en <div class="page">
-      - asset("x.png") => URL absoluta correcta, incluso si el sitio vive en /Nolia-Office/
-      --------------------------------------------------------------------------- */
-    const baseRaw = document.querySelector('.page')?.dataset.base || '/'; // BASE desde Astro (fallback "/")
-    const BASE = baseRaw.endsWith('/') ? baseRaw : baseRaw + '/';         // Asegura slash final
-    const asset = (path) =>                                               // Helper para assets
-      new URL(String(path).replace(/^\//, ''), location.origin + BASE).href;
+  /* ---------------------------------------------------------------------------
+    BASE_URL (Astro) - helper ÚNICO para rutas (local + GitHub Pages)
+    - Usa data-base={import.meta.env.BASE_URL} que ya pusiste en <div class="page">
+    - asset("x.png") => URL absoluta correcta, incluso si el sitio vive en /Nolia-Office/
+    --------------------------------------------------------------------------- */
+  const baseRaw = document.querySelector('.page')?.dataset.base || '/'; // BASE desde Astro (fallback "/")
+  const BASE = baseRaw.endsWith('/') ? baseRaw : baseRaw + '/';         // Asegura slash final
+  const asset = (path) =>                                               // Helper para assets
+    new URL(String(path).replace(/^\//, ''), location.origin + BASE).href;
 
-    /* ===========================================================================
-       ICONOS SVG DEFINIDOS COMO STRINGS
-       - Se inyectan dinámicamente en los botones con innerHTML.
-       - Evita tener múltiples SVG duplicados en el HTML.
-       =========================================================================== */
+  /* ===========================================================================
+     ICONOS SVG DEFINIDOS COMO STRINGS
+     - Se inyectan dinámicamente en los botones con innerHTML.
+     - Evita tener múltiples SVG duplicados en el HTML.
+     =========================================================================== */
 
-    /* Icono PLAY (reproducir música) */
-    const ICON_PLAY =
-      '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
-        '<path d="M8 5v14l11-7z"/>' +
-      '</svg>';
+  /* Icono PLAY (reproducir música) */
+  const ICON_PLAY =
+    '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
+      '<path d="M8 5v14l11-7z"/>' +
+    '</svg>';
 
-    /* Icono PAUSE (pausar música) */
-    const ICON_PAUSE =
-      '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
-        '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>' +
-      '</svg>';
+  /* Icono PAUSE (pausar música) */
+  const ICON_PAUSE =
+    '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
+      '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>' +
+    '</svg>';
 
-    /* Icono nube SIN lluvia (estado inactivo) */
-    const ICON_CLOUD = `
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M19 18a4 4 0 0 0 0-8
-                 5 5 0 0 0-9-2
-                 4 4 0 0 0-2 7.5"/>
-      </svg>`;
+  /* Icono nube SIN lluvia (estado inactivo) */
+  const ICON_CLOUD = `
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M19 18a4 4 0 0 0 0-8
+               5 5 0 0 0-9-2
+               4 4 0 0 0-2 7.5"/>
+    </svg>`;
 
-    /* Icono nube CON lluvia (estado activo) */
-    const ICON_CLOUD_RAIN = `
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M19 18a4 4 0 0 0 0-8
-                 5 5 0 0 0-9-2
-                 4 4 0 0 0-2 7.5"/>
-        <!-- Gotas de lluvia -->
-        <path d="M8 20l1-2
-                 M12 20l1-2
-                 M16 20l1-2"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              fill="none"/>
-      </svg>`;
-
-
-    /* ===========================================================================
-       VARIABLES DE ESTADO (MÚSICA Y LLUVIA)
-       =========================================================================== */
-
-    let playerMusic;           // Instancia del reproductor YouTube (solo audio)
-    let isMusicPlaying = false; // Estado de reproducción de música
-    let isRainPlaying  = false; // Estado del sonido de lluvia
-    let rainAudio;             // Referencia al elemento <audio> de lluvia
-
-    /* ===========================================================================
-       REFERENCIAS A ELEMENTOS DEL DOM
-       - Se asignan una sola vez cuando el player está listo.
-       =========================================================================== */
-    let btnMusic;    // Botón play/pause
-    let btnRain;     // Botón lluvia
-    let volMusic;    // Slider de volumen
-    let btnShuffle;  // Botón cambiar GIF
-    let gifImg;      // Imagen del GIF principal
-
-    /* ===========================================================================
-       CARGA DINÁMICA DE LA API DE YOUTUBE
-       - Inserta el script oficial de YouTube IFrame API.
-       - Necesario para crear YT.Player.
-       =========================================================================== */
-
-    const ytScript = document.createElement('script'); // Crea <script>
-    ytScript.src = 'https://www.youtube.com/iframe_api'; // API oficial
-    document.head.appendChild(ytScript); // Se agrega al <head>
-
-    /* ===========================================================================
-       CALLBACK GLOBAL REQUERIDO POR YOUTUBE
-       - YouTube llama automáticamente a esta función cuando la API está lista.
-       =========================================================================== */
-    window.onYouTubeIframeAPIReady = function () {
-
-      /* Crear reproductor de YouTube SOLO PARA AUDIO */
-      playerMusic = new YT.Player('ytplayerMusic', {
-        videoId: '8kBlKM71pjc', // ID del video de YouTube (música)
-        playerVars: {
-          autoplay: 0,   // No reproducir automáticamente
-          controls: 0,   // Ocultar controles nativos
-          rel: 0,        // No mostrar videos relacionados
-          playsinline: 1 // Reproducir inline en móviles
-        },
-        events: {
-          onReady: onPlayersReady // Se dispara cuando el player está listo
-        }
-      });
-    };
+  /* Icono nube CON lluvia (estado activo) */
+  const ICON_CLOUD_RAIN = `
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M19 18a4 4 0 0 0 0-8
+               5 5 0 0 0-9-2
+               4 4 0 0 0-2 7.5"/>
+      <!-- Gotas de lluvia -->
+      <path d="M8 20l1-2
+               M12 20l1-2
+               M16 20l1-2"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            fill="none"/>
+    </svg>`;
 
 
-    /* ===========================================================================
-       CALLBACK: onPlayersReady
-       - Se ejecuta cuando el reproductor de YouTube queda listo.
-       - Aplica volúmenes iniciales.
-       - Conecta (una sola vez) los controles de la UI.
-       - Inicializa helpers del GIF.
-       =========================================================================== */
-    function onPlayersReady() {
+  /* ===========================================================================
+     VARIABLES DE ESTADO (MÚSICA Y LLUVIA)
+     =========================================================================== */
 
-      /* -------------------------------------------------------------------------
-         1) APLICAR SIEMPRE EL VOLUMEN ACTUAL AL PLAYER DE YOUTUBE
-         - Esto se ejecuta cada vez que algún player “ready-ea”.
-         - Se protege con try/catch para evitar errores silenciosos.
-         ------------------------------------------------------------------------- */
-      try {
-        const volEl = document.getElementById('volumeMusic'); // Slider de volumen
-        const volValue = volEl ? Number(volEl.value) : 100;   // Fallback a 100%
+  let playerMusic;           // Instancia del reproductor YouTube (solo audio)
+  let isMusicPlaying = false; // Estado de reproducción de música
+  let isRainPlaying  = false; // Estado del sonido de lluvia
+  let rainAudio;             // Referencia al elemento <audio> de lluvia
 
-        // Verifica que el player exista y tenga el método setVolume
-        if (playerMusic && typeof playerMusic.setVolume === 'function') {
-          playerMusic.setVolume(volValue); // Aplica volumen a YouTube
-        }
-      } catch (e) {
-        // Error ignorado intencionalmente (no rompe la UI si algo falla)
+  /* ===========================================================================
+     REFERENCIAS A ELEMENTOS DEL DOM
+     - Se asignan una sola vez cuando el player está listo.
+     =========================================================================== */
+  let btnMusic;    // Botón play/pause
+  let btnRain;     // Botón lluvia
+  let volMusic;    // Slider de volumen
+  let btnShuffle;  // Botón cambiar GIF
+  let gifImg;      // Imagen del GIF principal
+
+  /* ===========================================================================
+     CARGA DINÁMICA DE LA API DE YOUTUBE
+     - Inserta el script oficial de YouTube IFrame API.
+     - Necesario para crear YT.Player.
+     =========================================================================== */
+
+  const ytScript = document.createElement('script'); // Crea <script>
+  ytScript.src = 'https://www.youtube.com/iframe_api'; // API oficial
+  document.head.appendChild(ytScript); // Se agrega al <head>
+
+  /* ===========================================================================
+     CALLBACK GLOBAL REQUERIDO POR YOUTUBE
+     - YouTube llama automáticamente a esta función cuando la API está lista.
+     =========================================================================== */
+  window.onYouTubeIframeAPIReady = function () {
+
+    /* Crear reproductor de YouTube SOLO PARA AUDIO */
+    playerMusic = new YT.Player('ytplayerMusic', {
+      videoId: '8kBlKM71pjc', // ID del video de YouTube (música)
+      playerVars: {
+        autoplay: 0,   // No reproducir automáticamente
+        controls: 0,   // Ocultar controles nativos
+        rel: 0,        // No mostrar videos relacionados
+        playsinline: 1 // Reproducir inline en móviles
+      },
+      events: {
+        onReady: onPlayersReady // Se dispara cuando el player está listo
       }
+    });
+  };
 
-      /* -------------------------------------------------------------------------
-         2) VOLUMEN INICIAL DEL AUDIO LOCAL DE LLUVIA
-         - Se convierte el porcentaje (0–100) a rango 0.0–1.0.
-         ------------------------------------------------------------------------- */
-      rainAudio = document.getElementById('rainAudio'); // <audio> de lluvia
-      if (rainAudio) {
-        rainAudio.volume = DEFAULT_RAIN_VOL / 100; // Ej: 60 → 0.6
+
+  /* ===========================================================================
+     CALLBACK: onPlayersReady
+     - Se ejecuta cuando el reproductor de YouTube queda listo.
+     - Aplica volúmenes iniciales.
+     - Conecta (una sola vez) los controles de la UI.
+     - Inicializa helpers del GIF.
+     =========================================================================== */
+  function onPlayersReady() {
+
+    /* -------------------------------------------------------------------------
+       1) APLICAR SIEMPRE EL VOLUMEN ACTUAL AL PLAYER DE YOUTUBE
+       - Esto se ejecuta cada vez que algún player “ready-ea”.
+       - Se protege con try/catch para evitar errores silenciosos.
+       ------------------------------------------------------------------------- */
+    try {
+      const volEl = document.getElementById('volumeMusic'); // Slider de volumen
+      const volValue = volEl ? Number(volEl.value) : 100;   // Fallback a 100%
+
+      // Verifica que el player exista y tenga el método setVolume
+      if (playerMusic && typeof playerMusic.setVolume === 'function') {
+        playerMusic.setVolume(volValue); // Aplica volumen a YouTube
       }
+    } catch (e) {
+      // Error ignorado intencionalmente (no rompe la UI si algo falla)
+    }
 
-      /* -------------------------------------------------------------------------
-         3) EVITAR REGISTRAR EVENTOS MÁS DE UNA VEZ
-         - Si btnMusic ya existe, significa que el wiring ya ocurrió.
-         - Previene listeners duplicados si YouTube re-inicializa el player.
-         ------------------------------------------------------------------------- */
+    /* -------------------------------------------------------------------------
+       2) VOLUMEN INICIAL DEL AUDIO LOCAL DE LLUVIA
+       - Se convierte el porcentaje (0–100) a rango 0.0–1.0.
+       ------------------------------------------------------------------------- */
+    rainAudio = document.getElementById('rainAudio'); // <audio> de lluvia
+    if (rainAudio) {
+      rainAudio.volume = DEFAULT_RAIN_VOL / 100; // Ej: 60 → 0.6
+    }
 
-         if (btnMusic) return;
+    /* -------------------------------------------------------------------------
+       3) EVITAR REGISTRAR EVENTOS MÁS DE UNA VEZ
+       - Si btnMusic ya existe, significa que el wiring ya ocurrió.
+       - Previene listeners duplicados si YouTube re-inicializa el player.
+       ------------------------------------------------------------------------- */
 
-      /* -------------------------------------------------------------------------
-         4) CACHEAR REFERENCIAS AL DOM (UNA SOLA VEZ)
-         - Mejora performance y claridad.
-         ------------------------------------------------------------------------- */
-      btnMusic   = document.getElementById('musicToggle'); // Botón música
-      btnRain    = document.getElementById('rainToggle');  // Botón lluvia
-      volMusic   = document.getElementById('volumeMusic'); // Slider volumen
-      btnShuffle = document.getElementById('gifShuffle');  // Botón cambiar GIF
-      gifImg     = document.getElementById('mainGif');     // Imagen principal GIF
+    if (btnMusic) return;
 
-      // Guardia: evita crash si algún elemento falta (IDs cambiados, embed, etc.)
-      if (!btnMusic || !btnRain || !volMusic || !btnShuffle || !gifImg) return;
+    /* -------------------------------------------------------------------------
+       4) CACHEAR REFERENCIAS AL DOM (UNA SOLA VEZ)
+       - Mejora performance y claridad.
+       ------------------------------------------------------------------------- */
+    btnMusic   = document.getElementById('musicToggle'); // Botón música
+    btnRain    = document.getElementById('rainToggle');  // Botón lluvia
+    volMusic   = document.getElementById('volumeMusic'); // Slider volumen
+    btnShuffle = document.getElementById('gifShuffle');  // Botón cambiar GIF
+    gifImg     = document.getElementById('mainGif');     // Imagen principal GIF
 
-      /* -------------------------------------------------------------------------
-         HELPERS DE ESTADO (UI)
-         - Centraliza cambios de icono/aria/estado sin tocar la lógica.
-         ------------------------------------------------------------------------- */
-      function setMusicState(playing) {
-        btnMusic.innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
-        btnMusic.setAttribute('aria-label', playing ? 'Pausar música' : 'Reproducir música');
-        isMusicPlaying = playing;
+    // Guardia: evita crash si algún elemento falta (IDs cambiados, embed, etc.)
+    if (!btnMusic || !btnRain || !volMusic || !btnShuffle || !gifImg) return;
+
+    /* -------------------------------------------------------------------------
+       HELPERS DE ESTADO (UI)
+       - Centraliza cambios de icono/aria/estado sin tocar la lógica.
+       ------------------------------------------------------------------------- */
+    function setMusicState(playing) {
+      btnMusic.innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
+      btnMusic.setAttribute('aria-label', playing ? 'Pausar música' : 'Reproducir música');
+      isMusicPlaying = playing;
+    }
+
+    function setRainState(playing) {
+      if (playing) {
+        btnRain.classList.add('active');
+        btnRain.innerHTML = ICON_CLOUD_RAIN;
+        btnRain.setAttribute('aria-label','Apagar lluvia');
+      } else {
+        btnRain.classList.remove('active');
+        btnRain.innerHTML = ICON_CLOUD;
+        btnRain.setAttribute('aria-label','Activar lluvia');
       }
-
-      function setRainState(playing) {
-        if (playing) {
-          btnRain.classList.add('active');
-          btnRain.innerHTML = ICON_CLOUD_RAIN;
-          btnRain.setAttribute('aria-label','Apagar lluvia');
-        } else {
-          btnRain.classList.remove('active');
-          btnRain.innerHTML = ICON_CLOUD;
-          btnRain.setAttribute('aria-label','Activar lluvia');
-        }
-        isRainPlaying = playing;
-      }
-
-
-      /* ===========================================================================
-         EVENTOS DE INTERFAZ
-         =========================================================================== */
-
-      /* -------------------------------------------------------------------------
-         BOTÓN PLAY / PAUSE DE LA MÚSICA (YouTube)
-         ------------------------------------------------------------------------- */
-      btnMusic.addEventListener('click', () => {
-        if (!isMusicPlaying) {
-          playerMusic.playVideo();                          // Reproduce música
-          setMusicState(true);                              // Actualiza estado/UI
-        } else {
-          playerMusic.pauseVideo();                         // Pausa música
-          setMusicState(false);
-        }
-      });
-
-      /* -------------------------------------------------------------------------
-         SLIDER DE VOLUMEN DE LA MÚSICA (YouTube)
-         - Se ejecuta mientras el usuario arrastra el control.
-         ------------------------------------------------------------------------- */
-      volMusic.addEventListener('input', () => {
-        if (playerMusic && typeof playerMusic.setVolume === 'function') {
-          playerMusic.setVolume(Number(volMusic.value)); // Aplica nuevo volumen
-        }
-      });
-
-      /* -------------------------------------------------------------------------
-         BOTÓN DE LLUVIA (AUDIO LOCAL)
-         - Play / Pause del sonido ambiental.
-         - Cambia icono, clase y aria-label.
-         ------------------------------------------------------------------------- */
-      btnRain.addEventListener('click', () => {
-        if (!rainAudio) return; // Seguridad: si no existe, no hacemos nada
-
-        if (!isRainPlaying) {
-          // En móviles, el primer play requiere gesto del usuario (este click)
-          rainAudio.currentTime = 0;            // (Opcional) reinicia audio
-          rainAudio.play();                     // Reproduce lluvia
-          setRainState(true);                   // Actualiza estado/UI
-        } else {
-          rainAudio.pause();                    // Pausa lluvia
-          setRainState(false);
-        }
-      });
-
-      /* -------------------------------------------------------------------------
-         INICIALIZACIONES FINALES
-         - Bloquea proporción del contenedor según el GIF.
-         - Activa el rotador de GIFs.
-         ------------------------------------------------------------------------- */
-      lockAspectFrom(gifImg);                   // Fija aspect-ratio inicial
-      setupGifRotator(btnShuffle, gifImg);      // Habilita cambio de GIFs
+      isRainPlaying = playing;
     }
 
 
     /* ===========================================================================
+       EVENTOS DE INTERFAZ
+       =========================================================================== */
+
+    /* -------------------------------------------------------------------------
+       BOTÓN PLAY / PAUSE DE LA MÚSICA (YouTube)
+       ------------------------------------------------------------------------- */
+    btnMusic.addEventListener('click', () => {
+      if (!isMusicPlaying) {
+        playerMusic.playVideo();                          // Reproduce música
+        setMusicState(true);                              // Actualiza estado/UI
+      } else {
+        playerMusic.pauseVideo();                         // Pausa música
+        setMusicState(false);
+      }
+    });
+
+    /* -------------------------------------------------------------------------
+       SLIDER DE VOLUMEN DE LA MÚSICA (YouTube)
+       - Se ejecuta mientras el usuario arrastra el control.
+       ------------------------------------------------------------------------- */
+    volMusic.addEventListener('input', () => {
+      if (playerMusic && typeof playerMusic.setVolume === 'function') {
+        playerMusic.setVolume(Number(volMusic.value)); // Aplica nuevo volumen
+      }
+    });
+
+    /* -------------------------------------------------------------------------
+       BOTÓN DE LLUVIA (AUDIO LOCAL)
+       - Play / Pause del sonido ambiental.
+       - Cambia icono, clase y aria-label.
+       ------------------------------------------------------------------------- */
+    btnRain.addEventListener('click', () => {
+      if (!rainAudio) return; // Seguridad: si no existe, no hacemos nada
+
+      if (!isRainPlaying) {
+        // En móviles, el primer play requiere gesto del usuario (este click)
+        rainAudio.currentTime = 0;            // (Opcional) reinicia audio
+        rainAudio.play();                     // Reproduce lluvia
+        setRainState(true);                   // Actualiza estado/UI
+      } else {
+        rainAudio.pause();                    // Pausa lluvia
+        setRainState(false);
+      }
+    });
+
+    /* -------------------------------------------------------------------------
+       INICIALIZACIONES FINALES
+       - Bloquea proporción del contenedor según el GIF.
+       - Activa el rotador de GIFs.
+       ------------------------------------------------------------------------- */
+    lockAspectFrom(gifImg);                   // Fija aspect-ratio inicial
+    setupGifRotator(btnShuffle, gifImg);      // Habilita cambio de GIFs
+  }
+
+
+  /* ===========================================================================
      MODO OSCURITO (TIRITA SOL / LUNA)
      - Controla el cambio entre modo día y modo noche.
      - Usa una “tirita” vertical fija con una bolita (thumb).
@@ -1474,7 +1467,3 @@
     }
   })();
 </script>
-
-
-
-
