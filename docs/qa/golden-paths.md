@@ -5,7 +5,7 @@ Estos golden paths son el checklist que se repite en cada PR para asegurar que e
 ## Antes de empezar
 - Ejecuta `npm run lint` (debe pasar)
 - Ejecuta `npm run build` (debe pasar)
-- Ejecuta `npm run dev` y prueba en la app
+- Para QA visual usa la Preview de Vercel si existe; si no, ejecuta `npm run dev` y prueba en la app
 
 ## 1) Carga inicial
 - [ ] La página carga sin errores visibles.

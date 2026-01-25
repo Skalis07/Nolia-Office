@@ -30,3 +30,22 @@ Desde la raíz del proyecto:
 
 ```bash
 docker build --no-cache -t nolia-office:local .
+```
+
+### Ejecutar el contenedor
+
+```bash
+docker run --rm -p 8080:80 --name nolia-office nolia-office:local
+```
+
+### Verificar
+- Abrir `http://localhost:8080/Nolia-Office/`
+- (Opcional) `http://localhost:8080/` redirige a `/Nolia-Office/`
+
+### Detener / limpiar
+Si no usaste `--rm`:
+
+```bash
+docker stop nolia-office
+docker rm nolia-office
+```

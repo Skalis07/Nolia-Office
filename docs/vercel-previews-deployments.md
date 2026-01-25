@@ -58,37 +58,13 @@ El enlace es único por PR y se actualiza con cada push.
 
 ---
 
-## Qué validar en una Preview (Golden Paths)
+## QA en Preview (Golden Paths)
 
-Antes de aprobar un PR, **siempre** se deben validar los siguientes puntos en la preview:
+La fuente de verdad del checklist es `docs/qa/golden-paths.md`.
 
-### Carga general
-- La página carga sin errores visibles.
-- No hay errores 404 de CSS o JS.
-
-### YouTube
-- Play / pausa funcionan correctamente.
-- El volumen responde correctamente.
-- El estado se mantiene al cambiar de modo.
-
-### Ambiente (lluvia)
-- Activar / desactivar funciona correctamente.
-- El volumen responde.
-- No hay duplicación de sonido.
-
-### Escena
-- Cambio de GIF o escena funciona correctamente.
-- No hay estados inconsistentes.
-
-### Modo visual
-- Cambio día / noche funciona correctamente.
-
-### Responsive básico
-- Vista móvil (~360×800).
-- Vista desktop (~1366×768).
-
-### Integraciones
-- Embed de Notion (si aplica) carga correctamente.
+Regla práctica:
+- Si el PR afecta **runtime/UI** → ejecutar golden paths en la preview.
+- Si la preview no está disponible → ejecutar en local y dejar nota en el PR.
 
 ---
 
