@@ -12,35 +12,44 @@ jobs:
     steps:
       - name: List deployments
         env:
-          VERCEL_TOKEN: z3uOGifmZ6gmdTjsUauz7XCT
-          VERCEL_PROJECT_ID: prj_y34HKidmG6NRyzoT7tsX3mS78M2g
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
+          set -euo pipefail
           curl -sS \
             -H "Authorization: Bearer $VERCEL_TOKEN" \
             "https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&limit=100" \
             > deployments.json
 
-      - name: Find previews for this PR
-        env:
-          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+      - name: Find all preview deployments
         run: |
+          set -euo pipefail
           node <<'NODE'
           const fs = require('fs');
           const data = JSON.parse(fs.readFileSync('deployments.json', 'utf8'));
           const ids = (data.deployments || [])
-            .filter(d => d.target === 'preview' && d.meta?.githubCommitRef === process.env.PR_BRANCH)
-            .map(d => d.uid);
-          fs.writeFileSync('to-delete.txt', ids.join('\n'));
+            .filter(d => d.target === 'preview')
+            .map(d => d.uid)
+            .filter(Boolean);
+
+          console.log(`Found ${ids.length} preview deployments`);
+          fs.writeFileSync('to-delete.txt', ids.join('\n') + (ids.length ? '\n' : ''));
           NODE
 
       - name: Delete deployments
         env:
-          VERCEL_TOKEN: z3uOGifmZ6gmdTjsUauz7XCT
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
-          if [ -f to-delete.txt ]; then
-            while read id; do
-              curl -X DELETE \
-                -H "Authorization: Bearer $VERCEL_TOKEN" \
-                "https://api.vercel.com/v13/deployments/$id"
-            done < to-delete.txt
+          set -euo pipefail
+          if [ ! -s to-delete.txt ]; then
+            echo "Nothing to delete."
+            exit 0
           fi
+
+          while IFS= read -r id; do
+            echo "Deleting $id"
+            curl -sS -X DELETE \
+              -H "Authorization: Bearer $VERCEL_TOKEN" \
+              "https://api.vercel.com/v13/deployments/$id" \
+              > /dev/null
+          done < to-delete.txt
