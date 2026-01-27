@@ -49,6 +49,15 @@ On the client side, JavaScript handles:
 
 ---
 
+## 📚 Documentation
+
+- Workflow: `docs/workflow.md`
+- QA (Golden Paths): `docs/qa/golden-paths.md`
+- Vercel Previews: `docs/vercel-previews-deployments.md`
+- Docker: `docs/docker.md`
+
+---
+
 ## 🔮 Future Plans (probably not XD)
 
 - More music.

@@ -10,9 +10,20 @@ con **GitHub Pull Requests**.
 
 ---
 
+## Estado en este proyecto (importante)
+
+- **Vercel no se usa para producción.** La producción vive en **GitHub Pages** y se despliega
+  desde `main` con el workflow `.github/workflows/deploy.yml`.
+- Las **previews de Vercel** (cuando existen) son **temporales** y se **eliminan automáticamente**
+  al hacer merge del PR (workflow `.github/workflows/vercel-cleanup.yml`).
+- Si por configuración no se genera preview en Vercel, el flujo de QA sigue igual
+  (ejecutar golden paths en local y dejar nota en el PR).
+
+---
+
 ## ¿Cuándo se genera una Preview?
 
-Se genera automáticamente cuando ocurre cualquiera de estos eventos:
+Se genera automáticamente cuando ocurre cualquiera de estos eventos (si la integración de Vercel está activa):
 
 - Se crea un **Pull Request**
 - Se hace **push** a una rama con un PR abierto
@@ -40,8 +51,8 @@ Esto es el comportamiento esperado y forma parte del flujo de revisión interna.
 
 | Entorno | Descripción |
 |------|-----------|
-| **Preview** | Versión temporal del sitio asociada a una rama o PR, usada para revisión interna. |
-| **Producción (`main`)** | Versión estable del proyecto, accesible públicamente. |
+| **Preview (Vercel)** | Versión temporal asociada a una rama o PR, usada para revisión interna. |
+| **Producción (`main`, GitHub Pages)** | Versión estable del proyecto, accesible públicamente. |
 
 Las previews permiten validar cambios sin afectar producción.
 
@@ -100,6 +111,14 @@ Estos checks indican que la preview está disponible para revisión.
 - GitHub Pages sirve el sitio bajo **subpath (`/Nolia-Office/`)**.
 - El proyecto está configurado para adaptarse automáticamente a ambos entornos,
   evitando roturas de rutas y assets.
+
+---
+
+## Borrado automático de previews
+
+Al hacer **merge** de un PR, las previews de Vercel se borran automáticamente
+para no dejar despliegues huérfanos. Esto se ejecuta con el workflow:
+`.github/workflows/vercel-cleanup.yml`.
 
 ---
 
