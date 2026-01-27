@@ -1,0 +1,46 @@
+name: Delete Vercel previews on merge
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cleanup:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: List deployments
+        env:
+          VERCEL_TOKEN: z3uOGifmZ6gmdTjsUauz7XCT
+          VERCEL_PROJECT_ID: prj_y34HKidmG6NRyzoT7tsX3mS78M2g
+        run: |
+          curl -sS \
+            -H "Authorization: Bearer $VERCEL_TOKEN" \
+            "https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&limit=100" \
+            > deployments.json
+
+      - name: Find previews for this PR
+        env:
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const data = JSON.parse(fs.readFileSync('deployments.json', 'utf8'));
+          const ids = (data.deployments || [])
+            .filter(d => d.target === 'preview' && d.meta?.githubCommitRef === process.env.PR_BRANCH)
+            .map(d => d.uid);
+          fs.writeFileSync('to-delete.txt', ids.join('\n'));
+          NODE
+
+      - name: Delete deployments
+        env:
+          VERCEL_TOKEN: z3uOGifmZ6gmdTjsUauz7XCT
+        run: |
+          if [ -f to-delete.txt ]; then
+            while read id; do
+              curl -X DELETE \
+                -H "Authorization: Bearer $VERCEL_TOKEN" \
+                "https://api.vercel.com/v13/deployments/$id"
+            done < to-delete.txt
+          fi
