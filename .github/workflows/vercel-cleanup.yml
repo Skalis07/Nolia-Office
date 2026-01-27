@@ -17,8 +17,8 @@ jobs:
           VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
         run: |
           set -euo pipefail
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-          echo "PR merged: #$PR_NUMBER"
+          PR_BRANCH="${{ github.event.pull_request.head.ref }}"
+          echo "PR branch merged: $PR_BRANCH"
 
           url="https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&target=preview&limit=100&teamId=$VERCEL_TEAM_ID"
           echo "GET $url"
@@ -26,34 +26,27 @@ jobs:
           curl -sS -H "Authorization: Bearer $VERCEL_TOKEN" "$url" > deployments.json
           node -e "const d=require('./deployments.json'); console.log('deployments returned:', (d.deployments||[]).length);"
 
-      - name: Pick deployments that belong to this PR
+      - name: Pick deployments that belong to this PR branch
         env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs = require('fs');
 
-          const pr = Number(process.env.PR_NUMBER);
+          const branch = process.env.PR_BRANCH;
           const data = JSON.parse(fs.readFileSync('deployments.json', 'utf8'));
           const deployments = data.deployments || [];
 
-          // Vercel suele traer info GitHub en gitSource.prId (a veces string/number)
           const matches = deployments.filter(d => {
-            const prId = d?.gitSource?.prId;
-            return Number(prId) === pr;
+            return d?.meta?.githubCommitRef === branch;
           });
 
           const ids = matches.map(d => d.uid).filter(Boolean);
 
-          console.log(`PR #${pr}: matched ${ids.length} preview deployment(s)`);
+          console.log(`Branch ${branch}: matched ${ids.length} preview deployment(s)`);
           if (matches[0]) {
-            console.log('Example match:', {
-              uid: matches[0].uid,
-              url: matches[0].url,
-              gitSource: matches[0].gitSource,
-              target: matches[0].target,
-            });
+            console.log('Example match meta:', matches[0].meta);
           }
 
           fs.writeFileSync('to-delete.txt', ids.join('\n') + (ids.length ? '\n' : ''));
