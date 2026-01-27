@@ -1,4 +1,4 @@
-name: Delete Vercel previews on merge
+name: Delete Vercel preview on merge
 
 on:
   pull_request:
@@ -10,46 +10,75 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: List deployments
+      - name: List preview deployments for this project
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
         run: |
           set -euo pipefail
-          curl -sS \
-            -H "Authorization: Bearer $VERCEL_TOKEN" \
-            "https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&limit=100" \
-            > deployments.json
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          echo "PR merged: #$PR_NUMBER"
 
-      - name: Find all preview deployments
+          url="https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&target=preview&limit=100&teamId=$VERCEL_TEAM_ID"
+          echo "GET $url"
+
+          curl -sS -H "Authorization: Bearer $VERCEL_TOKEN" "$url" > deployments.json
+          node -e "const d=require('./deployments.json'); console.log('deployments returned:', (d.deployments||[]).length);"
+
+      - name: Pick deployments that belong to this PR
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs = require('fs');
-          const data = JSON.parse(fs.readFileSync('deployments.json', 'utf8'));
-          const ids = (data.deployments || [])
-            .filter(d => d.target === 'preview')
-            .map(d => d.uid)
-            .filter(Boolean);
 
-          console.log(`Found ${ids.length} preview deployments`);
+          const pr = Number(process.env.PR_NUMBER);
+          const data = JSON.parse(fs.readFileSync('deployments.json', 'utf8'));
+          const deployments = data.deployments || [];
+
+          // Vercel suele traer info GitHub en gitSource.prId (a veces string/number)
+          const matches = deployments.filter(d => {
+            const prId = d?.gitSource?.prId;
+            return Number(prId) === pr;
+          });
+
+          const ids = matches.map(d => d.uid).filter(Boolean);
+
+          console.log(`PR #${pr}: matched ${ids.length} preview deployment(s)`);
+          if (matches[0]) {
+            console.log('Example match:', {
+              uid: matches[0].uid,
+              url: matches[0].url,
+              gitSource: matches[0].gitSource,
+              target: matches[0].target,
+            });
+          }
+
           fs.writeFileSync('to-delete.txt', ids.join('\n') + (ids.length ? '\n' : ''));
           NODE
 
-      - name: Delete deployments
+      - name: Delete matched deployments
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           set -euo pipefail
           if [ ! -s to-delete.txt ]; then
-            echo "Nothing to delete."
+            echo "Nothing to delete for this PR."
             exit 0
           fi
 
           while IFS= read -r id; do
             echo "Deleting $id"
-            curl -sS -X DELETE \
+            status=$(curl -sS -o /tmp/out -w "%{http_code}" -X DELETE \
               -H "Authorization: Bearer $VERCEL_TOKEN" \
-              "https://api.vercel.com/v13/deployments/$id" \
-              > /dev/null
+              "https://api.vercel.com/v13/deployments/$id")
+
+            echo "HTTP $status"
+            if [ "$status" -ge 400 ]; then
+              echo "Response body:"
+              cat /tmp/out || true
+              exit 1
+            fi
           done < to-delete.txt
