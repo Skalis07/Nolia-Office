@@ -842,21 +842,32 @@
     })();
 </script>
 
+<!-- ===========================================================================
+     SCRIPTS DE SOPORTE
+     - Definen constantes globales usadas por el script principal.
+     - audio.js  → configuración de audio (volúmenes por defecto).
+     - icons.js  → íconos SVG para la interfaz.
+     IMPORTANTE: deben cargarse antes del script principal.
+     =========================================================================== -->
+<script is:inline src={import.meta.env.BASE_URL + "lib/audio.js"}></script>
+<script is:inline src={import.meta.env.BASE_URL + "lib/icons.js"}></script>
 
 <!-- ===========================================================================
-     SCRIPT: MÚSICA (YouTube) + LLUVIA (MP3) + LÓGICA DE INTERFAZ
-     - Maneja reproducción de música vía YouTube embebido (solo audio).
-     - Controla sonido de lluvia con <audio>.
-     - Cambia iconos y estados de botones.
+     SCRIPT PRINCIPAL DE INTERFAZ
+     - Música (YouTube), lluvia, GIFs, modo día/noche, UI.
      =========================================================================== -->
 <script is:inline>
-
+  
   /* ---------------------------------------------------------------------------
-     VOLUMEN POR DEFECTO DE LA LLUVIA
-     - Valor en porcentaje (0–100).
-     - Se convierte luego a rango 0.0–1.0 para el elemento <audio>.
-     --------------------------------------------------------------------------- */
-  const DEFAULT_RAIN_VOL = 60; // mismo 60% que usa el slider visual
+     CONSTANTES DE CONFIGURACIÓN E ÍCONOS
+     - Definidas en scripts externos cargados antes de este bloque.
+    --------------------------------------------------------------------------- */
+  const DEFAULT_RAIN_VOL = window.NOLIA_AUDIO.DEFAULT_RAIN_VOL;
+
+  const ICON_PLAY = window.NOLIA_ICONS.ICON_PLAY;
+  const ICON_PAUSE = window.NOLIA_ICONS.ICON_PAUSE;
+  const ICON_CLOUD = window.NOLIA_ICONS.ICON_CLOUD;
+  const ICON_CLOUD_RAIN = window.NOLIA_ICONS.ICON_CLOUD_RAIN;
 
   /* ---------------------------------------------------------------------------
     BASE_URL (Astro) - helper ÚNICO para rutas (local + GitHub Pages)
@@ -867,49 +878,6 @@
   const BASE = baseRaw.endsWith('/') ? baseRaw : baseRaw + '/';         // Asegura slash final
   const asset = (path) =>                                               // Helper para assets
     new URL(String(path).replace(/^\//, ''), location.origin + BASE).href;
-
-  /* ===========================================================================
-     ICONOS SVG DEFINIDOS COMO STRINGS
-     - Se inyectan dinámicamente en los botones con innerHTML.
-     - Evita tener múltiples SVG duplicados en el HTML.
-     =========================================================================== */
-
-  /* Icono PLAY (reproducir música) */
-  const ICON_PLAY =
-    '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
-      '<path d="M8 5v14l11-7z"/>' +
-    '</svg>';
-
-  /* Icono PAUSE (pausar música) */
-  const ICON_PAUSE =
-    '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
-      '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>' +
-    '</svg>';
-
-  /* Icono nube SIN lluvia (estado inactivo) */
-  const ICON_CLOUD = `
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M19 18a4 4 0 0 0 0-8
-               5 5 0 0 0-9-2
-               4 4 0 0 0-2 7.5"/>
-    </svg>`;
-
-  /* Icono nube CON lluvia (estado activo) */
-  const ICON_CLOUD_RAIN = `
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M19 18a4 4 0 0 0 0-8
-               5 5 0 0 0-9-2
-               4 4 0 0 0-2 7.5"/>
-      <!-- Gotas de lluvia -->
-      <path d="M8 20l1-2
-               M12 20l1-2
-               M16 20l1-2"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            fill="none"/>
-    </svg>`;
-
 
   /* ===========================================================================
      VARIABLES DE ESTADO (MÚSICA Y LLUVIA)
