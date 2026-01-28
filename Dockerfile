@@ -14,8 +14,7 @@ FROM nginx:alpine AS runtime
 # Usar configuración custom de nginx
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
-# Servir el sitio bajo /Nolia-Office/
-RUN mkdir -p /usr/share/nginx/html/Nolia-Office
-COPY --from=build /app/dist/ /usr/share/nginx/html/Nolia-Office/
+# Servir el sitio en /
+COPY --from=build /app/dist/ /usr/share/nginx/html/
 
 EXPOSE 80

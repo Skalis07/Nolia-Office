@@ -46,6 +46,8 @@ jobs:
 
       # Paso 4️⃣ — Compila el sitio Astro → genera la carpeta /dist
       - name: Build
+        env:
+          BASE_PATH: /Nolia-Office/
         run: npm run build # 👉 Aquí Astro compila src/pages/*.astro → dist/
 
       # Paso 5️⃣ — Empaqueta el resultado para pasarlo al siguiente job (deploy)
