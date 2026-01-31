@@ -5,14 +5,22 @@
   "description": "Web application for a relaxing, customizable study/work environment inspired by Animal Crossing.",
   "author": "Skalis07",
   "scripts": {
-    "predev": "node scripts/gen-gifs-manifest.mjs",
     "dev": "astro dev",
-    "prebuild": "node scripts/gen-gifs-manifest.mjs",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
   },
   "dependencies": {
     "astro": "^5.12.9"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "globals": "^16.5.0",
+    "prettier": "^3.7.4"
   }
 }

@@ -1,0 +1,15 @@
+# Normalización de finales de línea
+* text=auto
+
+# Código y config -> LF en el repo
+*.js     text eol=lf
+*.ts     text eol=lf
+*.astro  text eol=lf
+*.json   text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+*.css    text eol=lf
+*.md     text eol=lf
+
+# Shell scripts (si existen)
+*.sh     text eol=lf
