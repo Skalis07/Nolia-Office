@@ -536,13 +536,19 @@ const initialGif = gifUrls[0] ?? '';
           - window.self !== window.top → Está en un iframe.
           El try/catch es por si el iframe está en dominio distinto y lanza error. */
 
+        const referrer = document.referrer || '';
+        const ancestorOrigins = Array.from(window.location.ancestorOrigins || []);
+        /* Notion a veces no envía referrer; ancestorOrigins suele conservar el origen del embed. */
+
         const isNotion = 
           qs.has('notion') || 
-          /notion\.so|notion\.site/i.test(document.referrer || '');
+          qs.has('embed') || 
+          /notion\.(so|site|app)/i.test(referrer) ||
+          ancestorOrigins.some((origin)=> /notion\.(so|site|app)/i.test(origin));
         /* Detecta si el embed proviene de Notion:
-          1) ?notion en la URL
-          2) El referrer contiene "notion.so" o "notion.site"
-          (cuando Notion inserta tu página como embed) */
+          1) ?notion o ?embed en la URL
+          2) El referrer contiene "notion.so" / "notion.site" / "notion.app"
+          3) ancestorOrigins contiene un dominio de Notion (cuando el referrer viene vacío) */
 
         if(inIframe && isNotion){
           document.documentElement.classList.add('embed-notion');

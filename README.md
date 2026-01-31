@@ -55,6 +55,7 @@ On the client side, JavaScript handles:
 - QA (Golden Paths): `docs/qa/golden-paths.md`
 - Vercel Previews: `docs/vercel-previews-deployments.md`
 - Docker: `docs/docker.md`
+- Notion embed test (local): `docs/qa/testing/test-embed.html`
 
 ---
 
