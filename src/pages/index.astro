@@ -1,18 +1,41 @@
-<!--=====================================================================================-->
-<!--=====================================================================================-->
+---
+// ============================================================================
+// Archivo: src/pages/index.astro
+// Página Astro que funciona en local y en GitHub Pages usando import.meta.env.BASE_URL
+// ============================================================================
+// Frontmatter: bloque ejecutado en build. Sirve para preparar datos del template.
 
-<!-- Archivo: src/pages/index.astro -->
-<!-- Página Astro que funciona en local y en GitHub Pages usando import.meta.env.BASE_URL -->
+import type { ImageMetadata } from 'astro'; // Metadata de imagen (la URL final vive en .src)
 
-<!--=====================================================================================-->
-<!--=====================================================================================-->
+// ============================================================================
+// LISTA DE GIFs EN BUILD (Astro + Vite)
+// - Escanea archivos en src/assets/gifs
+// - Astro devuelve ImageMetadata, usamos .src como URL final
+// ============================================================================
+const gifModules = import.meta.glob('../assets/gifs/*.gif', {
+  eager: true,        // Importa TODO en build (no lazy)
+  import: 'default'   // Toma la export default (ImageMetadata)
+}) as Record<string, ImageMetadata>;
+
+// Convierte el objeto en lista y ordena por nombre (1,2,3...10)
+const gifEntries = Object.entries(gifModules)
+  .sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true }));
+
+// Nos quedamos solo con las URLs finales de los GIFs
+const gifUrls = gifEntries.map(([, img]) => img.src);
+
+// Primer GIF como fallback para el <img> inicial
+const initialGif = gifUrls[0] ?? '';
+---
+
+ 
 
 <!-- Abre la cabecera del documento. -->
 <head>
   <!-- Configuración básica de la página -->
   <meta charset="utf-8" /> <!-- Tipo de caracteres: UTF-8 permite tildes, ñ y símbolos -->
   <meta name="color-scheme" content="light only" /> <!-- Para que la página se vea bien aunque fuercen dark mode -->
-  <link rel="icon" type="image/svg+xml" href={import.meta.env.BASE_URL + "favicon.svg"} /> <!-- Icono pequeño que se ve en la pestaña del navegador (BASE_URL) -->
+  <link rel="icon" type="image/svg+xml" href={import.meta.env.BASE_URL + "icons/favicon.svg"} /> <!-- Icono pequeño que se ve en la pestaña del navegador (BASE_URL) -->
   <meta name="viewport" content="width=device-width, initial-scale=1" /> <!-- Hace que la página se adapte a móviles <diseño responsivo> -->
   <meta name="generator" content={Astro.generator} /> <!-- Esto lo agrega Astro automáticamente, indica que se utiliza Astro y su versión-->
   <title>Para mi princesa &lt;3</title> <!-- Texto que se ve en la pestaña del navegador, &lt; es el símbolo "<" -->
@@ -620,7 +643,7 @@
 <!-- Contenedor principal de todo el contenido visible de la página -->
 <div class="page" 
      data-base={import.meta.env.BASE_URL}
-     style={`--bg-url: url(${import.meta.env.BASE_URL}fondo.png)`}>
+     style={`--bg-url: url(${import.meta.env.BASE_URL}img/fondo.png)`}>
 
   <!-- =======================================================================
        TÍTULO PRINCIPAL
@@ -651,11 +674,11 @@
 
       <!-- Imagen principal (GIF) -->
       <!-- id="mainGif": lo usa JS para cambiar de GIF y bloquear proporción -->
-      <!-- src: usa BASE_URL para encontrar correctamente 1.gif en local y GitHub Pages -->
+      <!-- src: GIF inicial resuelto en build (Astro ya incluye la BASE_URL correcta) -->
       <!-- alt: texto alternativo para accesibilidad -->
-      <img id="mainGif"
-           src={import.meta.env.BASE_URL + "1.gif"}
-           alt="Gif en el centro">
+       <img id="mainGif"
+            src={initialGif}
+            alt="Gif en el centro">
 
       <!-- Reloj / fecha superpuesto (actualizado por JS) -->
       <!-- id="reloj": JS escribe aquí la fecha y hora -->
@@ -677,7 +700,7 @@
       <!-- preload="auto": intenta cargar el audio por adelantado -->
       <!-- loop: reproduce en bucle continuamente -->
       <audio id="rainAudio"
-             src={import.meta.env.BASE_URL + "rain.mp3"}
+             src={import.meta.env.BASE_URL + "audio/rain.mp3"}
              preload="auto"
              loop></audio>
     </div> <!-- /.img-redondeada -->
@@ -843,20 +866,20 @@
 </script>
 
 <!-- ===========================================================================
-     SCRIPTS DE SOPORTE
-     - Definen constantes globales usadas por el script principal.
-     - audio.js  → configuración de audio (volúmenes por defecto).
-     - icons.js  → íconos SVG para la interfaz.
-     IMPORTANTE: deben cargarse antes del script principal.
+     ENTRY DEL CLIENTE (PUENTE TEMPORAL)
+     - Este script carga src/client/main.js (procesado por Astro).
+     - main.js expone NOLIA_AUDIO y NOLIA_ICONS para que el script inline actual
+       siga funcionando sin cambios mientras migramos la lógica.
+     IMPORTANTE: debe ejecutarse antes del script principal.
      =========================================================================== -->
-<script is:inline src={import.meta.env.BASE_URL + "lib/audio.js"}></script>
-<script is:inline src={import.meta.env.BASE_URL + "lib/icons.js"}></script>
+<script src="../client/main.js"></script>
 
 <!-- ===========================================================================
      SCRIPT PRINCIPAL DE INTERFAZ
      - Música (YouTube), lluvia, GIFs, modo día/noche, UI.
+     - define:vars inyecta GIF_URLS desde el frontmatter (build-time).
      =========================================================================== -->
-<script is:inline>
+<script is:inline type="module" define:vars={{ GIF_URLS: gifUrls }}>
   
   /* ---------------------------------------------------------------------------
      CONSTANTES DE CONFIGURACIÓN E ÍCONOS
@@ -1108,7 +1131,7 @@
        ------------------------------------------------------------------------- */
 
     // Construye la URL del sonido respetando subcarpetas (local / GitHub Pages)
-    const SWITCH_URL = asset('light_switch.mp3');
+    const SWITCH_URL = asset('audio/light_switch.mp3');
 
     const switchSfx = new Audio(SWITCH_URL); // Audio del interruptor
     switchSfx.preload = 'auto';              // Precarga el sonido
@@ -1246,53 +1269,42 @@
 
   /* ===================================================================
     ROTADOR DE GIFs — V3 (PRO)
-    - El primer GIF carga instantáneo
-    - gifs.json se carga en background
+    - La lista se genera en build con import.meta.glob (Astro)
+    - No hay fetch ni manifiesto externo
     - Todos los GIFs se precargan
     - Cambio de GIF SIEMPRE instantáneo
     =================================================================== */
   function setupGifRotator(btn, imgEl) {
     if (!btn || !imgEl) return;
 
-    let urls = [];
+    const urls = Array.isArray(GIF_URLS) ? GIF_URLS.slice() : []; // GIF_URLS viene de define:vars (Astro)
+    const urlsAbs = urls.map((url) => new URL(url, location.href).href);
+
     let actual = 0;
-    let ready = false;
+    let ready = urls.length > 0;
 
-    // Deshabilita el botón hasta que todo esté listo
-    btn.disabled = true;
-    btn.style.opacity = "0.5";
+    // Deshabilita el botón si no hay GIFs
+    btn.disabled = !ready;
+    btn.style.opacity = ready ? "1" : "0.5";
 
-    // Carga la lista en background (no bloquea render)
-    fetch(asset("gifs.json"), { cache: "no-store" })
-      .then(r => r.ok ? r.json() : Promise.reject())
-      .then(files => {
-        if (!Array.isArray(files) || files.length === 0) return;
+    if (!ready) {
+      console.warn("GIF rotator: lista de GIFs vacía");
+      return;
+    }
 
-        urls = files.map(f => asset(f));
+    // Detectar GIF actual
+    const current = new URL(imgEl.getAttribute("src"), location.href).href;
+    const idx = urlsAbs.indexOf(current);
+    actual = idx >= 0 ? idx : 0;
 
-        // Detectar GIF actual
-        const current = new URL(imgEl.getAttribute("src"), location.href).href;
-        const idx = urls.indexOf(current);
-        actual = idx >= 0 ? idx : 0;
+    // 🔥 PRE-CARGA REAL
+    urls.forEach((url) => {
+      const img = new Image();
+      img.src = url;
+    });
 
-        // 🔥 PRE-CARGA REAL
-        urls.forEach((url) => {
-          const img = new Image();
-          img.src = url;
-        });
-
-        ready = true;
-        btn.disabled = false;
-        btn.style.opacity = "1";
-      })
-      .catch(() => {
-        console.warn("GIF rotator: gifs.json no disponible");
-      });
-
-    // Click → siguiente GIF (solo si está listo)
+    // Click → siguiente GIF
     btn.addEventListener("click", () => {
-      if (!ready || urls.length === 0) return;
-
       actual = (actual + 1) % urls.length;
       imgEl.src = urls[actual];
       setCover(imgEl);

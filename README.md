@@ -10,7 +10,7 @@ The code has been developed from scratch, incorporating aesthetic changes and fu
 
 ## 📸 Preview
 
-![Site Preview](/public/preview.png)
+![Site Preview](/public/img/preview.png)
 
 ---
 

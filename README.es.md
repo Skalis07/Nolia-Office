@@ -8,7 +8,7 @@ El código ha sido desarrollado desde cero, incorporando cambios estéticos y me
 
 ## 📸 Vista Previa
 
-![Vista previa del sitio](/public/preview.png)
+![Vista previa del sitio](/public/img/preview.png)
 
 ---
 
