@@ -5,9 +5,7 @@
   "description": "Web application for a relaxing, customizable study/work environment inspired by Animal Crossing.",
   "author": "Skalis07",
   "scripts": {
-    "predev": "node scripts/gen-gifs-manifest.mjs",
     "dev": "astro dev",
-    "prebuild": "node scripts/gen-gifs-manifest.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
