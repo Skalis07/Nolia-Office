@@ -1,0 +1,17 @@
+# Dependencias y builds locales
+node_modules
+dist
+
+# Git y tooling local
+.git
+.vscode
+.github
+
+# Documentación y scripts no necesarios en runtime
+docs
+
+# Logs y envs
+npm-debug.log
+yarn-error.log
+.env
+.env.*

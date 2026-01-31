@@ -5,7 +5,7 @@ name: Deploy Astro to GitHub Pages
 on:
   # 1️⃣ Se ejecuta automáticamente cada vez que se hace push a la rama “main”
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   # 2️⃣ También se puede ejecutar manualmente desde GitHub (botón “Run workflow”)
   workflow_dispatch:
 
@@ -15,7 +15,6 @@ permissions:
   pages: write # Puede subir archivos al sistema de GitHub Pages
   id-token: write # Permite autenticarse de forma segura con OIDC
 
-
 # ⚙️ Controla la concurrencia: si se hacen varios pushes seguidos, cancela los anteriores para no sobrecargar los despliegues.
 concurrency:
   group: "pages"
@@ -23,7 +22,6 @@ concurrency:
 
 # 🧱 Definición de los trabajos (“jobs”) del pipeline
 jobs:
-
   # --- JOB 1: Build ---
   build:
     # 🔧 Sistema operativo donde se ejecutarán los comandos
@@ -40,7 +38,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
 
       # Paso 3️⃣ — Instala dependencias según el package-lock.json
       - name: Install deps
@@ -48,13 +46,15 @@ jobs:
 
       # Paso 4️⃣ — Compila el sitio Astro → genera la carpeta /dist
       - name: Build
-        run: npm run build   # 👉 Aquí Astro compila src/pages/*.astro → dist/
+        env:
+          BASE_PATH: /Nolia-Office/
+        run: npm run build # 👉 Aquí Astro compila src/pages/*.astro → dist/
 
       # Paso 5️⃣ — Empaqueta el resultado para pasarlo al siguiente job (deploy)
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist        # 👉 MUY IMPORTANTE: publicar SOLO la carpeta dist
+          path: ./dist # 👉 MUY IMPORTANTE: publicar SOLO la carpeta dist
 
   # --- JOB 2: Deploy ---
   deploy:

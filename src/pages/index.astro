@@ -1,20 +1,41 @@
-<!-- ========================================================================================================================================================-->
-<!-- ========================================================================================================================================================-->
+---
+// ============================================================================
+// Archivo: src/pages/index.astro
+// Página Astro que funciona en local y en GitHub Pages usando import.meta.env.BASE_URL
+// ============================================================================
+// Frontmatter: bloque ejecutado en build. Sirve para preparar datos del template.
 
+import type { ImageMetadata } from 'astro'; // Metadata de imagen (la URL final vive en .src)
 
-<!-- Archivo: src/pages/index.astro -->
-<!-- Página Astro que funciona en local y en GitHub Pages usando import.meta.env.BASE_URL -->
+// ============================================================================
+// LISTA DE GIFs EN BUILD (Astro + Vite)
+// - Escanea archivos en src/assets/gifs
+// - Astro devuelve ImageMetadata, usamos .src como URL final
+// ============================================================================
+const gifModules = import.meta.glob('../assets/gifs/*.gif', {
+  eager: true,        // Importa TODO en build (no lazy)
+  import: 'default'   // Toma la export default (ImageMetadata)
+}) as Record<string, ImageMetadata>;
 
+// Convierte el objeto en lista y ordena por nombre (1,2,3...10)
+const gifEntries = Object.entries(gifModules)
+  .sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true }));
 
-<!-- ========================================================================================================================================================-->
-<!-- ========================================================================================================================================================-->
+// Nos quedamos solo con las URLs finales de los GIFs
+const gifUrls = gifEntries.map(([, img]) => img.src);
 
+// Primer GIF como fallback para el <img> inicial
+const initialGif = gifUrls[0] ?? '';
+---
+
+ 
 
 <!-- Abre la cabecera del documento. -->
 <head>
   <!-- Configuración básica de la página -->
   <meta charset="utf-8" /> <!-- Tipo de caracteres: UTF-8 permite tildes, ñ y símbolos -->
-  <link rel="icon" type="image/svg+xml" href={import.meta.env.BASE_URL + "favicon.svg"} /> <!-- Icono pequeño que se ve en la pestaña del navegador (BASE_URL) -->
+  <meta name="color-scheme" content="light only" /> <!-- Para que la página se vea bien aunque fuercen dark mode -->
+  <link rel="icon" type="image/svg+xml" href={import.meta.env.BASE_URL + "icons/favicon.svg"} /> <!-- Icono pequeño que se ve en la pestaña del navegador (BASE_URL) -->
   <meta name="viewport" content="width=device-width, initial-scale=1" /> <!-- Hace que la página se adapte a móviles <diseño responsivo> -->
   <meta name="generator" content={Astro.generator} /> <!-- Esto lo agrega Astro automáticamente, indica que se utiliza Astro y su versión-->
   <title>Para mi princesa &lt;3</title> <!-- Texto que se ve en la pestaña del navegador, &lt; es el símbolo "<" -->
@@ -24,14 +45,45 @@
 
     *, *::before, *::after { box-sizing: border-box; } /* Evita que el padding/border agranden el tamaño real (está principalmente por estándar y buena práctica) */
 
+    :root{
+      --frame-max:1200px; /* Ancho base compartido por título y frame */
+      --page-pad:10px; /* Padding horizontal/vertical base de la página */
+      --color-bg:#2a5b3d; /* Fondo principal */
+      --color-text:#000; /* Texto principal */
+      --color-white:#fff; /* Blanco base */
+      --color-bar:#5aa7a6; /* Barra de música */
+      --color-bar-border:rgba(255,255,255,.75); /* Borde de barra */
+      --white-65:rgba(255,255,255,.65); /* Blancos con transparencia */
+      --white-18:rgba(255,255,255,.18);
+      --white-12:rgba(255,255,255,.12);
+      --radius-lg:20px; /* Radio grande */
+      --radius-pill:9999px; /* Radio tipo pastilla */
+      --border-thick:5px; /* Borde grueso */
+      --border-btn:3px; /* Borde de botones/bolita */
+      --shadow-card:0 4px 15px rgba(0,0,0,.3);
+      --shadow-bar:0 4px 12px rgba(0,0,0,.25);
+      --shadow-thumb:0 1px 2px rgba(0,0,0,.25);
+      --shadow-thumb-lg:0 3px 6px rgba(0,0,0,.25);
+      --shadow-handle:inset 0 2px 0 rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.15);
+      --shadow-handle-hover:inset 0 2px 0 rgba(0,0,0,.1), 0 3px 10px rgba(0,0,0,.2);
+      --slider-track-h:6px; /* Alto de la barra del volumen */
+      --slider-thumb:16px; /* Tamaño del circulito */
+      --bar-pad:10px 16px; /* Padding base de la barra */
+      --bar-pad-compact:8px 10px; /* Padding en pantallas chicas/Notion */
+      --bar-gap:10px; /* Separación base de íconos */
+      --bar-gap-compact:8px; /* Separación compacta */
+      --frame-gap:12px; /* Espacio entre GIF y barra */
+    }
+
     .title-wrap{ /* Selector CSS '.title-wrap': aplica a cualquier elemento con esa clase */
       width:100%; /* La caja ocupa todo el ancho disponible de su contenedor padre. */
-      max-width:1200px; /* Ancho máximo */
+      max-width:var(--frame-max); /* Ancho máximo */
+      margin-inline:auto; /* Centrado para que calce con el frame */
       overflow: visible; /* Permite que el contenido que sobresalga (por ejemplo, un título escalado con transform) siga siendo visible y no se recorte */
       padding-top: 4px; /* Colchón (espacio) superior */
       position: relative; /* Mantiene la posición normal del elemento, pero permite usar desplazamientos (top/left/etc.) */
       z-index: 10; /* Asegura que esta capa quede por encima de otros elementos con z-index menor. En tu página ayuda a que el título no quede tapado por overlays o fondos animados. */
-      transition: height 140ms ease-out; /* Hace que los cambios de altura sean suaves, por ejemplo cuando el título se escala o el contenedor ajusta su tamaño. */
+      transition: none; /* Evita animaciones raras: ajuste instantáneo */
       will-change: height; /* Indica al navegador que la altura probablemente cambiará pronto, optimizando el renderizado (mejora el rendimiento de animaciones). */
     }
     
@@ -41,7 +93,7 @@
       transform-origin: left top; /* Punto de origen de las transformaciones (scale, etc.) en la esquina superior izquierda del título. */
       line-height:1.15; /* Ajusta el espacio vertical entre líneas para que el título se vea más compacto y legible. */
       font-size: clamp(14px, 4vw, 28px); /* Tamaño de fuente fluido: mínimo 14px, máximo 28px, creciendo según el ancho de la ventana (4vw). */
-      transition: transform 140ms ease-out; /* Hace que los cambios en 'transform' (por ejemplo escalado) sean suaves y rápidos. */
+      transition: none; /* Evita animaciones raras: ajuste instantáneo */
       will-change: transform; /* Le avisa al navegador que 'transform' cambiará, optimizando el renderizado de la animación. */
     }
 
@@ -52,15 +104,14 @@
     }
     body{
       text-align:center; /* Centra el texto de forma horizontal por defecto dentro del body. */
-      background:#2a5b3d; /* Color de fondo base de la página (verde oscuro). */
+      background:var(--color-bg); /* Color de fondo base de la página (verde oscuro). */
     }
 
     .page{
-      background-image: var(--bg-url); /* Usa la variable CSS --bg-url como imagen de fondo (definida en otro lugar). */
-      background-repeat:repeat; /* Repite la imagen de fondo en mosaico para cubrir toda el área. */
-      background-position:0 0; /* Posiciona la imagen de fondo en la esquina superior izquierda. */
-      background-size:auto; /* Mantiene el tamaño original de la imagen de fondo. */
-      background-attachment:scroll; /* El fondo se desplaza junto con el contenido al hacer scroll. */
+      background-image:var(--bg-url); /* Patrón directo en la página */
+      background-repeat:repeat; /* Repite el mosaico */
+      background-position:0 0; /* Ancla el patrón en la esquina superior izquierda */
+      background-size:auto; /* Mantiene el tamaño original del tile */
 
       min-height:100vh; /* La sección .page siempre mide al menos el alto completo de la ventana (viewport). */
 
@@ -69,24 +120,24 @@
       align-items:center; /* Centra horizontalmente los elementos hijos dentro del contenedor. */
 
       gap:16px; /* Espacio de 16px entre los elementos hijos (separación vertical en este caso). */
-      padding:10px 10px 0; /* Relleno: 10px arriba y a los lados, 0 abajo. */
+      padding:var(--page-pad) var(--page-pad) 0; /* Relleno: 10px arriba y a los lados, 0 abajo. */
       position:relative; /* Mantiene la posición normal, pero permite posicionar hijos de forma absoluta dentro de .page. */
     }
 
     /* ===== Título principal ===== */
     h1{
       margin:0; /* Elimina el margen superior e inferior que los <h1> traen por defecto. */
-      color:#000; /* Color del texto: negro. */
+      color:var(--color-text); /* Color del texto: negro. */
       font-family:Arial, sans-serif; /* Usa Arial, o si no existe, otra fuente sans-serif. */
     }
 
     /* ===== Marco del GIF (Contenedor) ===== */
     .img-redondeada{ /* Contenedor del GIF (o imagen) con bordes redondeados y estilo de tarjeta. */
-      max-width:1200px; /* Limita el ancho máximo para que no se haga demasiado grande en pantallas grandes. */
+      max-width:var(--frame-max); /* Limita el ancho máximo para que no se haga demasiado grande en pantallas grandes. */
       width:100%; /* Ocupa el 100% del espacio disponible hasta el máximo. */
-      border-radius:20px; /* Esquinas redondeadas del marco. */
-      border:5px solid #fff; /* Borde blanco grueso alrededor del GIF. */
-      box-shadow:0 4px 15px rgba(0,0,0,.3); /* Sombra para dar sensación de elevación/3D. */
+      border-radius:var(--radius-lg); /* Esquinas redondeadas del marco. */
+      border:var(--border-thick) solid var(--color-white); /* Borde blanco grueso alrededor del GIF. */
+      box-shadow:var(--shadow-card); /* Sombra para dar sensación de elevación/3D. */
       overflow:hidden; /* Recorta lo que sobresalga de los bordes redondeados. */
       position:relative; /* Necesario para que elementos hijos (como la fecha) se posicionen de forma absoluta dentro. */
     }
@@ -106,7 +157,7 @@
       position: absolute; /* Se posiciona libremente dentro del contenedor (.img-redondeada). */
       left: 0; bottom: 0; /* Ubicación exacta: esquina inferior izquierda. */
       background: none; /* Sin fondo sólido (puede superponerse directamente sobre el GIF). */
-      color: #fff; /* Texto blanco para contrastar con el GIF. */
+      color: var(--color-white); /* Texto blanco para contrastar con el GIF. */
 
       font-family: "Arial Rounded MT Bold", "Arial Rounded MT", Arial, sans-serif; /* Fuente más amigable y redondeada. */
       font-weight: 900; /* Peso muy grueso: texto fuerte y destacado. */
@@ -149,17 +200,16 @@
 
     /* ===== Barra música ===== */
     .barra-musica{
-      --turquesa:#5aa7a6; --borde-claro:rgba(255,255,255,.75); /* Variables internas del componente */
+      --turquesa:var(--color-bar); --borde-claro:var(--color-bar-border); /* Variables internas del componente */
       width:100%; margin-inline:auto; /* Centrado y responsivo */
       background:var(--turquesa); /* Color del fondo */
       border:4px solid var(--borde-claro); /* Contorno claro */
-      border-radius:9999px; /* Bordes súper redondeados (pastilla) */
-      padding:10px 16px; /* Separación interna para que no quede apretado. */
+      border-radius:var(--radius-pill); /* Bordes súper redondeados (pastilla) */
+      padding:var(--bar-pad); /* Separación interna para que no quede apretado. */
       display:flex; align-items:center; justify-content:center; /* Alineación */
       flex-wrap:nowrap; /* Los botones no saltan de línea */
-      box-sizing:border-box; /* Seguridad de layout */
-      gap:10px; /* Separación entre items */
-      box-shadow:0 4px 12px rgba(0,0,0,.25); /* Sombra elegante */
+      gap:var(--bar-gap); /* Separación entre items */
+      box-shadow:var(--shadow-bar); /* Sombra elegante */
       position:relative; z-index:20; /* Se mantiene sobre otros elementos */
       transition:opacity .2s, filter .2s; /* Animación suave al cambiar de modo oscuro o cuando algo afecte opacity. */
     }
@@ -172,16 +222,16 @@
     .icon-btn{
       width:44px; height:44px; flex:0 0 44px; /* Botón cuadrado, tamaño fijo */
       border-radius:50%; /* Botón redondo */
-      border:3px solid #fff; background:transparent; color:#fff; /* Estilo visual del borde + color del icono. */
+      border:var(--border-btn) solid var(--color-white); background:transparent; color:var(--color-white); /* Estilo visual del borde + color del icono. */
       display:grid; place-items:center; /* Centrado perfecto del SVG */
       cursor:pointer; /* Manito mouse */
       transition:background-color .2s, transform .05s, opacity .2s; /* Animación suave del hover, active y cualquier cambio de opacidad. */
     }
 
-    .icon-btn:hover{ background-color:rgba(255,255,255,.12); } /* Hover: cuando el mouse pasa encima del botón, se ilumina levemente */
+    .icon-btn:hover{ background-color:var(--white-12); } /* Hover: cuando el mouse pasa encima del botón, se ilumina levemente */
     .icon-btn:active{ transform:scale(.98); } /* Active (pseudo): mientras se hace clic o se mantiene presionado, el botón se “hunde” */
     .icon-btn svg{ width:20px; height:20px; display:block; } /* Tamaño del ícono SVG y display:block evita espacios indeseados */
-    .icon-btn.active{ background-color:rgba(255,255,255,.18); } /* Clase .active: estado «encendido» cuando lo activa el JS */
+    .icon-btn.active{ background-color:var(--white-18); } /* Clase .active: estado «encendido» cuando lo activa el JS */
 
     /* ===== Slider volumen (MÚSICA) ===== */
     .volume-slider{
@@ -189,8 +239,8 @@
       flex:1 1 160px; /* Se estira, puede reducirse, base 160px: funciona bien en flexbox */
       min-width:0; /* CLAVE para que no rompa el layout dentro de flex */
       max-width:320px; /* En pantallas grandes crece hasta 320px */
-      width:auto; height:6px; border-radius:999px; /* Barra larga, muy redondeada */
-      background:rgba(255,255,255,.65); /* Color de la barra */
+      height:var(--slider-track-h); border-radius:var(--radius-pill); /* Barra larga, muy redondeada */
+      background:var(--white-65); /* Color de la barra */
       outline:none; /* Elimina contorno feo al enfocarse */
       cursor:pointer; /* Manito para indicar que es interactivo */
     }
@@ -198,20 +248,20 @@
     /* Thumb (punto que se arrastra) */
     .volume-slider::-webkit-slider-thumb{
       -webkit-appearance:none; appearance:none; /* Elimina estilo por defecto */
-      width:16px; height:16px; border-radius:50%; background:#fff; /* Circulito blanco */
+      width:var(--slider-thumb); height:var(--slider-thumb); border-radius:50%; background:var(--color-white); /* Circulito blanco */
       border:2px solid var(--turquesa); /* Borde del color del tema */
-      box-shadow:0 1px 2px rgba(0,0,0,.25); /* Sombra ligera */
+      box-shadow:var(--shadow-thumb); /* Sombra ligera */
     }
 
     /* Thumb — Firefox */
     .volume-slider::-moz-range-thumb{
-      width:16px; height:16px; border-radius:50%; background:#fff;
-      border:2px solid var(--turquesa); box-shadow:0 1px 2px rgba(0,0,0,.25);
+      width:var(--slider-thumb); height:var(--slider-thumb); border-radius:50%; background:var(--color-white);
+      border:2px solid var(--turquesa); box-shadow:var(--shadow-thumb);
     }
     
     /* Track — Firefox */
     .volume-slider::-moz-range-track{
-      height:6px; border-radius:999px; background:rgba(255,255,255,.65);
+      height:var(--slider-track-h); border-radius:var(--radius-pill); background:var(--white-65);
     }
 
     /* ======= Tirita sol/luna ======= */
@@ -240,7 +290,7 @@
       background:#fff9e8; /* Color crema */
       border-radius:0; 
       margin-bottom:calc(var(--thumb)*.5); /* Espacio para que el botón no se corte */
-      box-shadow:inset 0 2px 0 rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.15); /* Sombras dobles */
+      box-shadow:var(--shadow-handle); /* Sombras dobles */
       pointer-events:auto; /* Esta parte sí recibe clics */
       transform-origin:top center; /* Punto de origen para la animación stretch */
       cursor:pointer; 
@@ -250,7 +300,7 @@
     /* Hover en la barra */
     .right-handle .track:hover{ 
       background:#fff4d1; /* Más clarito */
-      box-shadow:inset 0 2px 0 rgba(0,0,0,.1), 0 3px 10px rgba(0,0,0,.2); 
+      box-shadow:var(--shadow-handle-hover); 
     }
 
     /* Cuando se activa la animación stretch */
@@ -264,13 +314,13 @@
       left:50%; transform:translateX(-50%); /* Centrado horizontal */
       width:var(--thumb); height:var(--thumb); /* Tamaño según variable */
       border-radius:50%; /* Perfectamente redondo */
-      border:3px solid #fff; 
+      border:var(--border-btn) solid var(--color-white); 
       display:grid; place-items:center; /* Centra el ícono SVG */
       bottom:calc(-1 * var(--thumb) * .5); /* Sale “medio afuera” de la tirita */
       transition:background 160ms, color 160ms, box-shadow 160ms, transform 80ms; /* Animaciones */
       cursor:pointer; 
       color:#6b4a00; background:#ffc400; /* Color de “sol” */
-      box-shadow:0 3px 6px rgba(0,0,0,.25);
+      box-shadow:var(--shadow-thumb-lg);
       pointer-events:auto; /* Sí recibe clics */
     }
     
@@ -287,7 +337,7 @@
     /* Estado “modo oscuro” (cuando la clase .activo está activada) */
     .right-handle.activo .thumb{ 
       background:#2e2e2e; /* Fondo oscuro */
-      color:#fff; /* Ícono blanco */
+      color:var(--color-white); /* Ícono blanco */
     }
 
     /* ===== Oscurecido ===== */
@@ -311,8 +361,13 @@
     /* ===== Frame: mismo ancho para GIF y barra ===== */
     .frame{ 
       width:100%; 
-      max-width:1200px; /* Límite de ancho */
+      max-width:var(--frame-max); /* Límite de ancho */
       margin-inline:auto; /* Centrado */
+    }
+
+    /* ===== Fullscreen (F11 / Fullscreen API) ===== */
+    html.browser-fullscreen{
+      --frame-max:min(1400px, 92vw); /* Expansión suave solo en fullscreen */
     }
 
     /* Asegura que GIF y barra tengan el mismo ancho */
@@ -320,25 +375,24 @@
     .frame .barra-musica{ 
       width:100%; 
       max-width:none; 
-      box-sizing:border-box; 
     }
 
     /* --- separación entre GIF y barra (página y Notion) --- */
     .frame .barra-musica{
-      margin-top: 12px; /* espacio extra debajo del GIF */
+      margin-top: var(--frame-gap); /* espacio extra debajo del GIF */
     }
 
     /* En embeds de Notion — a veces hay CSS que pisa el tuyo */
     html.embed-notion .barra-musica{
-      margin-top: 12px !important; /* Se fuerza para evitar bugs */
+      margin-top: var(--frame-gap) !important; /* Se fuerza para evitar bugs */
     }
 
     /* ===== Ajustes móviles generales ===== */
     @media (max-width:520px){
 
       .barra-musica{ 
-        padding:8px 10px; /* Menos padding para pantallas pequeñas */
-        gap:8px; /* Menor separación entre íconos */
+        padding:var(--bar-pad-compact); /* Menos padding para pantallas pequeñas */
+        gap:var(--bar-gap-compact); /* Menor separación entre íconos */
       }
 
       .icon-btn{ 
@@ -421,19 +475,18 @@
     }
 
     /* Quita bordes y sombras que se ven mal en el embed */
-    html.embed-notion .img-redondeada{ 
-      border:0!important; 
-      box-shadow:none!important; 
-      border-radius:20px!important; 
-    }
-
+    html.embed-notion .img-redondeada,
     html.embed-notion .barra-musica{ 
-      box-shadow:none!important; 
       border:0!important; 
     }
 
-    /* Extra: evita sombras en botones dentro de Notion */
+    html.embed-notion .img-redondeada{ 
+      border-radius:var(--radius-lg)!important; 
+    }
+
+    /* Extra: evita sombras en Notion */
     html.embed-notion .img-redondeada, 
+    html.embed-notion .barra-musica, 
     html.embed-notion .icon-btn{ 
       box-shadow:none!important; 
     }
@@ -441,8 +494,8 @@
     /* La barra NO se debe cortar: permite que pase a 2 filas */
     html.embed-notion .barra-musica{
       flex-wrap:wrap!important; /* Permite salto a otra línea */
-      padding:8px 10px!important; /* Más compacto */
-      gap:8px!important; /* Menos separación */
+      padding:var(--bar-pad-compact)!important; /* Más compacto */
+      gap:var(--bar-gap-compact)!important; /* Menos separación */
       min-width:0!important; /* Previene cortes raros con flex */
     }
 
@@ -483,13 +536,19 @@
           - window.self !== window.top → Está en un iframe.
           El try/catch es por si el iframe está en dominio distinto y lanza error. */
 
+        const referrer = document.referrer || '';
+        const ancestorOrigins = Array.from(window.location.ancestorOrigins || []);
+        /* Notion a veces no envía referrer; ancestorOrigins suele conservar el origen del embed. */
+
         const isNotion = 
           qs.has('notion') || 
-          /notion\.so|notion\.site/i.test(document.referrer || '');
+          qs.has('embed') || 
+          /notion\.(so|site|app)/i.test(referrer) ||
+          ancestorOrigins.some((origin)=> /notion\.(so|site|app)/i.test(origin));
         /* Detecta si el embed proviene de Notion:
-          1) ?notion en la URL
-          2) El referrer contiene "notion.so" o "notion.site"
-          (cuando Notion inserta tu página como embed) */
+          1) ?notion o ?embed en la URL
+          2) El referrer contiene "notion.so" / "notion.site" / "notion.app"
+          3) ancestorOrigins contiene un dominio de Notion (cuando el referrer viene vacío) */
 
         if(inIframe && isNotion){
           document.documentElement.classList.add('embed-notion');
@@ -499,13 +558,86 @@
           para activar todos los estilos especiales CSS que creaste. */
       })();
   </script>
+  
+<!-- ===== Script: Detecta fullscreen del navegador (F11) ===== -->
+<script is:inline>
+  (function(){
+    /* IIFE (Immediately Invoked Function Expression)
+       - Se ejecuta inmediatamente al cargarse el script.
+       - Evita contaminar el scope global (no crea variables globales innecesarias). */
+
+    const root = document.documentElement;
+    /* document.documentElement === <html>
+       - Guardamos el elemento raíz para poder agregar/quitar clases CSS. */
+
+    const threshold = 8; // px de tolerancia
+    /* Umbral de tolerancia en píxeles:
+       - A veces el tamaño de la ventana no coincide EXACTO con screen.width/screen.height
+         (por barras, scroll, zoom, o comportamiento del navegador).
+       - Por eso usamos ±8px como margen de error. */
+
+    function isDesktop() {
+      /* Detecta si estamos en un entorno "desktop real":
+         - (hover: hover) => el dispositivo permite hover (mouse)
+         - (pointer: fine) => puntero preciso (mouse)
+         Esto ayuda a evitar falsos positivos en móviles/tablets. */
+      return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    }
+
+    function detectFullscreen() {
+
+      /* Si estamos embebidos en Notion (iframe), no aplicamos fullscreen.
+         - embed-notion se añade por tu otro script de detección de Notion.
+         - Dentro de iframes fullscreen normalmente no aplica o no tiene sentido. */
+      if (root.classList.contains('embed-notion')) return;
+
+      /* 1) Fullscreen API real:
+         - document.fullscreenElement es distinto de null cuando
+           un elemento entró a fullscreen usando requestFullscreen().
+         - Esto NO siempre ocurre con F11. */
+      const apiFullscreen = !!document.fullscreenElement;
+
+      /* 2) Fullscreen por F11 (modo “casi pantalla completa”)
+         - F11 muchas veces no activa Fullscreen API.
+         - Entonces detectamos si el tamaño de la ventana ≈ tamaño real de pantalla.
+         - Si coincide (dentro del threshold), asumimos fullscreen. */
+      const nearScreen =
+        Math.abs(window.innerWidth - screen.width) <= threshold &&
+        Math.abs(window.innerHeight - screen.height) <= threshold;
+
+      /* Fullscreen activo si:
+         - Hay fullscreen por API, o
+         - estamos en desktop y la ventana ocupa prácticamente toda la pantalla (F11). */
+      const active = apiFullscreen || (isDesktop() && nearScreen);
+
+      /* Agrega o quita la clase en <html>:
+         - Si active === true => <html class="browser-fullscreen">
+         - Si active === false => se elimina la clase
+         
+         Esta clase activa tu CSS:
+         html.browser-fullscreen { --frame-max: ... } */
+      root.classList.toggle('browser-fullscreen', active);
+    }
+
+    /* Cuando se cambia el tamaño de la ventana (incluye entrar/salir F11),
+       se recalcula si estamos en fullscreen.
+       passive:true = mejora performance porque el listener no bloquea scroll */
+    window.addEventListener('resize', detectFullscreen, { passive: true });
+
+    /* Cuando cambia el fullscreen usando Fullscreen API (requestFullscreen / exitFullscreen),
+       se vuelve a detectar */
+    document.addEventListener('fullscreenchange', detectFullscreen);
+
+    /* Al cargar la página por primera vez, detecta el estado inicial */
+    window.addEventListener('load', detectFullscreen, { once: true });
+
+  })();
+</script>
 
 </head>
 
-
-<!-- ========================================================================================================================================================-->
-<!-- ========================================================================================================================================================-->
-
+<!--=====================================================================================-->
+<!--=====================================================================================-->
 
 <!-- NOTA: En Astro, no se añade <html> ni <body> explícitos. El contenido de la página va directo aquí. -->
 
@@ -517,7 +649,7 @@
 <!-- Contenedor principal de todo el contenido visible de la página -->
 <div class="page" 
      data-base={import.meta.env.BASE_URL}
-     style={`--bg-url: url(${import.meta.env.BASE_URL}fondo.png)`}>
+     style={`--bg-url: url(${import.meta.env.BASE_URL}img/fondo.png)`}>
 
   <!-- =======================================================================
        TÍTULO PRINCIPAL
@@ -548,11 +680,11 @@
 
       <!-- Imagen principal (GIF) -->
       <!-- id="mainGif": lo usa JS para cambiar de GIF y bloquear proporción -->
-      <!-- src: usa BASE_URL para encontrar correctamente 1.gif en local y GitHub Pages -->
+      <!-- src: GIF inicial resuelto en build (Astro ya incluye la BASE_URL correcta) -->
       <!-- alt: texto alternativo para accesibilidad -->
-      <img id="mainGif"
-           src={import.meta.env.BASE_URL + "1.gif"}
-           alt="Gif en el centro">
+       <img id="mainGif"
+            src={initialGif}
+            alt="Gif en el centro">
 
       <!-- Reloj / fecha superpuesto (actualizado por JS) -->
       <!-- id="reloj": JS escribe aquí la fecha y hora -->
@@ -574,7 +706,7 @@
       <!-- preload="auto": intenta cargar el audio por adelantado -->
       <!-- loop: reproduce en bucle continuamente -->
       <audio id="rainAudio"
-             src={import.meta.env.BASE_URL + "rain.mp3"}
+             src={import.meta.env.BASE_URL + "audio/rain.mp3"}
              preload="auto"
              loop></audio>
     </div> <!-- /.img-redondeada -->
@@ -739,250 +871,231 @@
     })();
 </script>
 
+<!-- ===========================================================================
+     ENTRY DEL CLIENTE (PUENTE TEMPORAL)
+     - Este script carga src/client/main.js (procesado por Astro).
+     - main.js expone NOLIA_AUDIO y NOLIA_ICONS para que el script inline actual
+       siga funcionando sin cambios mientras migramos la lógica.
+     IMPORTANTE: debe ejecutarse antes del script principal.
+     =========================================================================== -->
+<script src="../client/main.js"></script>
 
 <!-- ===========================================================================
-     SCRIPT: MÚSICA (YouTube) + LLUVIA (MP3) + LÓGICA DE INTERFAZ
-     - Maneja reproducción de música vía YouTube embebido (solo audio).
-     - Controla sonido de lluvia con <audio>.
-     - Cambia iconos y estados de botones.
+     SCRIPT PRINCIPAL DE INTERFAZ
+     - Música (YouTube), lluvia, GIFs, modo día/noche, UI.
+     - define:vars inyecta GIF_URLS desde el frontmatter (build-time).
      =========================================================================== -->
-<script is:inline>
+<script is:inline type="module" define:vars={{ GIF_URLS: gifUrls }}>
+  
+  /* ---------------------------------------------------------------------------
+     CONSTANTES DE CONFIGURACIÓN E ÍCONOS
+     - Definidas en scripts externos cargados antes de este bloque.
+    --------------------------------------------------------------------------- */
+  const DEFAULT_RAIN_VOL = window.NOLIA_AUDIO.DEFAULT_RAIN_VOL;
 
-    /* ---------------------------------------------------------------------------
-       VOLUMEN POR DEFECTO DE LA LLUVIA
-       - Valor en porcentaje (0–100).
-       - Se convierte luego a rango 0.0–1.0 para el elemento <audio>.
-       --------------------------------------------------------------------------- */
-    const DEFAULT_RAIN_VOL = 60; // mismo 60% que usa el slider visual
+  const ICON_PLAY = window.NOLIA_ICONS.ICON_PLAY;
+  const ICON_PAUSE = window.NOLIA_ICONS.ICON_PAUSE;
+  const ICON_CLOUD = window.NOLIA_ICONS.ICON_CLOUD;
+  const ICON_CLOUD_RAIN = window.NOLIA_ICONS.ICON_CLOUD_RAIN;
 
-    /* ---------------------------------------------------------------------------
-      BASE_URL (Astro) - helper ÚNICO para rutas (local + GitHub Pages)
-      - Usa data-base={import.meta.env.BASE_URL} que ya pusiste en <div class="page">
-      - asset("x.png") => URL absoluta correcta, incluso si el sitio vive en /Nolia-Office/
-      --------------------------------------------------------------------------- */
-    const baseRaw = document.querySelector('.page')?.dataset.base || '/'; // BASE desde Astro (fallback "/")
-    const BASE = baseRaw.endsWith('/') ? baseRaw : baseRaw + '/';         // Asegura slash final
-    const asset = (path) =>                                               // Helper para assets
-      new URL(String(path).replace(/^\//, ''), location.origin + BASE).href;
+  /* ---------------------------------------------------------------------------
+    BASE_URL (Astro) - helper ÚNICO para rutas (local + GitHub Pages)
+    - Usa data-base={import.meta.env.BASE_URL} que ya pusiste en <div class="page">
+    - asset("x.png") => URL absoluta correcta, incluso si el sitio vive en /Nolia-Office/
+    --------------------------------------------------------------------------- */
+  const baseRaw = document.querySelector('.page')?.dataset.base || '/'; // BASE desde Astro (fallback "/")
+  const BASE = baseRaw.endsWith('/') ? baseRaw : baseRaw + '/';         // Asegura slash final
+  const asset = (path) =>                                               // Helper para assets
+    new URL(String(path).replace(/^\//, ''), location.origin + BASE).href;
 
-    /* ===========================================================================
-       ICONOS SVG DEFINIDOS COMO STRINGS
-       - Se inyectan dinámicamente en los botones con innerHTML.
-       - Evita tener múltiples SVG duplicados en el HTML.
-       =========================================================================== */
+  /* ===========================================================================
+     VARIABLES DE ESTADO (MÚSICA Y LLUVIA)
+     =========================================================================== */
 
-    /* Icono PLAY (reproducir música) */
-    const ICON_PLAY =
-      '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
-        '<path d="M8 5v14l11-7z"/>' +
-      '</svg>';
+  let playerMusic;           // Instancia del reproductor YouTube (solo audio)
+  let isMusicPlaying = false; // Estado de reproducción de música
+  let isRainPlaying  = false; // Estado del sonido de lluvia
+  let rainAudio;             // Referencia al elemento <audio> de lluvia
 
-    /* Icono PAUSE (pausar música) */
-    const ICON_PAUSE =
-      '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
-        '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>' +
-      '</svg>';
+  /* ===========================================================================
+     REFERENCIAS A ELEMENTOS DEL DOM
+     - Se asignan una sola vez cuando el player está listo.
+     =========================================================================== */
+  let btnMusic;    // Botón play/pause
+  let btnRain;     // Botón lluvia
+  let volMusic;    // Slider de volumen
+  let btnShuffle;  // Botón cambiar GIF
+  let gifImg;      // Imagen del GIF principal
 
-    /* Icono nube SIN lluvia (estado inactivo) */
-    const ICON_CLOUD = `
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M19 18a4 4 0 0 0 0-8
-                 5 5 0 0 0-9-2
-                 4 4 0 0 0-2 7.5"/>
-      </svg>`;
+  /* ===========================================================================
+     CARGA DINÁMICA DE LA API DE YOUTUBE
+     - Inserta el script oficial de YouTube IFrame API.
+     - Necesario para crear YT.Player.
+     =========================================================================== */
 
-    /* Icono nube CON lluvia (estado activo) */
-    const ICON_CLOUD_RAIN = `
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M19 18a4 4 0 0 0 0-8
-                 5 5 0 0 0-9-2
-                 4 4 0 0 0-2 7.5"/>
-        <!-- Gotas de lluvia -->
-        <path d="M8 20l1-2
-                 M12 20l1-2
-                 M16 20l1-2"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              fill="none"/>
-      </svg>`;
+  const ytScript = document.createElement('script'); // Crea <script>
+  ytScript.src = 'https://www.youtube.com/iframe_api'; // API oficial
+  document.head.appendChild(ytScript); // Se agrega al <head>
 
+  /* ===========================================================================
+     CALLBACK GLOBAL REQUERIDO POR YOUTUBE
+     - YouTube llama automáticamente a esta función cuando la API está lista.
+     =========================================================================== */
+  window.onYouTubeIframeAPIReady = function () {
 
-    /* ===========================================================================
-       VARIABLES DE ESTADO (MÚSICA Y LLUVIA)
-       =========================================================================== */
-
-    let playerMusic;           // Instancia del reproductor YouTube (solo audio)
-    let isMusicPlaying = false; // Estado de reproducción de música
-    let isRainPlaying  = false; // Estado del sonido de lluvia
-    let rainAudio;             // Referencia al elemento <audio> de lluvia
-
-    /* ===========================================================================
-       REFERENCIAS A ELEMENTOS DEL DOM
-       - Se asignan una sola vez cuando el player está listo.
-       =========================================================================== */
-    let btnMusic;    // Botón play/pause
-    let btnRain;     // Botón lluvia
-    let volMusic;    // Slider de volumen
-    let btnShuffle;  // Botón cambiar GIF
-    let gifImg;      // Imagen del GIF principal
-
-    /* ===========================================================================
-       CARGA DINÁMICA DE LA API DE YOUTUBE
-       - Inserta el script oficial de YouTube IFrame API.
-       - Necesario para crear YT.Player.
-       =========================================================================== */
-
-    const ytScript = document.createElement('script'); // Crea <script>
-    ytScript.src = 'https://www.youtube.com/iframe_api'; // API oficial
-    document.head.appendChild(ytScript); // Se agrega al <head>
-
-    /* ===========================================================================
-       CALLBACK GLOBAL REQUERIDO POR YOUTUBE
-       - YouTube llama automáticamente a esta función cuando la API está lista.
-       =========================================================================== */
-    window.onYouTubeIframeAPIReady = function () {
-
-      /* Crear reproductor de YouTube SOLO PARA AUDIO */
-      playerMusic = new YT.Player('ytplayerMusic', {
-        videoId: '8kBlKM71pjc', // ID del video de YouTube (música)
-        playerVars: {
-          autoplay: 0,   // No reproducir automáticamente
-          controls: 0,   // Ocultar controles nativos
-          rel: 0,        // No mostrar videos relacionados
-          playsinline: 1 // Reproducir inline en móviles
-        },
-        events: {
-          onReady: onPlayersReady // Se dispara cuando el player está listo
-        }
-      });
-    };
-
-
-    /* ===========================================================================
-       CALLBACK: onPlayersReady
-       - Se ejecuta cuando el reproductor de YouTube queda listo.
-       - Aplica volúmenes iniciales.
-       - Conecta (una sola vez) los controles de la UI.
-       - Inicializa helpers del GIF.
-       =========================================================================== */
-    function onPlayersReady() {
-
-      /* -------------------------------------------------------------------------
-         1) APLICAR SIEMPRE EL VOLUMEN ACTUAL AL PLAYER DE YOUTUBE
-         - Esto se ejecuta cada vez que algún player “ready-ea”.
-         - Se protege con try/catch para evitar errores silenciosos.
-         ------------------------------------------------------------------------- */
-      try {
-        const volEl = document.getElementById('volumeMusic'); // Slider de volumen
-        const volValue = volEl ? Number(volEl.value) : 100;   // Fallback a 100%
-
-        // Verifica que el player exista y tenga el método setVolume
-        if (playerMusic && typeof playerMusic.setVolume === 'function') {
-          playerMusic.setVolume(volValue); // Aplica volumen a YouTube
-        }
-      } catch (e) {
-        // Error ignorado intencionalmente (no rompe la UI si algo falla)
+    /* Crear reproductor de YouTube SOLO PARA AUDIO */
+    playerMusic = new YT.Player('ytplayerMusic', {
+      videoId: '8kBlKM71pjc', // ID del video de YouTube (música)
+      playerVars: {
+        autoplay: 0,   // No reproducir automáticamente
+        controls: 0,   // Ocultar controles nativos
+        rel: 0,        // No mostrar videos relacionados
+        playsinline: 1 // Reproducir inline en móviles
+      },
+      events: {
+        onReady: onPlayersReady // Se dispara cuando el player está listo
       }
+    });
+  };
 
-      /* -------------------------------------------------------------------------
-         2) VOLUMEN INICIAL DEL AUDIO LOCAL DE LLUVIA
-         - Se convierte el porcentaje (0–100) a rango 0.0–1.0.
-         ------------------------------------------------------------------------- */
-      rainAudio = document.getElementById('rainAudio'); // <audio> de lluvia
-      if (rainAudio) {
-        rainAudio.volume = DEFAULT_RAIN_VOL / 100; // Ej: 60 → 0.6
+
+  /* ===========================================================================
+     CALLBACK: onPlayersReady
+     - Se ejecuta cuando el reproductor de YouTube queda listo.
+     - Aplica volúmenes iniciales.
+     - Conecta (una sola vez) los controles de la UI.
+     - Inicializa helpers del GIF.
+     =========================================================================== */
+  function onPlayersReady() {
+
+    /* -------------------------------------------------------------------------
+       1) APLICAR SIEMPRE EL VOLUMEN ACTUAL AL PLAYER DE YOUTUBE
+       - Esto se ejecuta cada vez que algún player “ready-ea”.
+       - Se protege con try/catch para evitar errores silenciosos.
+       ------------------------------------------------------------------------- */
+    try {
+      const volEl = document.getElementById('volumeMusic'); // Slider de volumen
+      const volValue = volEl ? Number(volEl.value) : 100;   // Fallback a 100%
+
+      // Verifica que el player exista y tenga el método setVolume
+      if (playerMusic && typeof playerMusic.setVolume === 'function') {
+        playerMusic.setVolume(volValue); // Aplica volumen a YouTube
       }
+    } catch (e) {
+      // Error ignorado intencionalmente (no rompe la UI si algo falla)
+    }
 
-      /* -------------------------------------------------------------------------
-         3) EVITAR REGISTRAR EVENTOS MÁS DE UNA VEZ
-         - Si btnMusic ya existe, significa que el wiring ya ocurrió.
-         - Previene listeners duplicados si YouTube re-inicializa el player.
-         ------------------------------------------------------------------------- */
+    /* -------------------------------------------------------------------------
+       2) VOLUMEN INICIAL DEL AUDIO LOCAL DE LLUVIA
+       - Se convierte el porcentaje (0–100) a rango 0.0–1.0.
+       ------------------------------------------------------------------------- */
+    rainAudio = document.getElementById('rainAudio'); // <audio> de lluvia
+    if (rainAudio) {
+      rainAudio.volume = DEFAULT_RAIN_VOL / 100; // Ej: 60 → 0.6
+    }
 
-         if (btnMusic) return;
+    /* -------------------------------------------------------------------------
+       3) EVITAR REGISTRAR EVENTOS MÁS DE UNA VEZ
+       - Si btnMusic ya existe, significa que el wiring ya ocurrió.
+       - Previene listeners duplicados si YouTube re-inicializa el player.
+       ------------------------------------------------------------------------- */
 
-      /* -------------------------------------------------------------------------
-         4) CACHEAR REFERENCIAS AL DOM (UNA SOLA VEZ)
-         - Mejora performance y claridad.
-         ------------------------------------------------------------------------- */
-      btnMusic   = document.getElementById('musicToggle'); // Botón música
-      btnRain    = document.getElementById('rainToggle');  // Botón lluvia
-      volMusic   = document.getElementById('volumeMusic'); // Slider volumen
-      btnShuffle = document.getElementById('gifShuffle');  // Botón cambiar GIF
-      gifImg     = document.getElementById('mainGif');     // Imagen principal GIF
+    if (btnMusic) return;
 
-      // Guardia: evita crash si algún elemento falta (IDs cambiados, embed, etc.)
-      if (!btnMusic || !btnRain || !volMusic || !btnShuffle || !gifImg) return;
+    /* -------------------------------------------------------------------------
+       4) CACHEAR REFERENCIAS AL DOM (UNA SOLA VEZ)
+       - Mejora performance y claridad.
+       ------------------------------------------------------------------------- */
+    btnMusic   = document.getElementById('musicToggle'); // Botón música
+    btnRain    = document.getElementById('rainToggle');  // Botón lluvia
+    volMusic   = document.getElementById('volumeMusic'); // Slider volumen
+    btnShuffle = document.getElementById('gifShuffle');  // Botón cambiar GIF
+    gifImg     = document.getElementById('mainGif');     // Imagen principal GIF
 
+    // Guardia: evita crash si algún elemento falta (IDs cambiados, embed, etc.)
+    if (!btnMusic || !btnRain || !volMusic || !btnShuffle || !gifImg) return;
 
-      /* ===========================================================================
-         EVENTOS DE INTERFAZ
-         =========================================================================== */
+    /* -------------------------------------------------------------------------
+       HELPERS DE ESTADO (UI)
+       - Centraliza cambios de icono/aria/estado sin tocar la lógica.
+       ------------------------------------------------------------------------- */
+    function setMusicState(playing) {
+      btnMusic.innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
+      btnMusic.setAttribute('aria-label', playing ? 'Pausar música' : 'Reproducir música');
+      isMusicPlaying = playing;
+    }
 
-      /* -------------------------------------------------------------------------
-         BOTÓN PLAY / PAUSE DE LA MÚSICA (YouTube)
-         ------------------------------------------------------------------------- */
-      btnMusic.addEventListener('click', () => {
-        if (!isMusicPlaying) {
-          playerMusic.playVideo();                          // Reproduce música
-          btnMusic.innerHTML = ICON_PAUSE;                  // Cambia icono
-          btnMusic.setAttribute('aria-label','Pausar música'); // Accesibilidad
-          isMusicPlaying = true;                            // Actualiza estado
-        } else {
-          playerMusic.pauseVideo();                         // Pausa música
-          btnMusic.innerHTML = ICON_PLAY;                   // Cambia icono
-          btnMusic.setAttribute('aria-label','Reproducir música');
-          isMusicPlaying = false;                           // Actualiza estado
-        }
-      });
-
-      /* -------------------------------------------------------------------------
-         SLIDER DE VOLUMEN DE LA MÚSICA (YouTube)
-         - Se ejecuta mientras el usuario arrastra el control.
-         ------------------------------------------------------------------------- */
-      volMusic.addEventListener('input', () => {
-        if (playerMusic && typeof playerMusic.setVolume === 'function') {
-          playerMusic.setVolume(Number(volMusic.value)); // Aplica nuevo volumen
-        }
-      });
-
-      /* -------------------------------------------------------------------------
-         BOTÓN DE LLUVIA (AUDIO LOCAL)
-         - Play / Pause del sonido ambiental.
-         - Cambia icono, clase y aria-label.
-         ------------------------------------------------------------------------- */
-      btnRain.addEventListener('click', () => {
-        if (!rainAudio) return; // Seguridad: si no existe, no hacemos nada
-
-        if (!isRainPlaying) {
-          // En móviles, el primer play requiere gesto del usuario (este click)
-          rainAudio.currentTime = 0;            // (Opcional) reinicia audio
-          rainAudio.play();                     // Reproduce lluvia
-          btnRain.classList.add('active');      // Estado visual activo
-          btnRain.innerHTML = ICON_CLOUD_RAIN;  // Icono nube con lluvia
-          btnRain.setAttribute('aria-label','Apagar lluvia');
-          isRainPlaying = true;                 // Actualiza estado
-        } else {
-          rainAudio.pause();                    // Pausa lluvia
-          btnRain.classList.remove('active');   // Quita estado visual
-          btnRain.innerHTML = ICON_CLOUD;       // Icono nube simple
-          btnRain.setAttribute('aria-label','Activar lluvia');
-          isRainPlaying = false;                // Actualiza estado
-        }
-      });
-
-      /* -------------------------------------------------------------------------
-         INICIALIZACIONES FINALES
-         - Bloquea proporción del contenedor según el GIF.
-         - Activa el rotador de GIFs.
-         ------------------------------------------------------------------------- */
-      lockAspectFrom(gifImg);                   // Fija aspect-ratio inicial
-      setupGifRotator(btnShuffle, gifImg);      // Habilita cambio de GIFs
+    function setRainState(playing) {
+      if (playing) {
+        btnRain.classList.add('active');
+        btnRain.innerHTML = ICON_CLOUD_RAIN;
+        btnRain.setAttribute('aria-label','Apagar lluvia');
+      } else {
+        btnRain.classList.remove('active');
+        btnRain.innerHTML = ICON_CLOUD;
+        btnRain.setAttribute('aria-label','Activar lluvia');
+      }
+      isRainPlaying = playing;
     }
 
 
     /* ===========================================================================
+       EVENTOS DE INTERFAZ
+       =========================================================================== */
+
+    /* -------------------------------------------------------------------------
+       BOTÓN PLAY / PAUSE DE LA MÚSICA (YouTube)
+       ------------------------------------------------------------------------- */
+    btnMusic.addEventListener('click', () => {
+      if (!isMusicPlaying) {
+        playerMusic.playVideo();                          // Reproduce música
+        setMusicState(true);                              // Actualiza estado/UI
+      } else {
+        playerMusic.pauseVideo();                         // Pausa música
+        setMusicState(false);
+      }
+    });
+
+    /* -------------------------------------------------------------------------
+       SLIDER DE VOLUMEN DE LA MÚSICA (YouTube)
+       - Se ejecuta mientras el usuario arrastra el control.
+       ------------------------------------------------------------------------- */
+    volMusic.addEventListener('input', () => {
+      if (playerMusic && typeof playerMusic.setVolume === 'function') {
+        playerMusic.setVolume(Number(volMusic.value)); // Aplica nuevo volumen
+      }
+    });
+
+    /* -------------------------------------------------------------------------
+       BOTÓN DE LLUVIA (AUDIO LOCAL)
+       - Play / Pause del sonido ambiental.
+       - Cambia icono, clase y aria-label.
+       ------------------------------------------------------------------------- */
+    btnRain.addEventListener('click', () => {
+      if (!rainAudio) return; // Seguridad: si no existe, no hacemos nada
+
+      if (!isRainPlaying) {
+        // En móviles, el primer play requiere gesto del usuario (este click)
+        rainAudio.currentTime = 0;            // (Opcional) reinicia audio
+        rainAudio.play();                     // Reproduce lluvia
+        setRainState(true);                   // Actualiza estado/UI
+      } else {
+        rainAudio.pause();                    // Pausa lluvia
+        setRainState(false);
+      }
+    });
+
+    /* -------------------------------------------------------------------------
+       INICIALIZACIONES FINALES
+       - Bloquea proporción del contenedor según el GIF.
+       - Activa el rotador de GIFs.
+       ------------------------------------------------------------------------- */
+    lockAspectFrom(gifImg);                   // Fija aspect-ratio inicial
+    setupGifRotator(btnShuffle, gifImg);      // Habilita cambio de GIFs
+  }
+
+
+  /* ===========================================================================
      MODO OSCURITO (TIRITA SOL / LUNA)
      - Controla el cambio entre modo día y modo noche.
      - Usa una “tirita” vertical fija con una bolita (thumb).
@@ -1024,7 +1137,7 @@
        ------------------------------------------------------------------------- */
 
     // Construye la URL del sonido respetando subcarpetas (local / GitHub Pages)
-    const SWITCH_URL = asset('light_switch.mp3');
+    const SWITCH_URL = asset('audio/light_switch.mp3');
 
     const switchSfx = new Audio(SWITCH_URL); // Audio del interruptor
     switchSfx.preload = 'auto';              // Precarga el sonido
@@ -1126,9 +1239,7 @@
          ----------------------------------------------------------------------- */
       if (window.matchMedia('(max-width: 520px)').matches) {
         container.style.aspectRatio = '';    // Limpia ratio inline si existía
-        imgEl.style.width  = '100%';         // Imagen ocupa todo el ancho
-        imgEl.style.height = '100%';          // Imagen ocupa toda la altura
-        imgEl.style.objectFit = 'cover';      // Rellena recortando
+        setCover(imgEl);                      // Imagen cubre el contenedor
         return;
       }
 
@@ -1141,9 +1252,7 @@
 
       container.style.height = '';            // Limpia height previo
       container.style.aspectRatio = `${w} / ${h}`; // Fija proporción
-      imgEl.style.width  = '100%';            // Ajuste completo
-      imgEl.style.height = '100%';
-      imgEl.style.objectFit = 'cover';
+      setCover(imgEl);
     };
 
     // Si la imagen ya cargó, aplica de inmediato
@@ -1156,60 +1265,55 @@
   }
 
 
+  // Aplica el modo "cover" al <img> de forma consistente
+  function setCover(imgEl) {
+    if (!imgEl) return;
+    imgEl.style.width = "100%";
+    imgEl.style.height = "100%";
+    imgEl.style.objectFit = "cover";
+  }
+
   /* ===================================================================
     ROTADOR DE GIFs — V3 (PRO)
-    - El primer GIF carga instantáneo
-    - gifs.json se carga en background
+    - La lista se genera en build con import.meta.glob (Astro)
+    - No hay fetch ni manifiesto externo
     - Todos los GIFs se precargan
     - Cambio de GIF SIEMPRE instantáneo
     =================================================================== */
   function setupGifRotator(btn, imgEl) {
     if (!btn || !imgEl) return;
 
-    let urls = [];
+    const urls = Array.isArray(GIF_URLS) ? GIF_URLS.slice() : []; // GIF_URLS viene de define:vars (Astro)
+    const urlsAbs = urls.map((url) => new URL(url, location.href).href);
+
     let actual = 0;
-    let ready = false;
+    let ready = urls.length > 0;
 
-    // Deshabilita el botón hasta que todo esté listo
-    btn.disabled = true;
-    btn.style.opacity = "0.5";
+    // Deshabilita el botón si no hay GIFs
+    btn.disabled = !ready;
+    btn.style.opacity = ready ? "1" : "0.5";
 
-    // Carga la lista en background (no bloquea render)
-    fetch(asset("gifs.json"), { cache: "no-store" })
-      .then(r => r.ok ? r.json() : Promise.reject())
-      .then(files => {
-        if (!Array.isArray(files) || files.length === 0) return;
+    if (!ready) {
+      console.warn("GIF rotator: lista de GIFs vacía");
+      return;
+    }
 
-        urls = files.map(f => asset(f));
+    // Detectar GIF actual
+    const current = new URL(imgEl.getAttribute("src"), location.href).href;
+    const idx = urlsAbs.indexOf(current);
+    actual = idx >= 0 ? idx : 0;
 
-        // Detectar GIF actual
-        const current = new URL(imgEl.getAttribute("src"), location.href).href;
-        const idx = urls.indexOf(current);
-        actual = idx >= 0 ? idx : 0;
+    // 🔥 PRE-CARGA REAL
+    urls.forEach((url) => {
+      const img = new Image();
+      img.src = url;
+    });
 
-        // 🔥 PRE-CARGA REAL
-        urls.forEach((url) => {
-          const img = new Image();
-          img.src = url;
-        });
-
-        ready = true;
-        btn.disabled = false;
-        btn.style.opacity = "1";
-      })
-      .catch(() => {
-        console.warn("GIF rotator: gifs.json no disponible");
-      });
-
-    // Click → siguiente GIF (solo si está listo)
+    // Click → siguiente GIF
     btn.addEventListener("click", () => {
-      if (!ready || urls.length === 0) return;
-
       actual = (actual + 1) % urls.length;
       imgEl.src = urls[actual];
-      imgEl.style.width = "100%";
-      imgEl.style.height = "100%";
-      imgEl.style.objectFit = "cover";
+      setCover(imgEl);
     });
   }
 
@@ -1233,6 +1337,7 @@
       /* -----------------------------------------------------------------------
          REFERENCIAS AL DOM
          ----------------------------------------------------------------------- */
+      const root  = document.documentElement;             // <html> (clases globales)
       const wrap  = document.querySelector('.title-wrap'); // Contenedor del título
       const title = document.getElementById('pageTitle');  // <h1> principal
       if (!wrap || !title) return;                         // Seguridad
@@ -1241,11 +1346,12 @@
          VARIABLES DE CONTROL Y CACHÉ
          ----------------------------------------------------------------------- */
       let rafId = 0;            // ID del requestAnimationFrame activo
-      let debounceTimer = 0;    // Timer para suavizar recalculados
 
       let lastAvail  = NaN;     // Último ancho disponible medido
       let lastScale  = NaN;     // Última escala aplicada
+      let lastSpacing = NaN;    // Última separación entre letras aplicada
       let lastHeight = NaN;     // Última altura aplicada al contenedor
+      let lastFull   = null;    // Último estado fullscreen (browser-fullscreen)
 
       /* -----------------------------------------------------------------------
          CÁLCULO Y APLICACIÓN DEL ESCALADO
@@ -1254,20 +1360,56 @@
         rafId = 0;                                  // Libera el RAF actual
 
         const avail = wrap.clientWidth || 0;        // Ancho disponible
-        const need  = title.scrollWidth || 1;       // Ancho real del texto
+        const isFull = root.classList.contains('browser-fullscreen');
 
-        // Evita recalcular si el ancho no cambió de forma significativa
-        if (isFinite(lastAvail) && Math.abs(avail - lastAvail) < 1) return;
+        // Evita recalcular si el ancho no cambió y el modo no cambió
+        const modeUnchanged = lastFull !== null && isFull === lastFull;
+        if (modeUnchanged && isFinite(lastAvail) && Math.abs(avail - lastAvail) < 1) return;
         lastAvail = avail;
+        lastFull = isFull;
 
-        // Calcula escala necesaria (limitada entre 0.25 y 1)
-        const targetScale = Math.max(0.25, Math.min(1, avail / need));
-        if (!isFinite(targetScale)) return;
+        // Medida base sin letter-spacing para calcular expansión sin distorsión
+        const prevLetter = title.style.letterSpacing;
+        title.style.letterSpacing = '0px';
+        const base = title.scrollWidth || 1;        // Ancho real del texto (sin spacing)
+        title.style.letterSpacing = prevLetter;
+        if (!isFinite(base)) return;
+
+        const textLen = (title.textContent || '').length;
+        const gaps = Math.max(1, textLen - 1);
+
+        let spacing = 0;
+        let scale = 1;
+        let origin = 'left top';
+
+        if (avail >= base) {
+          // En fullscreen, abrimos con letter-spacing y luego ajustamos con un scale leve
+          if (isFull) {
+            const neededSpacing = (avail - base) / gaps;
+            const spacingWeight = 0.45; // reparte expansión entre spacing y scale
+            const maxSpacing = 3.5; // px: evita separación excesiva
+            spacing = Math.min(maxSpacing, Math.max(0, neededSpacing * spacingWeight));
+
+            const expanded = base + spacing * gaps;
+            if (expanded > 0 && expanded < avail) {
+              const maxExpandScale = 1.18; // expansión leve, sin deformar demasiado
+              scale = Math.min(maxExpandScale, avail / expanded);
+              if (scale > 1) origin = 'center top';
+            }
+          }
+        } else {
+          // Si no cabe, reducimos con scaleX (no hay alternativa sin romper línea)
+          spacing = 0;
+          scale = Math.max(0.25, avail / base);
+        }
 
         // Solo aplica si el cambio es perceptible
-        if (!isFinite(lastScale) || Math.abs(targetScale - lastScale) > 0.005) {
-          title.style.transform = `scaleX(${targetScale})`; // Escala horizontal
-          lastScale = targetScale;
+        if (!isFinite(lastScale) || Math.abs(scale - lastScale) > 0.005 || Math.abs(spacing - lastSpacing) > 0.25) {
+          title.style.letterSpacing = spacing ? `${spacing}px` : '0px';
+          title.style.transformOrigin = origin;
+          title.style.transform = `scaleX(${scale})`;
+          lastScale = scale;
+          lastSpacing = spacing;
 
           // Ajusta la altura del wrapper según el título escalado
           const h = title.getBoundingClientRect().height;
@@ -1282,12 +1424,8 @@
          PLANIFICACIÓN SUAVIZADA DEL RECÁLCULO
          ----------------------------------------------------------------------- */
       function schedule() {
-        if (debounceTimer) clearTimeout(debounceTimer);
-
-        debounceTimer = setTimeout(() => {
-          if (rafId) return;                      // Evita múltiples RAF simultáneos
-          rafId = requestAnimationFrame(computeAndApply);
-        }, 40);                                  // Delay suave (debounce)
+        if (rafId) return;                       // Evita múltiples RAF simultáneos
+        rafId = requestAnimationFrame(computeAndApply);
       }
 
       /* -----------------------------------------------------------------------
@@ -1299,6 +1437,13 @@
       }
 
       window.addEventListener('resize', schedule, { passive: true }); // Fallback
+      document.addEventListener('fullscreenchange', schedule);        // API fullscreen
+
+      // Si cambia la clase en <html>, recalcula (ej: F11 detectado por script)
+      if (typeof MutationObserver !== 'undefined') {
+        const mo = new MutationObserver(() => schedule());
+        mo.observe(root, { attributes: true, attributeFilter: ['class'] });
+      }
 
       // Primera ejecución inicial
       schedule();
