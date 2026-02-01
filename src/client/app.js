@@ -1,10 +1,13 @@
 import { AUDIO_CONFIG } from "./config/audio.js";
 import { createAssetResolver } from "./utils/asset.js";
 import { setupDayNight } from "./features/day-night.js";
+import { setupNotionEmbedClass } from "./features/embed-notion.js";
+import { setupFullscreenClass } from "./features/fullscreen.js";
 import { setupGifRotator } from "./features/gif-rotator.js";
 import { setupMusic } from "./features/music.js";
 import { setupRain } from "./features/rain.js";
 import { setupTitleFit } from "./features/title-fit.js";
+import { setupClock } from "./features/clock.js";
 
 // ============================================================================
 // APP PRINCIPAL
@@ -17,6 +20,10 @@ export function initApp({ gifUrls = [] } = {}) {
   const baseRaw = page?.dataset.base || "/";
   const asset = createAssetResolver(baseRaw);
 
+  // Detecciones globales (embeds / fullscreen) y reloj
+  setupNotionEmbedClass();
+  setupFullscreenClass();
+
   // Cacheo de DOM (una sola vez)
   const btnMusic = document.getElementById("musicToggle");
   const btnRain = document.getElementById("rainToggle");
@@ -24,6 +31,7 @@ export function initApp({ gifUrls = [] } = {}) {
   const btnShuffle = document.getElementById("gifShuffle");
   const gifImg = document.getElementById("mainGif");
   const rainAudio = document.getElementById("rainAudio");
+  const reloj = document.getElementById("reloj");
 
   // Música (YouTube)
   setupMusic({
@@ -50,4 +58,7 @@ export function initApp({ gifUrls = [] } = {}) {
   // Modo día/noche + ajuste de título
   setupDayNight({ asset });
   setupTitleFit();
+
+  // Reloj/fecha
+  setupClock({ el: reloj });
 }
