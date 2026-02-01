@@ -52,3 +52,7 @@ jobs:
       # 👉 Detecta errores de compilación antes del merge
       - name: Build
         run: npm run build
+      
+      # Paso 6️⃣ — Build con BASE_PATH para GitHub Pages (subpath)
+      - name: Build (Pages)
+        run: BASE_PATH=/Nolia-Office/ npm run build
