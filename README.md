@@ -49,6 +49,13 @@ On the client side, JavaScript handles:
 
 ---
 
+## 🧪 Local development
+
+- `npm run dev` → runs at root (normal local mode).
+- `npm run dev:pages` → simulates GitHub Pages (subpath `/Nolia-Office/`).
+
+---
+
 ## 📚 Documentation
 
 - Workflow: `docs/workflow.md`
