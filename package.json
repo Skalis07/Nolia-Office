@@ -6,6 +6,7 @@
   "author": "Skalis07",
   "scripts": {
     "dev": "astro dev",
+    "dev:pages": "set BASE_PATH=/Nolia-Office/&& astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
