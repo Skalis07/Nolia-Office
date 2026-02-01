@@ -6,7 +6,7 @@
 // Frontmatter: bloque ejecutado en build. Sirve para preparar datos del template.
 
 import type { ImageMetadata } from 'astro'; // Metadata de imagen (la URL final vive en .src)
-import mainEntry from '../client/main.js?url'; // Entry del cliente empaquetado por Vite/Astro
+import mainEntry from '../client/main.js?url&no-inline'; // URL del entry (sin inlining)
 
 // ============================================================================
 // LISTA DE GIFs EN BUILD (Astro + Vite)
@@ -876,8 +876,8 @@ const initialGif = gifUrls[0] ?? '';
 
 <!-- ===========================================================================
      ENTRY DEL CLIENTE (MÓDULOS)
-     - Usa un import `?url` para que Vite genere la URL final.
-     - Garantiza bundling, imports y BASE_URL correctos (local + GitHub Pages).
+     - Usa ?url&no-inline para obtener la URL final del bundle sin data: URL.
+     - Evita romper imports relativos en producción.
      - main.js lee data-gifs del HTML y arranca la app en src/client/app.js.
      =========================================================================== -->
 <script type="module" src={mainEntry}></script>
