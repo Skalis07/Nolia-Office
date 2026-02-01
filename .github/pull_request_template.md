@@ -15,6 +15,8 @@
   - [ ] modo día/noche
   - [ ] responsive básico
   - [ ] embed Notion (si aplica)
+- [ ] `npm run dev:pages` y validar:
+  - [ ] subpath correcto (GitHub Pages)
 
 ## Riesgos
 <!-- Qué podría salir mal -->
