@@ -47,6 +47,13 @@ En el cliente, JavaScript se encarga de:
 
 ---
 
+## 🧪 Desarrollo local
+
+- `npm run dev` → levanta el sitio en raíz (modo local normal).
+- `npm run dev:pages` → simula GitHub Pages (subpath `/Nolia-Office/`).
+
+---
+
 ## 📚 Documentación
 
 - Flujo de trabajo: `docs/workflow.md`
