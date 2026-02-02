@@ -19,10 +19,7 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
   // Actualiza icono y aria-label según el estado actual.
   function setState(playing) {
     btn.innerHTML = playing ? ICONS.ICON_PAUSE : ICONS.ICON_PLAY;
-    btn.setAttribute(
-      "aria-label",
-      playing ? "Pausar musica" : "Reproducir musica"
-    );
+    btn.setAttribute("aria-label", playing ? "Pausar musica" : "Reproducir musica");
     isPlaying = playing;
   }
 
