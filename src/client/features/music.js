@@ -28,9 +28,10 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
 
   // Aplica el volumen del slider al player de YouTube.
   function applyVolume() {
-    const value = Number(slider.value) || 100;
+    const value = Number(slider.value);
+    const safeValue = Number.isFinite(value) ? value : 100;
     if (player && typeof player.setVolume === "function") {
-      player.setVolume(value);
+      player.setVolume(safeValue);
     }
   }
 
