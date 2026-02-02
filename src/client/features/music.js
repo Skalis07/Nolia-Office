@@ -11,6 +11,9 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
 
   let player = null;
   let isPlaying = false;
+  let pendingResume = false;
+  let resumeBound = false;
+  const STORAGE_KEY = "musicOn";
 
   /* ---------------------------------------------------------------------------
      HELPERS DE ESTADO (UI)
@@ -32,6 +35,72 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
     }
   }
 
+  function saveIntent(playing) {
+    try {
+      localStorage.setItem(STORAGE_KEY, playing ? "1" : "0");
+    } catch {
+      // Ignorado
+    }
+  }
+
+  function readIntent() {
+    try {
+      return localStorage.getItem(STORAGE_KEY) === "1";
+    } catch {
+      return false;
+    }
+  }
+
+  function ensureResumeOnGesture() {
+    if (resumeBound) return;
+    resumeBound = true;
+
+    const resume = () => {
+      if (!pendingResume) return;
+      pendingResume = false;
+      tryPlay();
+    };
+
+    window.addEventListener("pointerdown", resume, { once: true });
+    window.addEventListener("keydown", resume, { once: true });
+  }
+
+  function tryPlay() {
+    if (!player) return;
+
+    try {
+      if (typeof player.unMute === "function") {
+        player.unMute();
+      }
+    } catch {
+      // Ignorado
+    }
+
+    applyVolume();
+
+    try {
+      player.playVideo();
+    } catch {
+      pendingResume = true;
+      ensureResumeOnGesture();
+      return;
+    }
+
+    setTimeout(() => {
+      if (!player || typeof player.getPlayerState !== "function") return;
+      const state = player.getPlayerState();
+
+      if (state === YT.PlayerState.PLAYING) {
+        setState(true);
+        saveIntent(true);
+      } else {
+        setState(false);
+        pendingResume = true;
+        ensureResumeOnGesture();
+      }
+    }, 200);
+  }
+
   /* ---------------------------------------------------------------------------
      CALLBACK: onReady
      - Se ejecuta cuando el reproductor queda listo.
@@ -41,6 +110,10 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
   // Se dispara cuando el player queda listo.
   function onReady() {
     applyVolume();
+    if (readIntent()) {
+      pendingResume = true;
+      ensureResumeOnGesture();
+    }
 
     if (btn.dataset.bound) return;
     btn.dataset.bound = "true";
@@ -49,11 +122,11 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
       if (!player) return;
 
       if (!isPlaying) {
-        player.playVideo();
-        setState(true);
+        tryPlay();
       } else {
         player.pauseVideo();
         setState(false);
+        saveIntent(false);
       }
     });
 
@@ -72,6 +145,8 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
     player = new YT.Player(playerId, {
       videoId,
       playerVars: {
+        origin: window.location.origin,
+        enablejsapi: 1,
         autoplay: 0,
         controls: 0,
         rel: 0,
