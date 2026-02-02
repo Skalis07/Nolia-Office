@@ -11,6 +11,8 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
 
   let player = null;
   let isPlaying = false;
+  let playerReady = false;
+  let pendingPlay = false;
   let pendingResume = false;
   let resumeBound = false;
   const STORAGE_KEY = "musicOn";
@@ -22,10 +24,7 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
   // Actualiza icono y aria-label según el estado actual.
   function setState(playing) {
     btn.innerHTML = playing ? ICONS.ICON_PAUSE : ICONS.ICON_PLAY;
-    btn.setAttribute(
-      "aria-label",
-      playing ? "Pausar musica" : "Reproducir musica"
-    );
+    btn.setAttribute("aria-label", playing ? "Pausar musica" : "Reproducir musica");
     isPlaying = playing;
   }
 
@@ -96,12 +95,30 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
       if (state === YT.PlayerState.PLAYING) {
         setState(true);
         saveIntent(true);
-      } else {
-        setState(false);
+      }
+      if (state !== YT.PlayerState.PLAYING) {
         pendingResume = true;
         ensureResumeOnGesture();
       }
     }, 200);
+  }
+
+  function handleToggle() {
+    const nextPlaying = !isPlaying;
+    setState(nextPlaying);
+
+    if (!playerReady || !player) {
+      pendingPlay = nextPlaying;
+      return;
+    }
+
+    if (nextPlaying) {
+      tryPlay();
+      return;
+    }
+
+    player.pauseVideo();
+    saveIntent(false);
   }
 
   /* ---------------------------------------------------------------------------
@@ -112,30 +129,16 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
      --------------------------------------------------------------------------- */
   // Se dispara cuando el player queda listo.
   function onReady() {
+    playerReady = true;
     applyVolume();
     if (readIntent()) {
       pendingResume = true;
       ensureResumeOnGesture();
     }
 
-    if (btn.dataset.bound) return;
-    btn.dataset.bound = "true";
-
-    btn.addEventListener("click", () => {
-      if (!player) return;
-
-      if (!isPlaying) {
-        tryPlay();
-      } else {
-        player.pauseVideo();
-        setState(false);
-        saveIntent(false);
-      }
-    });
-
-    slider.addEventListener("input", () => {
-      applyVolume();
-    });
+    if (pendingPlay && isPlaying) {
+      tryPlay();
+    }
   }
 
   /* ---------------------------------------------------------------------------
@@ -191,5 +194,12 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
   }
 
   ensureApi();
+  if (!btn.dataset.bound) {
+    btn.dataset.bound = "true";
+    btn.addEventListener("click", handleToggle);
+    slider.addEventListener("input", () => {
+      applyVolume();
+    });
+  }
   setState(false);
 }
