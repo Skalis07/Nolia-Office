@@ -1,0 +1,30 @@
+<!-- Contenedor principal de la tirita -->
+<!-- id="rightHandle": usado por JS para aplicar estados (activo/inactivo) -->
+<!-- class="right-handle": estilos de posición fija, altura y animaciones -->
+<!-- aria-hidden="false": el control es visible y accesible -->
+<div id="rightHandle" class="right-handle" aria-hidden="false">
+  <!-- Barra vertical interactiva (riel de la tirita) -->
+  <!-- id="rightTrack": JS escucha clics aquí para alternar el modo -->
+  <!-- class="track": estilos del riel (color, sombra, animación stretch) -->
+  <!-- role="presentation": indica que es decorativo/estructural -->
+  <!-- title: tooltip al pasar el mouse -->
+  <div
+    id="rightTrack"
+    class="track"
+    role="presentation"
+    title="Click para atenuar/encender"
+  >
+    <!-- Botón redondo que representa Sol / Luna -->
+    <!-- id="modeThumb": JS cambia el icono y estado -->
+    <!-- class="thumb": estilos de la bolita (color, sombra, hover) -->
+    <!-- aria-label: descripción accesible del control -->
+    <!-- aria-pressed: indica estado activado/desactivado (día/noche) -->
+    <button
+      id="modeThumb"
+      class="thumb"
+      type="button"
+      aria-label="Cambiar modo (día/noche)"
+      aria-pressed="false"
+    ></button>
+  </div>
+</div>

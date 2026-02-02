@@ -1,0 +1,20 @@
+---
+import GifFrame from "./GifFrame.astro";
+import ControlsBar from "./ControlsBar.astro";
+
+const { initialGif, baseUrl } = Astro.props;
+---
+
+<!-- Frame: agrupa el bloque del GIF y la barra de controles en un mismo ancho -->
+<div class="frame">
+  <!-- =====================================================================
+       CONTENEDOR DEL GIF
+       - Marco redondeado, sombra, y elementos superpuestos (reloj, audio).
+       ===================================================================== -->
+  <GifFrame initialGif={initialGif} baseUrl={baseUrl} />
+
+  <!-- =====================================================================
+       BARRA DE CONTROL (MÚSICA, VOLUMEN, LLUVIA, CAMBIAR GIF)
+       ===================================================================== -->
+  <ControlsBar />
+</div>

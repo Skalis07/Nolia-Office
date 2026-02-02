@@ -57,6 +57,8 @@ En el cliente, JavaScript se encarga de:
 ## 📚 Documentación
 
 - Flujo de trabajo: `docs/workflow.md`
+- Flujo de renderizado: `docs/architecture/flow.md`
+- Overview de arquitectura: `docs/architecture/overview.md`
 - QA (Golden Paths): `docs/qa/golden-paths.md`
 - Vercel Previews: `docs/vercel-previews-deployments.md`
 - Docker: `docs/docker.md`

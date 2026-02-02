@@ -1,0 +1,38 @@
+---
+const { initialGif, baseUrl } = Astro.props;
+---
+
+<!-- Contenedor con marco redondeado y sombra donde va el GIF y overlays -->
+<div class="img-redondeada">
+  <!-- Imagen principal (GIF) -->
+  <!-- id="mainGif": lo usa JS para cambiar de GIF y bloquear proporción -->
+  <!-- src: GIF inicial resuelto en build (Astro ya incluye la BASE_URL correcta) -->
+  <!-- alt: texto alternativo para accesibilidad -->
+  <img id="mainGif" src={initialGif} alt="Gif en el centro" />
+
+  <!-- Reloj / fecha superpuesto (actualizado por JS) -->
+  <!-- id="reloj": JS escribe aquí la fecha y hora -->
+  <!-- class="badge-fecha": estilos de la etiqueta pegada abajo a la izquierda -->
+  <!-- aria-live="polite": permite que lectores de pantalla anuncien los cambios sin interrumpir -->
+  <div id="reloj" class="badge-fecha" aria-live="polite"></div>
+
+  <!-- Reproductor de YouTube oculto para la música -->
+  <!-- id="yt-audio": contenedor invisible que mantiene el iframe de YouTube fuera de la vista -->
+  <!-- aria-hidden="true": se marca como irrelevante para accesibilidad -->
+  <div id="yt-audio" aria-hidden="true">
+    <!-- Aquí la API de YouTube inserta el <iframe> del reproductor -->
+    <div id="ytplayerMusic"></div>
+  </div>
+
+  <!-- Audio local de lluvia controlado por JavaScript -->
+  <!-- id="rainAudio": el JS lo usa para reproducir/pausar lluvia -->
+  <!-- src: ruta al archivo rain.mp3 usando BASE_URL -->
+  <!-- preload="auto": intenta cargar el audio por adelantado -->
+  <!-- loop: reproduce en bucle continuamente -->
+  <audio
+    id="rainAudio"
+    src={baseUrl + "audio/rain.mp3"}
+    preload="auto"
+    loop
+  ></audio>
+</div>

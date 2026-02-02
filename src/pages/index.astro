@@ -7,223 +7,86 @@
 
 import type { ImageMetadata } from 'astro'; // Metadata de imagen (la URL final vive en .src)
 import '../styles/index.css'; // CSS global de la página
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Title from '../components/Title.astro';
+import Frame from '../components/Frame.astro';
+import DayNightToggle from '../components/DayNightToggle.astro';
+import DimOverlay from '../components/DimOverlay.astro';
 
 // ============================================================================
 // LISTA DE GIFs EN BUILD (Astro + Vite)
 // - Escanea archivos en src/assets/gifs
 // - Astro devuelve ImageMetadata, usamos .src como URL final
+// - Estos datos se inyectan al HTML (data-gifs) y al <img> inicial
 // ============================================================================
+// Mapa { rutaDelArchivo -> ImageMetadata } generado en build
 const gifModules = import.meta.glob('../assets/gifs/*.gif', {
   eager: true,        // Importa TODO en build (no lazy)
   import: 'default'   // Toma la export default (ImageMetadata)
 }) as Record<string, ImageMetadata>;
 
-// Convierte el objeto en lista y ordena por nombre (1,2,3...10)
+// Lista ordenada por nombre para tener un orden estable
 const gifEntries = Object.entries(gifModules)
   .sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true }));
 
-// Nos quedamos solo con las URLs finales de los GIFs
+// URLs finales para inyectarlas en data-gifs
 const gifUrls = gifEntries.map(([, img]) => img.src);
 
-// Primer GIF como fallback para el <img> inicial
+// Primer GIF para el <img> inicial (fallback si no hay lista)
 const initialGif = gifUrls[0] ?? '';
 ---
 
-<!-- Abre la cabecera del documento. -->
-<head>
-  <!-- Configuración básica de la página -->
-  <meta charset="utf-8" /> <!-- Tipo de caracteres: UTF-8 permite tildes, ñ y símbolos -->
-  <meta name="color-scheme" content="light only" /> <!-- Para que la página se vea bien aunque fuercen dark mode -->
-  <link rel="icon" type="image/svg+xml" href={import.meta.env.BASE_URL + "icons/favicon.svg"} /> <!-- Icono pequeño que se ve en la pestaña del navegador (BASE_URL) -->
-  <meta name="viewport" content="width=device-width, initial-scale=1" /> <!-- Hace que la página se adapte a móviles <diseño responsivo> -->
-  <meta name="generator" content={Astro.generator} /> <!-- Esto lo agrega Astro automáticamente, indica que se utiliza Astro y su versión-->
-  <title>Para mi princesa &lt;3</title> <!-- Texto que se ve en la pestaña del navegador, &lt; es el símbolo "<" -->
-</head>
-
 <!--=====================================================================================-->
 <!--=====================================================================================-->
 
-<!-- NOTA: En Astro, no se añade <html> ni <body> explícitos. El contenido de la página va directo aquí. -->
-
-<!-- ===========================================================================
-     CONTENEDOR GENERAL DE LA PÁGINA
-     - Funciona como "wrapper" vertical que organiza todo el contenido.
-     - Se define la variable CSS --bg-url para el fondo (compatible con BASE_URL).
-     =========================================================================== -->
-<!-- Contenedor principal de todo el contenido visible de la página -->
-<!-- Lista de GIFs (build-time) serializada para que el entry la lea en runtime -->
-<div class="page"
-     data-base={import.meta.env.BASE_URL}
-     data-gifs={JSON.stringify(gifUrls)}
-     style={`--bg-url: url(${import.meta.env.BASE_URL}img/fondo.png)`}>
-
-  <!-- =======================================================================
-       TÍTULO PRINCIPAL
-       - El contenedor controla padding, animaciones y escalado dinámico.
-       ======================================================================= -->
-  <!-- Contenedor del título, usado por CSS para manejar altura, padding y animación -->
-  <div class="title-wrap">
-    <!-- Título principal de la página, con id para estilos y JS (auto-escalado) -->
-    <h1 id="pageTitle">
-      <!-- Texto que se muestra como título grande arriba de todo -->
-      NOELIA ESTOY HACIENDO MI PÁGINA WEB QUÉ EMOCIÓN BUENO Y AHORA QUÉ HAGO
-    </h1>
-  </div>
-
-  <!-- =======================================================================
-       FRAME (AGRUPA EL GIF + BARRA DE MÚSICA)
-       - Mantiene ancho máximo y alinea todo al centro.
-       ======================================================================= -->
-  <!-- Frame: agrupa el bloque del GIF y la barra de controles en un mismo ancho -->
-  <div class="frame">
+<BaseLayout title="Para mi princesa <3">
+  <!-- =========================================================================
+       CONTENEDOR GENERAL DE LA PÁGINA
+       - Envuelve todo el contenido visible.
+       - Define la variable CSS --bg-url para el fondo (compatible con BASE_URL).
+       ======================================================================== -->
+  <!-- Lista de GIFs (build-time) serializada para que el entry la lea en runtime -->
+  <div class="page"
+       data-base={import.meta.env.BASE_URL}
+       data-gifs={JSON.stringify(gifUrls)}
+       style={`--bg-url: url(${import.meta.env.BASE_URL}img/fondo.png)`}>
 
     <!-- =====================================================================
-         CONTENEDOR DEL GIF
-         - Marco redondeado, sombra, y elementos superpuestos (reloj, audio).
+         TÍTULO PRINCIPAL
+         - El contenedor controla padding, animaciones y escalado dinámico.
          ===================================================================== -->
-    <!-- Contenedor con marco redondeado y sombra donde va el GIF y overlays -->
-    <div class="img-redondeada">
-
-      <!-- Imagen principal (GIF) -->
-      <!-- id="mainGif": lo usa JS para cambiar de GIF y bloquear proporción -->
-      <!-- src: GIF inicial resuelto en build (Astro ya incluye la BASE_URL correcta) -->
-      <!-- alt: texto alternativo para accesibilidad -->
-      <img id="mainGif" src={initialGif} alt="Gif en el centro">
-
-      <!-- Reloj / fecha superpuesto (actualizado por JS) -->
-      <!-- id="reloj": JS escribe aquí la fecha y hora -->
-      <!-- class="badge-fecha": estilos de la etiqueta pegada abajo a la izquierda -->
-      <!-- aria-live="polite": permite que lectores de pantalla anuncien los cambios sin interrumpir -->
-      <div id="reloj" class="badge-fecha" aria-live="polite"></div>
-
-      <!-- Reproductor de YouTube oculto para la música -->
-      <!-- id="yt-audio": contenedor invisible que mantiene el iframe de YouTube fuera de la vista -->
-      <!-- aria-hidden="true": se marca como irrelevante para accesibilidad -->
-      <div id="yt-audio" aria-hidden="true">
-        <!-- Aquí la API de YouTube inserta el <iframe> del reproductor -->
-        <div id="ytplayerMusic"></div>
-      </div>
-
-      <!-- Audio local de lluvia controlado por JavaScript -->
-      <!-- id="rainAudio": el JS lo usa para reproducir/pausar lluvia -->
-      <!-- src: ruta al archivo rain.mp3 usando BASE_URL -->
-      <!-- preload="auto": intenta cargar el audio por adelantado -->
-      <!-- loop: reproduce en bucle continuamente -->
-      <audio id="rainAudio"
-             src={import.meta.env.BASE_URL + "audio/rain.mp3"}
-             preload="auto"
-             loop></audio>
-    </div> <!-- /.img-redondeada -->
+    <Title text="NOELIA ESTOY HACIENDO MI PÁGINA WEB QUÉ EMOCIÓN BUENO Y AHORA QUÉ HAGO" />
 
     <!-- =====================================================================
-         BARRA DE CONTROL (MÚSICA, VOLUMEN, LLUVIA, CAMBIAR GIF)
+         FRAME (AGRUPA EL GIF + BARRA DE MÚSICA)
+         - Mantiene ancho máximo y alinea todo al centro.
          ===================================================================== -->
-    <!-- Barra horizontal con los controles de música, volumen, lluvia y cambio de GIF -->
-    <!-- id="controlsBar": usado por CSS/JS para referirse a toda la barra -->
-    <div class="barra-musica" id="controlsBar">
+    <Frame initialGif={initialGif} baseUrl={import.meta.env.BASE_URL} />
 
-      <!-- Botón Play/Pause de la música -->
-      <!-- id="musicToggle": JS engancha aquí el evento para reproducir/pausar -->
-      <!-- class="icon-btn": estilos comunes de botones redondos con icono -->
-      <!-- aria-label: descripción accesible del botón para lectores de pantalla -->
-      <button id="musicToggle" class="icon-btn" type="button" aria-label="Reproducir música">
-        <!-- Icono SVG de "play" (triángulo) -->
-        <!-- fill="currentColor": el icono hereda el color del botón -->
-        <!-- aria-hidden="true": el SVG es decorativo, la accesibilidad la da aria-label -->
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M8 5v14l11-7z"/>
-        </svg>
-      </button>
+  </div> <!-- /.page -->
 
-      <!-- Slider del volumen de la música -->
-      <!-- id="volumeMusic": JS lee y modifica este control para el volumen de YouTube -->
-      <!-- class="volume-slider": estilos personalizados del input range -->
-      <!-- type="range": deslizable horizontal -->
-      <!-- min/max/value: volumen 0–100, valor inicial 100 -->
-      <!-- aria-label: texto accesible para describir el control -->
-      <input id="volumeMusic" class="volume-slider" type="range"
-             min="0" max="100" value="100"
-             aria-label="Volumen de música (0 a 100)" />
+  <!-- ========================================================================
+       TIRITA SOL / LUNA (MODO DÍA / NOCHE)
+       - Control visual fijo al costado derecho de la pantalla.
+       - Permite alternar entre modo claro y modo oscuro.
+       ======================================================================== -->
+  <!-- Componente del control día/noche -->
+  <DayNightToggle />
 
-      <!-- Botón lluvia -->
-      <!-- id="rainToggle": JS lo usa para encender/apagar el sonido de lluvia -->
-      <!-- class="icon-btn": mismo estilo redondo que los otros botones -->
-      <!-- aria-label: descripción accesible -->
-      <!-- title: tooltip que aparece al pasar el mouse por encima -->
-      <button id="rainToggle" class="icon-btn" type="button" aria-label="Activar lluvia" title="Lluvia">
-        <!-- Icono SVG de nube (estado lluvia desactivada por defecto) -->
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M19 18a4 4 0 0 0 0-8 5 5 0 0 0-9-2 4 4 0 0 0-2 7.5"></path>
-        </svg>
-      </button>
+  <!-- ========================================================================
+       CAPA DE OSCURECIDO (OVERLAY)
+       - Se muestra encima del contenido cuando el modo noche está activo.
+       - Oscurece visualmente sin bloquear la interfaz.
+       ======================================================================== -->
+  <!-- Componente de overlay que el JS activa/desactiva -->
+  <DimOverlay />
 
-      <!-- Botón cambiar GIF -->
-      <!-- id="gifShuffle": JS lo usa para pasar al siguiente GIF disponible -->
-      <!-- title: tooltip "Cambiar GIF" -->
-      <button id="gifShuffle" class="icon-btn" type="button" aria-label="Cambiar GIF" title="Cambiar GIF">
-        <!-- Icono SVG que representa "cambio" o "siguiente" (flechas) -->
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M4 4h4l4 6-4 6H4l4-6-4-6zm10 0h6v2h-4v4h-2V4zm0 16v-6h2v4h4v2h-6z"/>
-        </svg>
-      </button>
-
-    </div> <!-- /.barra-musica -->
-
-  </div> <!-- /.frame -->
-
-</div> <!-- /.page -->
-
-
-<!-- ===========================================================================
-     TIRITA SOL / LUNA (MODO DÍA / NOCHE)
-     - Control visual fijo al costado derecho de la pantalla.
-     - Permite alternar entre modo claro y modo oscuro.
-     =========================================================================== -->
-
-<!-- Contenedor principal de la tirita -->
-<!-- id="rightHandle": usado por JS para aplicar estados (activo/inactivo) -->
-<!-- class="right-handle": estilos de posición fija, altura y animaciones -->
-<!-- aria-hidden="false": el control es visible y accesible -->
-<div id="rightHandle" class="right-handle" aria-hidden="false">
-
-  <!-- Barra vertical interactiva (riel de la tirita) -->
-  <!-- id="rightTrack": JS escucha clics aquí para alternar el modo -->
-  <!-- class="track": estilos del riel (color, sombra, animación stretch) -->
-  <!-- role="presentation": indica que es decorativo/estructural -->
-  <!-- title: tooltip al pasar el mouse -->
-  <div id="rightTrack" class="track"
-       role="presentation"
-       title="Click para atenuar/encender">
-
-    <!-- Botón redondo que representa Sol / Luna -->
-    <!-- id="modeThumb": JS cambia el icono y estado -->
-    <!-- class="thumb": estilos de la bolita (color, sombra, hover) -->
-    <!-- aria-label: descripción accesible del control -->
-    <!-- aria-pressed: indica estado activado/desactivado (día/noche) -->
-    <button id="modeThumb" class="thumb" type="button" aria-label="Cambiar modo (día/noche)" aria-pressed="false"></button>
-  </div>
-</div>
-
-
-<!-- ===========================================================================
-     CAPA DE OSCURECIDO (OVERLAY)
-     - Se muestra encima del contenido cuando el modo noche está activo.
-     - Oscurece visualmente sin bloquear la interfaz.
-     =========================================================================== -->
-
-<!-- id="dimOverlay": JS activa/desactiva la clase .activo -->
-<!-- class="dim-overlay": estilos de posición fija y transición de opacidad -->
-<!-- aria-hidden="true": no es relevante para lectores de pantalla -->
-<div id="dimOverlay" class="dim-overlay" aria-hidden="true"></div>
-
-
-
-
-<!-- ===========================================================================
-     ENTRY DEL CLIENTE (BUNDLE ASTRO)
-     - Astro procesa este script (src en /src) y lo bundlea.
-     - Se carga como module con defer automático.
-     - main.js lee data-gifs del HTML y arranca la app modular.
-     IMPORTANTE: no agregar atributos extra (type/async/defer) o Astro lo deja inline.
-     =========================================================================== -->
-<script src="../client/main.js"></script>
+  <!-- ========================================================================
+       ENTRY DEL CLIENTE
+       - Astro procesa este script (src en /src) y lo incluye en el HTML final.
+       - Se carga como módulo y se ejecuta cuando el HTML ya se cargó.
+       - main.js lee data-gifs del HTML y arranca la app modular.
+       IMPORTANTE: no agregar atributos extra (type/async/defer) o Astro cambia el modo de carga.
+       ======================================================================== -->
+  <script src="../client/main.js"></script>
+</BaseLayout>
