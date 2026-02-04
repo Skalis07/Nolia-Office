@@ -53,6 +53,7 @@ On the client side, JavaScript handles:
 
 - `npm run dev` → runs at root (normal local mode).
 - `npm run dev:pages` → simulates GitHub Pages (subpath `/Nolia-Office/`).
+- `npm run typecheck` → validates TypeScript types (no emit).
 
 ---
 
