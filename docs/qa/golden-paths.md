@@ -4,6 +4,7 @@ Estos golden paths son el checklist que se repite en cada PR para asegurar que e
 
 ## Antes de empezar
 - Ejecuta `npm run lint` (debe pasar)
+- Ejecuta `npm run typecheck` (debe pasar)
 - Ejecuta `npm run build` (debe pasar)
 - Para QA visual usa la Preview de Vercel si existe; si no, ejecuta `npm run dev` y prueba en la app
 - Si necesitas simular GitHub Pages (subpath), usa `npm run dev:pages`

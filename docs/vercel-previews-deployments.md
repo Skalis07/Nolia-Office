@@ -85,6 +85,7 @@ Las Preview Deployments **no reemplazan** el CI.
 
 - **CI (GitHub Actions)** verifica calidad técnica:
   - lint
+  - typecheck
   - build
 - **Vercel Preview** permite validar comportamiento visual y funcional.
 

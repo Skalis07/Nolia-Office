@@ -51,6 +51,7 @@ En el cliente, JavaScript se encarga de:
 
 - `npm run dev` → levanta el sitio en raíz (modo local normal).
 - `npm run dev:pages` → simula GitHub Pages (subpath `/Nolia-Office/`).
+- `npm run typecheck` → valida tipos de TypeScript (sin emitir archivos).
 
 ---
 
