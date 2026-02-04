@@ -1,4 +1,5 @@
 import type { AssetResolver } from "../../types/index.js";
+import { AUDIO_CONFIG } from "../config/audio.ts";
 
 // ============================================================================
 // MODO DIA / NOCHE
@@ -50,7 +51,7 @@ export function setupDayNight({ asset }: DayNightOptions = {}) {
     : "audio/light_switch.mp3";
   const switchSfx = new Audio(SWITCH_URL);
   switchSfx.preload = "auto";
-  switchSfx.volume = 0.7;
+  switchSfx.volume = AUDIO_CONFIG.DEFAULT_SWITCH_SFX_VOL / 100;
   switchSfx.playbackRate = 1.0;
 
   // Reproduce el sonido sin romper si el navegador bloquea autoplay.

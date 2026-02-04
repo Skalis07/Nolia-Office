@@ -38,6 +38,9 @@ export function initApp({ gifUrls = [] }: InitAppOptions = {}) {
   const reloj = document.getElementById("reloj") as HTMLElement | null;
 
   // Música (YouTube)
+  if (volMusic) {
+    volMusic.value = String(AUDIO_CONFIG.DEFAULT_MUSIC_VOL);
+  }
   setupMusic({
     btn: btnMusic,
     slider: volMusic,
