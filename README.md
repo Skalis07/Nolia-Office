@@ -2,7 +2,7 @@
 
 _(Spanish version available [here](README.es.md))_
 
-**Nolia Office** is a website created by **Skalis07** as a virtual space to relax, study, or work peacefully.
+**Nolia Office** is a Notion-friendly web app (embeddable as a widget) created by **Skalis07** as a relaxing, customizable study/work space.
 It is inspired by [NookOffice](https://github.com/VijiatJack/nookoffice) and uses _Animal Crossing_-themed visuals to create a warm and cozy atmosphere.
 The code has been developed from scratch, incorporating aesthetic changes and functional improvements.
 
