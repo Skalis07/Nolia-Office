@@ -37,6 +37,22 @@ export function initApp({ gifUrls = [] }: InitAppOptions = {}) {
   const rainAudio = document.getElementById("rainAudio") as HTMLAudioElement | null;
   const reloj = document.getElementById("reloj") as HTMLElement | null;
 
+  /* ---------------------------------------------------------------------------
+     SINCRONÍA DE VOLUMEN (MÚSICA -> LLUVIA)
+     - El slider controla YouTube (0–100).
+     - La lluvia se ajusta proporcionalmente a DEFAULT_RAIN_VOL.
+     --------------------------------------------------------------------------- */
+  function applyRainVolumeFromMusic(): void {
+    if (!volMusic || !rainAudio) return;
+    const sliderValue = Number(volMusic.value);
+    const safeValue = Number.isFinite(sliderValue)
+      ? sliderValue
+      : AUDIO_CONFIG.DEFAULT_MUSIC_VOL;
+    const rainPercent = (safeValue / 100) * AUDIO_CONFIG.DEFAULT_RAIN_VOL;
+    const rainVolume = rainPercent / 100;
+    rainAudio.volume = Math.min(1, Math.max(0, rainVolume));
+  }
+
   // Música (YouTube)
   if (volMusic) {
     volMusic.value = String(AUDIO_CONFIG.DEFAULT_MUSIC_VOL);
@@ -54,6 +70,10 @@ export function initApp({ gifUrls = [] }: InitAppOptions = {}) {
     audioEl: rainAudio,
     defaultVol: AUDIO_CONFIG.DEFAULT_RAIN_VOL,
   });
+  applyRainVolumeFromMusic();
+  if (volMusic) {
+    volMusic.addEventListener("input", applyRainVolumeFromMusic);
+  }
 
   // GIFs
   setupGifRotator({
