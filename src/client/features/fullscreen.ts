@@ -3,7 +3,13 @@
 // - Agrega la clase "browser-fullscreen" al <html> cuando corresponde.
 // - Esta clase ajusta el layout (por ejemplo --frame-max).
 // ============================================================================
-export function setupFullscreenClass({ threshold = 8 } = {}) {
+type FullscreenOptions = {
+  threshold?: number;
+};
+
+export function setupFullscreenClass({
+  threshold = 8,
+}: FullscreenOptions = {}) {
   const root = document.documentElement;
 
   function isDesktop() {

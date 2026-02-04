@@ -3,8 +3,13 @@
 // - Escribe fecha y hora en el elemento indicado.
 // - Respeta el idioma del navegador.
 // ============================================================================
-export function setupClock({ el } = {}) {
+type ClockOptions = {
+  el?: HTMLElement | null;
+};
+
+export function setupClock({ el }: ClockOptions = {}) {
   if (!el) return;
+  const safeEl = el;
 
   const locale = navigator.language || "es-ES";
 
@@ -23,7 +28,7 @@ export function setupClock({ el } = {}) {
       minute: "2-digit",
     });
 
-    el.textContent = `${fecha}\n${hora}`;
+    safeEl.textContent = `${fecha}\n${hora}`;
   }
 
   actualizarReloj();

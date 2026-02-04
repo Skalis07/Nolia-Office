@@ -1,15 +1,52 @@
-/* global YT */
 import { ICONS } from "../config/icons.ts";
+
+type MusicSetupOptions = {
+  btn: HTMLButtonElement | null;
+  slider: HTMLInputElement | null;
+  videoId: string;
+  playerId: string;
+};
+
+type YTPlayerOptions = {
+  videoId: string;
+  playerVars: Record<string, number | string>;
+  events: {
+    onReady: () => void;
+  };
+};
+
+type YTPlayer = {
+  setVolume: (value: number) => void;
+  unMute: () => void;
+  playVideo: () => void;
+  pauseVideo: () => void;
+  getPlayerState: () => number;
+};
+
+declare const YT: {
+  Player: new (elementId: string, options: YTPlayerOptions) => YTPlayer;
+  PlayerState: {
+    PLAYING: number;
+  };
+};
+
+type WindowWithYT = Window & {
+  YT?: typeof YT;
+  onYouTubeIframeAPIReady?: () => void;
+};
 
 // ============================================================================
 // MÚSICA (YouTube)
 // - Carga la API IFrame y crea un player oculto.
 // - Controla play/pausa y volumen desde los botones.
 // ============================================================================
-export function setupMusic({ btn, slider, videoId, playerId }) {
+export function setupMusic({ btn, slider, videoId, playerId }: MusicSetupOptions): void {
   if (!btn || !slider) return;
 
-  let player = null;
+  const safeBtn = btn;
+  const safeSlider = slider;
+
+  let player: YTPlayer | null = null;
   let isPlaying = false;
   let playerReady = false;
   let pendingPlay = false;
@@ -22,22 +59,22 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
      - Centraliza cambios de icono/aria/estado.
      --------------------------------------------------------------------------- */
   // Actualiza icono y aria-label según el estado actual.
-  function setState(playing) {
-    btn.innerHTML = playing ? ICONS.ICON_PAUSE : ICONS.ICON_PLAY;
-    btn.setAttribute("aria-label", playing ? "Pausar musica" : "Reproducir musica");
+  function setState(playing: boolean): void {
+    safeBtn.innerHTML = playing ? ICONS.ICON_PAUSE : ICONS.ICON_PLAY;
+    safeBtn.setAttribute("aria-label", playing ? "Pausar musica" : "Reproducir musica");
     isPlaying = playing;
   }
 
   // Aplica el volumen del slider al player de YouTube.
-  function applyVolume() {
-    const value = Number(slider.value);
+  function applyVolume(): void {
+    const value = Number(safeSlider.value);
     const safeValue = Number.isFinite(value) ? value : 100;
     if (player && typeof player.setVolume === "function") {
       player.setVolume(safeValue);
     }
   }
 
-  function saveIntent(playing) {
+  function saveIntent(playing: boolean): void {
     try {
       localStorage.setItem(STORAGE_KEY, playing ? "1" : "0");
     } catch {
@@ -45,7 +82,7 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
     }
   }
 
-  function readIntent() {
+  function readIntent(): boolean {
     try {
       return localStorage.getItem(STORAGE_KEY) === "1";
     } catch {
@@ -53,7 +90,7 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
     }
   }
 
-  function ensureResumeOnGesture() {
+  function ensureResumeOnGesture(): void {
     if (resumeBound) return;
     resumeBound = true;
 
@@ -67,7 +104,7 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
     window.addEventListener("keydown", resume, { once: true });
   }
 
-  function tryPlay() {
+  function tryPlay(): void {
     if (!player) return;
 
     try {
@@ -103,7 +140,7 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
     }, 200);
   }
 
-  function handleToggle() {
+  function handleToggle(): void {
     const nextPlaying = !isPlaying;
     setState(nextPlaying);
 
@@ -128,7 +165,7 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
      - Conecta eventos UNA sola vez.
      --------------------------------------------------------------------------- */
   // Se dispara cuando el player queda listo.
-  function onReady() {
+  function onReady(): void {
     playerReady = true;
     applyVolume();
     if (readIntent()) {
@@ -147,7 +184,7 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
      - videoId: id del video de YouTube
      --------------------------------------------------------------------------- */
   // Crea el reproductor de YouTube (solo audio).
-  function initPlayer() {
+  function initPlayer(): void {
     player = new YT.Player(playerId, {
       videoId,
       playerVars: {
@@ -170,15 +207,17 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
      - Encadena window.onYouTubeIframeAPIReady si ya existía.
      --------------------------------------------------------------------------- */
   // Inserta la API si no existe y encadena el callback global.
-  function ensureApi() {
-    if (window.YT && window.YT.Player) {
+  function ensureApi(): void {
+    const w = window as WindowWithYT;
+
+    if (w.YT && w.YT.Player) {
       initPlayer();
       return;
     }
 
     // Respeta un callback previo si ya existe.
-    const prev = window.onYouTubeIframeAPIReady;
-    window.onYouTubeIframeAPIReady = function () {
+    const prev = w.onYouTubeIframeAPIReady;
+    w.onYouTubeIframeAPIReady = function () {
       if (typeof prev === "function") prev();
       initPlayer();
     };
@@ -194,10 +233,10 @@ export function setupMusic({ btn, slider, videoId, playerId }) {
   }
 
   ensureApi();
-  if (!btn.dataset.bound) {
-    btn.dataset.bound = "true";
-    btn.addEventListener("click", handleToggle);
-    slider.addEventListener("input", () => {
+  if (!safeBtn.dataset.bound) {
+    safeBtn.dataset.bound = "true";
+    safeBtn.addEventListener("click", handleToggle);
+    safeSlider.addEventListener("input", () => {
       applyVolume();
     });
   }

@@ -1,20 +1,30 @@
+import type { AssetResolver } from "../../types/index.js";
+
 // ============================================================================
 // MODO DIA / NOCHE
 // - Tirita lateral con sol/luna.
 // - Aplica overlay y clases visuales.
 // - Reproduce sonido al alternar.
 // ============================================================================
-export function setupDayNight({ asset }) {
+type DayNightOptions = {
+  asset?: AssetResolver;
+};
+
+export function setupDayNight({ asset }: DayNightOptions = {}) {
   /* ---------------------------------------------------------------------------
      REFERENCIAS AL DOM
      --------------------------------------------------------------------------- */
-  const handle = document.getElementById("rightHandle");
-  const track = document.getElementById("rightTrack");
-  const thumb = document.getElementById("modeThumb");
-  const overlay = document.getElementById("dimOverlay");
+  const handle = document.getElementById("rightHandle") as HTMLElement | null;
+  const track = document.getElementById("rightTrack") as HTMLElement | null;
+  const thumb = document.getElementById("modeThumb") as HTMLElement | null;
+  const overlay = document.getElementById("dimOverlay") as HTMLElement | null;
 
   // Seguridad: si falta algún elemento crítico, abortamos todo el bloque.
   if (!handle || !track || !thumb || !overlay) return;
+  const safeHandle = handle;
+  const safeTrack = track;
+  const safeThumb = thumb;
+  const safeOverlay = overlay;
 
   /* ---------------------------------------------------------------------------
      ICONOS SVG (INLINE) PARA LA BOLITA
@@ -66,11 +76,11 @@ export function setupDayNight({ asset }) {
      --------------------------------------------------------------------------- */
   // Aplica clases y el icono correcto.
   function aplicarEstado() {
-    overlay.classList.toggle("activo", oscuro);
-    handle.classList.toggle("activo", oscuro);
+    safeOverlay.classList.toggle("activo", oscuro);
+    safeHandle.classList.toggle("activo", oscuro);
     document.body.classList.toggle("oscuro", oscuro);
-    thumb.setAttribute("aria-pressed", String(oscuro));
-    thumb.innerHTML = oscuro ? ICON_MOON : ICON_SUN;
+    safeThumb.setAttribute("aria-pressed", String(oscuro));
+    safeThumb.innerHTML = oscuro ? ICON_MOON : ICON_SUN;
   }
 
   /* ---------------------------------------------------------------------------
@@ -78,8 +88,8 @@ export function setupDayNight({ asset }) {
      --------------------------------------------------------------------------- */
   // Mini animación del riel.
   function estirarTirita() {
-    track.classList.add("stretch");
-    setTimeout(() => track.classList.remove("stretch"), 230);
+    safeTrack.classList.add("stretch");
+    setTimeout(() => safeTrack.classList.remove("stretch"), 230);
   }
 
   /* ---------------------------------------------------------------------------
@@ -96,12 +106,13 @@ export function setupDayNight({ asset }) {
   /* ---------------------------------------------------------------------------
      EVENTOS DE INTERACCIÓN
      --------------------------------------------------------------------------- */
-  track.addEventListener("click", (e) => {
-    if (e.target === thumb) return;
+  safeTrack.addEventListener("click", (e: MouseEvent) => {
+    const target = e.target as HTMLElement | null;
+    if (target === safeThumb) return;
     alternar();
   });
 
-  thumb.addEventListener("click", (e) => {
+  safeThumb.addEventListener("click", (e: MouseEvent) => {
     e.stopPropagation();
     alternar();
   });
