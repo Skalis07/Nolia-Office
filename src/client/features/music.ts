@@ -1,5 +1,5 @@
 /* global YT */
-import { ICONS } from "../config/icons.js";
+import { ICONS } from "../config/icons.ts";
 
 // ============================================================================
 // MÚSICA (YouTube)

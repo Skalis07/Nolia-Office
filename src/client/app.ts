@@ -1,11 +1,11 @@
-import { AUDIO_CONFIG } from "./config/audio.js";
-import { createAssetResolver } from "./utils/asset.js";
+import { AUDIO_CONFIG } from "./config/audio.ts";
+import { createAssetResolver } from "./utils/asset.ts";
 import { setupDayNight } from "./features/day-night.js";
 import { setupNotionEmbedClass } from "./features/embed-notion.js";
 import { setupFullscreenClass } from "./features/fullscreen.js";
 import { setupGifRotator } from "./features/gif-rotator.js";
-import { setupMusic } from "./features/music.js";
-import { setupRain } from "./features/rain.js";
+import { setupMusic } from "./features/music.ts";
+import { setupRain } from "./features/rain.ts";
 import { setupTitleFit } from "./features/title-fit.js";
 import { setupClock } from "./features/clock.js";
 
