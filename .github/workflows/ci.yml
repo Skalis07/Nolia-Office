@@ -48,11 +48,16 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      # Paso 5️⃣ — Ejecutar build de Astro
+      # Paso 5️⃣ — Ejecutar TypeScript typecheck
+      # 👉 Falla el job si hay errores de tipos
+      - name: Typecheck
+        run: npm run typecheck
+
+      # Paso 6️⃣ — Ejecutar build de Astro
       # 👉 Detecta errores de compilación antes del merge
       - name: Build
         run: npm run build
-      
-      # Paso 6️⃣ — Build con BASE_PATH para GitHub Pages (subpath)
+
+      # Paso 7️⃣ — Build con BASE_PATH para GitHub Pages (subpath)
       - name: Build (Pages)
         run: BASE_PATH=/Nolia-Office/ npm run build

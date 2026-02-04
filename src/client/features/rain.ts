@@ -24,7 +24,8 @@ export function setupRain({ btn, audioEl, defaultVol }: RainSetupOptions): void 
      --------------------------------------------------------------------------- */
   // Volumen inicial (0-100 -> 0.0-1.0)
   const volume = Number(defaultVol ?? AUDIO_CONFIG.DEFAULT_RAIN_VOL) / 100;
-  safeAudio.volume = Number.isFinite(volume) ? volume : 0.6;
+  const fallback = AUDIO_CONFIG.DEFAULT_RAIN_VOL / 100;
+  safeAudio.volume = Number.isFinite(volume) ? volume : fallback;
 
   let isPlaying = false;
 
