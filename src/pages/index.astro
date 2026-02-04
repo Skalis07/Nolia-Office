@@ -85,8 +85,8 @@ const initialGif = gifUrls[0] ?? '';
        ENTRY DEL CLIENTE
        - Astro procesa este script (src en /src) y lo incluye en el HTML final.
        - Se carga como módulo y se ejecuta cuando el HTML ya se cargó.
-       - main.js lee data-gifs del HTML y arranca la app modular.
+       - main.ts lee data-gifs del HTML y arranca la app modular.
        IMPORTANTE: no agregar atributos extra (type/async/defer) o Astro cambia el modo de carga.
        ======================================================================== -->
-  <script src="../client/main.js"></script>
+  <script src="../client/main.ts"></script>
 </BaseLayout>

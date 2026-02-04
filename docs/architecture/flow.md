@@ -120,7 +120,7 @@ Dentro del wrapper se renderizan:
 Y fuera del wrapper pero dentro del layout:
 - **`<DayNightToggle />`**: control día/noche.
 - **`<DimOverlay />`**: capa oscura.
-- `<script src="../client/main.js">` al final.
+- `<script src="../client/main.ts">` al final.
 
 ---
 
@@ -151,7 +151,7 @@ index.astro
                       └─ ControlsBar
        ├─ DayNightToggle
        ├─ DimOverlay
-       └─ script main.js
+       └─ script main.ts
 ```
 
 ---
@@ -166,7 +166,7 @@ index.astro
 6. Dentro del wrapper se renderizan `Title` y `Frame`.
 7. `Frame` inserta `GifFrame` y `ControlsBar`.
 8. Fuera del wrapper se renderizan `DayNightToggle` y `DimOverlay`.
-9. El script `main.js` se ejecuta cuando el HTML ya está listo.
+9. El script `main.ts` se ejecuta cuando el HTML ya está listo.
 
 ---
 

@@ -15,9 +15,11 @@ export function setupTitleFit() {
        REFERENCIAS AL DOM
        ------------------------------------------------------------------------- */
     const root = document.documentElement;
-    const wrap = document.querySelector(".title-wrap");
+    const wrap = document.querySelector<HTMLElement>(".title-wrap");
     const title = document.getElementById("pageTitle");
     if (!wrap || !title) return;
+    const safeWrap = wrap;
+    const safeTitle = title;
 
     /* -------------------------------------------------------------------------
        VARIABLES DE CONTROL Y CACHÉ
@@ -27,7 +29,7 @@ export function setupTitleFit() {
     let lastScale = NaN;
     let lastSpacing = NaN;
     let lastHeight = NaN;
-    let lastFull = null;
+    let lastFull: boolean | null = null;
 
     /* -------------------------------------------------------------------------
        CÁLCULO Y APLICACIÓN DEL ESCALADO
@@ -35,7 +37,7 @@ export function setupTitleFit() {
     // Calcula la escala y la aplica al titulo.
     function computeAndApply() {
       rafId = 0;
-      const avail = wrap.clientWidth || 0;
+      const avail = safeWrap.clientWidth || 0;
       const isFull = root.classList.contains("browser-fullscreen");
 
       const modeUnchanged = lastFull !== null && isFull === lastFull;
@@ -44,13 +46,13 @@ export function setupTitleFit() {
       lastAvail = avail;
       lastFull = isFull;
 
-      const prevLetter = title.style.letterSpacing;
-      title.style.letterSpacing = "0px";
-      const base = title.scrollWidth || 1;
-      title.style.letterSpacing = prevLetter;
+      const prevLetter = safeTitle.style.letterSpacing;
+      safeTitle.style.letterSpacing = "0px";
+      const base = safeTitle.scrollWidth || 1;
+      safeTitle.style.letterSpacing = prevLetter;
       if (!isFinite(base)) return;
 
-      const textLen = (title.textContent || "").length;
+      const textLen = (safeTitle.textContent || "").length;
       const gaps = Math.max(1, textLen - 1);
 
       let spacing = 0;
@@ -81,15 +83,15 @@ export function setupTitleFit() {
         Math.abs(scale - lastScale) > 0.005 ||
         Math.abs(spacing - lastSpacing) > 0.25
       ) {
-        title.style.letterSpacing = spacing ? `${spacing}px` : "0px";
-        title.style.transformOrigin = origin;
-        title.style.transform = `scaleX(${scale})`;
+        safeTitle.style.letterSpacing = spacing ? `${spacing}px` : "0px";
+        safeTitle.style.transformOrigin = origin;
+        safeTitle.style.transform = `scaleX(${scale})`;
         lastScale = scale;
         lastSpacing = spacing;
 
-        const h = title.getBoundingClientRect().height;
+        const h = safeTitle.getBoundingClientRect().height;
         if (!isFinite(lastHeight) || Math.abs(h - lastHeight) > 0.5) {
-          wrap.style.height = h + "px";
+          safeWrap.style.height = h + "px";
           lastHeight = h;
         }
       }
@@ -110,7 +112,7 @@ export function setupTitleFit() {
     // Observa cambios de tamaño del contenedor.
     if (typeof ResizeObserver !== "undefined") {
       const ro = new ResizeObserver(schedule);
-      ro.observe(wrap);
+      ro.observe(safeWrap);
     }
 
     // Fallback de resize + fullscreen API.

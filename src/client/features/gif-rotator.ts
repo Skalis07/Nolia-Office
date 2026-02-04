@@ -4,7 +4,17 @@
 // - Cambia instantáneamente al siguiente.
 // - Bloquea proporción según el GIF inicial.
 // ============================================================================
-export function setupGifRotator({ btn, img, gifUrls }) {
+type GifRotatorOptions = {
+  btn?: HTMLButtonElement | null;
+  img?: HTMLImageElement | null;
+  gifUrls?: string[];
+};
+
+export function setupGifRotator({
+  btn,
+  img,
+  gifUrls = [],
+}: GifRotatorOptions) {
   if (!btn || !img) return;
 
   /* ---------------------------------------------------------------------------
@@ -27,7 +37,8 @@ export function setupGifRotator({ btn, img, gifUrls }) {
   }
 
   // Detectar GIF actual
-  const current = new URL(img.getAttribute("src"), location.href).href;
+  const currentSrc = img.getAttribute("src");
+  const current = currentSrc ? new URL(currentSrc, location.href).href : "";
   const idx = urlsAbs.indexOf(current);
   actual = idx >= 0 ? idx : 0;
 
@@ -66,10 +77,10 @@ export function setupGifRotator({ btn, img, gifUrls }) {
    - Lee el tamaño natural del GIF.
    - En móviles deja que el CSS mande (vh).
    ============================================================================ */
-function lockAspectFrom(imgEl) {
+function lockAspectFrom(imgEl: HTMLImageElement) {
   if (!imgEl) return;
 
-  const container = imgEl.closest(".img-redondeada");
+  const container = imgEl.closest<HTMLElement>(".img-redondeada");
   if (!container) return;
 
   const apply = () => {
@@ -96,7 +107,7 @@ function lockAspectFrom(imgEl) {
 }
 
 // Aplica el modo "cover" al <img> de forma consistente.
-function setCover(imgEl) {
+function setCover(imgEl: HTMLImageElement) {
   if (!imgEl) return;
   imgEl.style.width = "100%";
   imgEl.style.height = "100%";
