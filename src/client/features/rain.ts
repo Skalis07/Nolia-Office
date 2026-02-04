@@ -1,5 +1,5 @@
-import { AUDIO_CONFIG } from "../config/audio.js";
-import { ICONS } from "../config/icons.js";
+import { AUDIO_CONFIG } from "../config/audio.ts";
+import { ICONS } from "../config/icons.ts";
 
 // ============================================================================
 // LLUVIA (audio local)

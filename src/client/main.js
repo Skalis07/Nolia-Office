@@ -1,4 +1,4 @@
-import { initApp } from "./app.js";
+import { initApp } from "./app.ts";
 
 // Entry del cliente: lee datos del HTML (renderizados por Astro)
 // y arranca la app modular.
