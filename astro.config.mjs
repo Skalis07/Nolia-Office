@@ -1,6 +1,8 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 
+import tailwindcss from "@tailwindcss/vite";
+
 /**
  * Base:
  * - Default: "/"
@@ -18,4 +20,8 @@ const base = baseFromEnv ?? "/";
 export default defineConfig({
   site: "https://Skalis07.github.io/Nolia-Office",
   base,
+
+  vite: {
+    plugins: [tailwindcss()],
+  },
 });
