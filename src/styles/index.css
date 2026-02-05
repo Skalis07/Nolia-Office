@@ -1,3 +1,6 @@
+@import "tailwindcss";
+@config "../../tailwind.config.cjs";
+
 *, *::before, *::after { box-sizing: border-box; } /* Evita que el padding/border agranden el tamaño real (está principalmente por estándar y buena práctica) */
 
     :root{
@@ -84,6 +87,7 @@
       margin:0; /* Elimina el margen superior e inferior que los <h1> traen por defecto. */
       color:var(--color-text); /* Color del texto: negro. */
       font-family:Arial, sans-serif; /* Usa Arial, o si no existe, otra fuente sans-serif. */
+      font-weight:700; /* Mantiene el título en negrita; Tailwind Preflight quita la negrita por defecto. */
     }
 
     /* ===== Marco del GIF (Contenedor) ===== */
