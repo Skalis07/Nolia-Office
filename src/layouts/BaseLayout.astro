@@ -8,6 +8,12 @@ const { title } = Astro.props;
     <meta charset="utf-8" />
     <meta name="color-scheme" content="light only" />
     <link
+      rel="preload"
+      as="image"
+      href={import.meta.env.BASE_URL + "img/fondo.png"}
+      fetchpriority="high"
+    />
+    <link
       rel="icon"
       type="image/svg+xml"
       href={import.meta.env.BASE_URL + "icons/favicon.svg"}
