@@ -8,7 +8,13 @@ const { initialGif, baseUrl } = Astro.props;
   <!-- id="mainGif": lo usa JS para cambiar de GIF y bloquear proporción -->
   <!-- src: GIF inicial resuelto en build (Astro ya incluye la BASE_URL correcta) -->
   <!-- alt: texto alternativo para accesibilidad -->
-  <img id="mainGif" src={initialGif} alt="Gif en el centro" />
+  <img
+    id="mainGif"
+    src={initialGif}
+    alt="Gif en el centro"
+    fetchpriority="low"
+    decoding="async"
+  />
 
   <!-- Reloj / fecha superpuesto (actualizado por JS) -->
   <!-- id="reloj": JS escribe aquí la fecha y hora -->
