@@ -1,6 +1,6 @@
 # Tailwind Tokens - Inventario actual (CSS)
 
-Este archivo resume los valores actuales del CSS para convertirlos en tokens de Tailwind.
+Este archivo resume los valores del CSS que se mapearon a tokens de Tailwind.
 Fuente: `src/styles/index.css`.
 
 --------------------------------------------------------------------------------
@@ -11,8 +11,6 @@ Fuente: `src/styles/index.css`.
 - --color-bar: #5aa7a6
 - --color-bar-border: rgba(255,255,255,.75)
 - --white-65: rgba(255,255,255,.65)
-- --white-18: rgba(255,255,255,.18)
-- --white-12: rgba(255,255,255,.12)
 
 --------------------------------------------------------------------------------
 ## Colores hardcodeados (sin variable)
@@ -31,13 +29,11 @@ Estos aparecen directo en reglas y conviene mapearlos a tokens:
 
 --------------------------------------------------------------------------------
 ## Espaciados y tamaños base
-- --frame-max: 1200px
 - --page-pad: 10px
 - --bar-pad: 10px 16px
 - --bar-pad-compact: 8px 10px
 - --bar-gap: 10px
 - --bar-gap-compact: 8px
-- --frame-gap: 12px
 - gap frecuente: 16px (en `.page`)
 
 --------------------------------------------------------------------------------
@@ -48,7 +44,6 @@ Estos aparecen directo en reglas y conviene mapearlos a tokens:
 - --border-btn: 3px
 - --shadow-card: 0 4px 15px rgba(0,0,0,.3)
 - --shadow-bar: 0 4px 12px rgba(0,0,0,.25)
-- --shadow-thumb: 0 1px 2px rgba(0,0,0,.25)
 - --shadow-thumb-lg: 0 3px 6px rgba(0,0,0,.25)
 - --shadow-handle: inset 0 2px 0 rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.15)
 - --shadow-handle-hover: inset 0 2px 0 rgba(0,0,0,.1), 0 3px 10px rgba(0,0,0,.2)
@@ -56,7 +51,6 @@ Estos aparecen directo en reglas y conviene mapearlos a tokens:
 --------------------------------------------------------------------------------
 ## Slider (volumen)
 - --slider-track-h: 6px
-- --slider-thumb: 16px
 
 --------------------------------------------------------------------------------
 ## Z-index (capas)
@@ -69,10 +63,8 @@ Estos aparecen directo en reglas y conviene mapearlos a tokens:
 
 --------------------------------------------------------------------------------
 ## Animaciones y transiciones
-- keyframes: `stretch` (escala vertical en la barra dia/noche)
 - transiciones presentes en botones, barra, overlay y handle
 
 --------------------------------------------------------------------------------
 ## Nota
 Este inventario se usa para definir `theme.extend` en Tailwind y evitar valores duplicados.
-
