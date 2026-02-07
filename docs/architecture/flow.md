@@ -107,7 +107,7 @@ Dentro del layout, `index.astro` renderiza el wrapper principal:
 **Qué hace el wrapper:**
 - Envuelve todo lo visible.
 - Define el fondo con `--bg-url`.
-- Expone datos a JS (`data-base`, `data-gifs`).
+- Expone datos al cliente (TS/JS) (`data-base`, `data-gifs`).
 
 ---
 

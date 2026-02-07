@@ -95,7 +95,8 @@ export function setupMusic({ btn, slider, videoId, playerId }: MusicSetupOptions
     resumeBound = true;
 
     const resume = () => {
-      if (!pendingResume) return;
+      resumeBound = false;
+      if (!pendingResume || !isPlaying) return;
       pendingResume = false;
       tryPlay();
     };
@@ -154,6 +155,8 @@ export function setupMusic({ btn, slider, videoId, playerId }: MusicSetupOptions
       return;
     }
 
+    pendingPlay = false;
+    pendingResume = false;
     player.pauseVideo();
     saveIntent(false);
   }

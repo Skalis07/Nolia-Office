@@ -33,104 +33,114 @@
       --frame-gap:12px; /* Espacio entre GIF y barra */
     }
 
-    .title-wrap{ /* Selector CSS '.title-wrap': aplica a cualquier elemento con esa clase */
-      width:100%; /* La caja ocupa todo el ancho disponible de su contenedor padre. */
-      max-width:var(--frame-max); /* Ancho máximo */
-      margin-inline:auto; /* Centrado para que calce con el frame */
-      overflow: visible; /* Permite que el contenido que sobresalga (por ejemplo, un título escalado con transform) siga siendo visible y no se recorte */
-      padding-top: 4px; /* Colchón (espacio) superior */
-      position: relative; /* Mantiene la posición normal del elemento, pero permite usar desplazamientos (top/left/etc.) */
-      z-index: 10; /* Asegura que esta capa quede por encima de otros elementos con z-index menor. En tu página ayuda a que el título no quede tapado por overlays o fondos animados. */
-      transition: none; /* Evita animaciones raras: ajuste instantáneo */
-      will-change: height; /* Indica al navegador que la altura probablemente cambiará pronto, optimizando el renderizado (mejora el rendimiento de animaciones). */
-    }
-    
-    #pageTitle{ /* Selector CSS '#pageTitle': aplica al elemento con id="pageTitle" (el título principal). */
-      display:inline-block; /* Se comporta como elemento en línea pero permite ancho/alto y transform sin ocupar toda la fila. */
-      white-space:nowrap; /* Evita que el texto haga saltos de línea: todo el título se mantiene en una sola línea. */
-      transform-origin: left top; /* Punto de origen de las transformaciones (scale, etc.) en la esquina superior izquierda del título. */
-      line-height:1.15; /* Ajusta el espacio vertical entre líneas para que el título se vea más compacto y legible. */
-      font-size: clamp(14px, 4vw, 28px); /* Tamaño de fuente fluido: mínimo 14px, máximo 28px, creciendo según el ancho de la ventana (4vw). */
-      transition: none; /* Evita animaciones raras: ajuste instantáneo */
-      will-change: transform; /* Le avisa al navegador que 'transform' cambiará, optimizando el renderizado de la animación. */
+    @layer components {
+      .title-wrap{ /* Selector CSS '.title-wrap': aplica a cualquier elemento con esa clase */
+        @apply w-full; /* La caja ocupa todo el ancho disponible de su contenedor padre. */
+        max-width:var(--frame-max); /* Ancho máximo */
+        @apply mx-auto; /* Centrado para que calce con el frame */
+        @apply overflow-visible; /* Permite que el contenido que sobresalga (por ejemplo, un título escalado con transform) siga siendo visible y no se recorte */
+        @apply pt-1; /* Colchón (espacio) superior */
+        @apply relative; /* Mantiene la posición normal del elemento, pero permite usar desplazamientos (top/left/etc.) */
+        @apply z-title; /* Asegura que esta capa quede por encima de otros elementos con z-index menor. En tu página ayuda a que el título no quede tapado por overlays o fondos animados. */
+        transition: none; /* Evita animaciones raras: ajuste instantáneo */
+        will-change: height; /* Indica al navegador que la altura probablemente cambiará pronto, optimizando el renderizado (mejora el rendimiento de animaciones). */
+      }
+      
+      #pageTitle{ /* Selector CSS '#pageTitle': aplica al elemento con id="pageTitle" (el título principal). */
+        @apply inline-block; /* Se comporta como elemento en línea pero permite ancho/alto y transform sin ocupar toda la fila. */
+        @apply whitespace-nowrap; /* Evita que el texto haga saltos de línea: todo el título se mantiene en una sola línea. */
+        transform-origin: left top; /* Punto de origen de las transformaciones (scale, etc.) en la esquina superior izquierda del título. */
+        line-height:1.15; /* Ajusta el espacio vertical entre líneas para que el título se vea más compacto y legible. */
+        font-size: clamp(14px, 4vw, 28px); /* Tamaño de fuente fluido: mínimo 14px, máximo 28px, creciendo según el ancho de la ventana (4vw). */
+        transition: none; /* Evita animaciones raras: ajuste instantáneo */
+        will-change: transform; /* Le avisa al navegador que 'transform' cambiará, optimizando el renderizado de la animación. */
+      }
     }
 
     /* ===== Página ===== */ /* Sección de estilos generales para la estructura y fondo de la página. */
-    html, body{
-      margin:0; /* Elimina el margen por defecto del navegador alrededor de la página. */
-      overflow-x:hidden; /* Evita que aparezca barra de scroll horizontal si algo se sale un poco por los lados. */
+    @layer base {
+      html, body{
+        @apply m-0; /* Elimina el margen por defecto del navegador alrededor de la página. */
+        @apply overflow-x-hidden; /* Evita que aparezca barra de scroll horizontal si algo se sale un poco por los lados. */
+      }
+      body{
+        @apply text-center; /* Centra el texto de forma horizontal por defecto dentro del body. */
+        @apply bg-surface; /* Color de fondo base de la página (verde oscuro). */
+      }
     }
-    body{
-      text-align:center; /* Centra el texto de forma horizontal por defecto dentro del body. */
-      background:var(--color-bg); /* Color de fondo base de la página (verde oscuro). */
-    }
 
-    .page{
-      background-image:var(--bg-url); /* Patrón directo en la página */
-      background-repeat:repeat; /* Repite el mosaico */
-      background-position:0 0; /* Ancla el patrón en la esquina superior izquierda */
-      background-size:auto; /* Mantiene el tamaño original del tile */
+    @layer components {
+      .page{
+        background-image:var(--bg-url); /* Patrón directo en la página */
+        background-repeat:repeat; /* Repite el mosaico */
+        background-position:0 0; /* Ancla el patrón en la esquina superior izquierda */
+        background-size:auto; /* Mantiene el tamaño original del tile */
 
-      min-height:100vh; /* La sección .page siempre mide al menos el alto completo de la ventana (viewport). */
+        @apply min-h-screen; /* La sección .page siempre mide al menos el alto completo de la ventana (viewport). */
 
-      display:flex; /* Usa Flexbox para organizar el contenido interno. */
-      flex-direction:column; /* Coloca los elementos hijos en una columna (uno debajo del otro). */
-      align-items:center; /* Centra horizontalmente los elementos hijos dentro del contenedor. */
+        @apply flex; /* Usa Flexbox para organizar el contenido interno. */
+        @apply flex-col; /* Coloca los elementos hijos en una columna (uno debajo del otro). */
+        @apply items-center; /* Centra horizontalmente los elementos hijos dentro del contenedor. */
 
-      gap:16px; /* Espacio de 16px entre los elementos hijos (separación vertical en este caso). */
-      padding:var(--page-pad) var(--page-pad) 0; /* Relleno: 10px arriba y a los lados, 0 abajo. */
-      position:relative; /* Mantiene la posición normal, pero permite posicionar hijos de forma absoluta dentro de .page. */
+        @apply gap-4; /* Espacio de 16px entre los elementos hijos (separación vertical en este caso). */
+        @apply px-page-pad pt-page-pad pb-0; /* Relleno: 10px arriba y a los lados, 0 abajo. */
+        @apply relative; /* Mantiene la posición normal, pero permite posicionar hijos de forma absoluta dentro de .page. */
+      }
     }
 
     /* ===== Título principal ===== */
-    h1{
-      margin:0; /* Elimina el margen superior e inferior que los <h1> traen por defecto. */
-      color:var(--color-text); /* Color del texto: negro. */
-      font-family:Arial, sans-serif; /* Usa Arial, o si no existe, otra fuente sans-serif. */
-      font-weight:700; /* Mantiene el título en negrita; Tailwind Preflight quita la negrita por defecto. */
+    @layer base {
+      h1{
+        @apply m-0; /* Elimina el margen superior e inferior que los <h1> traen por defecto. */
+        @apply text-ink; /* Color del texto: negro. */
+        @apply font-title; /* Usa Arial, o si no existe, otra fuente sans-serif. */
+        @apply font-bold; /* Mantiene el título en negrita; Tailwind Preflight quita la negrita por defecto. */
+      }
     }
 
     /* ===== Marco del GIF (Contenedor) ===== */
-    .img-redondeada{ /* Contenedor del GIF (o imagen) con bordes redondeados y estilo de tarjeta. */
-      max-width:var(--frame-max); /* Limita el ancho máximo para que no se haga demasiado grande en pantallas grandes. */
-      width:100%; /* Ocupa el 100% del espacio disponible hasta el máximo. */
-      border-radius:var(--radius-lg); /* Esquinas redondeadas del marco. */
-      border:var(--border-thick) solid var(--color-white); /* Borde blanco grueso alrededor del GIF. */
-      box-shadow:var(--shadow-card); /* Sombra para dar sensación de elevación/3D. */
-      overflow:hidden; /* Recorta lo que sobresalga de los bordes redondeados. */
-      position:relative; /* Necesario para que elementos hijos (como la fecha) se posicionen de forma absoluta dentro. */
-    }
+    @layer components {
+      .img-redondeada{ /* Contenedor del GIF (o imagen) con bordes redondeados y estilo de tarjeta. */
+        max-width:var(--frame-max); /* Limita el ancho máximo para que no se haga demasiado grande en pantallas grandes. */
+        @apply w-full; /* Ocupa el 100% del espacio disponible hasta el máximo. */
+        @apply rounded-lg; /* Esquinas redondeadas del marco. */
+        @apply border-thick border-white; /* Borde blanco grueso alrededor del GIF. */
+        @apply shadow-card; /* Sombra para dar sensación de elevación/3D. */
+        @apply overflow-hidden; /* Recorta lo que sobresalga de los bordes redondeados. */
+        @apply relative; /* Necesario para que elementos hijos (como la fecha) se posicionen de forma absoluta dentro. */
+      }
 
-    /* ===== Imagen dentro del marco ===== */
-    .img-redondeada img{ /* Imagen interna del marco. */
-      display:block; /* Elimina el espacio en blanco de imágenes inline. */
-      width:100%; /* La imagen se adapta al ancho del marco. */
-      height:auto; /* Mantiene proporción natural del GIF. */
-      object-fit:cover; /* La imagen se recorta para llenar el contenedor sin deformarse. */
-      object-position:center bottom; /* Enfoque desde el centro hacia abajo (útil si el GIF tiene algo importante en la parte baja). */
-      position:relative; z-index:1; /* Se asegura de que quede por debajo del badge de fecha. */
-    }
+      /* ===== Imagen dentro del marco ===== */
+      .img-redondeada img{ /* Imagen interna del marco. */
+        @apply block; /* Elimina el espacio en blanco de imágenes inline. */
+        @apply w-full; /* La imagen se adapta al ancho del marco. */
+        @apply h-auto; /* Mantiene proporción natural del GIF. */
+        object-fit:cover; /* La imagen se recorta para llenar el contenedor sin deformarse. */
+        object-position:center bottom; /* Enfoque desde el centro hacia abajo (útil si el GIF tiene algo importante en la parte baja). */
+        @apply relative z-img; /* Se asegura de que quede por debajo del badge de fecha. */
+      }
 
-    /* ===== Badge de Fecha (Etiqueta sobre el GIF) ===== */
-    .badge-fecha { /* Etiqueta/placa de la fecha que aparece encima del GIF en la esquina inferior izquierda. */
-      position: absolute; /* Se posiciona libremente dentro del contenedor (.img-redondeada). */
-      left: 0; bottom: 0; /* Ubicación exacta: esquina inferior izquierda. */
-      background: none; /* Sin fondo sólido (puede superponerse directamente sobre el GIF). */
-      color: var(--color-white); /* Texto blanco para contrastar con el GIF. */
+      /* ===== Badge de Fecha (Etiqueta sobre el GIF) ===== */
+      .badge-fecha { /* Etiqueta/placa de la fecha que aparece encima del GIF en la esquina inferior izquierda. */
+        @apply absolute; /* Se posiciona libremente dentro del contenedor (.img-redondeada). */
+        @apply left-0 bottom-0; /* Ubicación exacta: esquina inferior izquierda. */
+        background: none; /* Sin fondo sólido (puede superponerse directamente sobre el GIF). */
+        @apply text-white; /* Texto blanco para contrastar con el GIF. */
 
-      font-family: "Arial Rounded MT Bold", "Arial Rounded MT", Arial, sans-serif; /* Fuente más amigable y redondeada. */
-      font-weight: 900; /* Peso muy grueso: texto fuerte y destacado. */
-      font-size: clamp(18px, 5vw, 26px); /* Tamaño adaptable: más grande que antes. */
-      line-height: 1.2; /* Altura de línea compacta, mejora la lectura si son dos líneas. */
-      letter-spacing: 0.1px; /* Muy leve separación entre caracteres para claridad. */
+        @apply font-badge; /* Fuente más amigable y redondeada. */
+        @apply font-black; /* Peso muy grueso: texto fuerte y destacado. */
+        font-size: clamp(18px, 5vw, 26px); /* Tamaño adaptable: más grande que antes. */
+        line-height: 1.2; /* Altura de línea compacta, mejora la lectura si son dos líneas. */
+        letter-spacing: 0.1px; /* Muy leve separación entre caracteres para claridad. */
 
-      padding: 8px 10px; /* Relleno interno: espacio entre borde y texto. */
-      border-top-right-radius: 10px; /* Redondea solo la esquina superior derecha (estilo de etiqueta pegada a un borde). */
-      text-align: left; /* Alineación del texto. */
-      white-space: pre-line; /* Permite saltos de línea si los pones dentro del texto. */
-      user-select: none; /* Evita que el usuario pueda seleccionar el texto accidentalmente. */
+        padding: 8px 10px; /* Relleno interno: espacio entre borde y texto. */
+        border-top-right-radius: 10px; /* Redondea solo la esquina superior derecha (estilo de etiqueta pegada a un borde). */
+        @apply text-left; /* Alineación del texto. */
+        @apply whitespace-pre-line; /* Permite saltos de línea si los pones dentro del texto. */
+        @apply select-none; /* Evita que el usuario pueda seleccionar el texto accidentalmente. */
 
-      z-index: 2; /* Se muestra por encima de la imagen (que está en z-index:1). */
+        @apply z-badge; /* Se muestra por encima de la imagen (que está en z-index:1). */
+      }
     }
 
     /* ===== iframes ocultos pero reproducibles (visually-hidden) ===== */
@@ -158,50 +168,62 @@
     }
 
     /* ===== Barra música ===== */
-    .barra-musica{
-      --turquesa:var(--color-bar); --borde-claro:var(--color-bar-border); /* Variables internas del componente */
-      width:100%; margin-inline:auto; /* Centrado y responsivo */
-      background:var(--turquesa); /* Color del fondo */
-      border:4px solid var(--borde-claro); /* Contorno claro */
-      border-radius:var(--radius-pill); /* Bordes súper redondeados (pastilla) */
-      padding:var(--bar-pad); /* Separación interna para que no quede apretado. */
-      display:flex; align-items:center; justify-content:center; /* Alineación */
-      flex-wrap:nowrap; /* Los botones no saltan de línea */
-      gap:var(--bar-gap); /* Separación entre items */
-      box-shadow:var(--shadow-bar); /* Sombra elegante */
-      position:relative; z-index:20; /* Se mantiene sobre otros elementos */
-      transition:opacity .2s, filter .2s; /* Animación suave al cambiar de modo oscuro o cuando algo afecte opacity. */
-    }
+    @layer components {
+      .barra-musica {
+        --turquesa:var(--color-bar); /* Variable interna del componente */
+        --borde-claro:var(--color-bar-border); /* Variable interna del componente */
+        @apply w-full mx-auto; /* Ancho + centrado */
+        @apply bg-bar; /* Fondo */
+        @apply border-4 border-bar-line; /* Borde */
+        @apply rounded-pill; /* Bordes redondeados */
+        @apply px-bar-pad-x py-bar-pad-y; /* Padding */
+        @apply flex items-center justify-center; /* Layout */
+        @apply flex-nowrap; /* Flex-wrap */
+        @apply gap-bar-gap; /* Separación */
+        @apply shadow-bar; /* Sombra */
+        @apply relative z-bar; /* Posición */
+        transition:opacity .2s, filter .2s; /* Animación suave al cambiar de modo oscuro o cuando algo afecte opacity. */
+      }
 
-    .oscuro .barra-musica{ 
-      opacity:.85; 
-      filter:saturate(.75) brightness(.85); /* Tema oscuro */
-    }
+      .oscuro .barra-musica { 
+        opacity:.85; 
+        filter:saturate(.75) brightness(.85); /* Tema oscuro */
+      }
 
-    .icon-btn{
-      width:44px; height:44px; flex:0 0 44px; /* Botón cuadrado, tamaño fijo */
-      border-radius:50%; /* Botón redondo */
-      border:var(--border-btn) solid var(--color-white); background:transparent; color:var(--color-white); /* Estilo visual del borde + color del icono. */
-      display:grid; place-items:center; /* Centrado perfecto del SVG */
-      cursor:pointer; /* Manito mouse */
-      transition:background-color .2s, transform .05s, opacity .2s; /* Animación suave del hover, active y cualquier cambio de opacidad. */
-    }
+      .icon-btn {
+        @apply h-11 w-11 flex-none; /* Tamaño */
+        @apply rounded-full; /* Bordes redondeados */
+        @apply border-btn border-white; /* Borde */
+        @apply bg-transparent text-white cursor-pointer; /* Fondo + texto + cursor */
+        @apply grid place-items-center; /* Layout */
+        @apply cursor-pointer; /* Cursor */
+        transition:background-color .2s, transform .05s, opacity .2s; /* Animación suave del hover, active y cualquier cambio de opacidad. */
+      }
 
-    .icon-btn:hover{ background-color:var(--white-12); } /* Hover: cuando el mouse pasa encima del botón, se ilumina levemente */
-    .icon-btn:active{ transform:scale(.98); } /* Active (pseudo): mientras se hace clic o se mantiene presionado, el botón se “hunde” */
-    .icon-btn svg{ width:20px; height:20px; display:block; } /* Tamaño del ícono SVG y display:block evita espacios indeseados */
-    .icon-btn.active{ background-color:var(--white-18); } /* Clase .active: estado «encendido» cuando lo activa el JS */
+      .icon-btn:hover { background-color:var(--white-12); } /* Hover: cuando el mouse pasa encima del botón, se ilumina levemente */
+      .icon-btn:active { transform:scale(.98); } /* Active (pseudo): mientras se hace clic o se mantiene presionado, el botón se “hunde” */
 
-    /* ===== Slider volumen (MÚSICA) ===== */
-    .volume-slider{
-      -webkit-appearance:none; appearance:none; /* Elimina el estilo por defecto del navegador */
-      flex:1 1 160px; /* Se estira, puede reducirse, base 160px: funciona bien en flexbox */
-      min-width:0; /* CLAVE para que no rompa el layout dentro de flex */
-      max-width:320px; /* En pantallas grandes crece hasta 320px */
-      height:var(--slider-track-h); border-radius:var(--radius-pill); /* Barra larga, muy redondeada */
-      background:var(--white-65); /* Color de la barra */
-      outline:none; /* Elimina contorno feo al enfocarse */
-      cursor:pointer; /* Manito para indicar que es interactivo */
+      .icon-btn svg { 
+        @apply h-5 w-5; 
+        display:block; 
+      } /* Tamaño del ícono SVG y display:block evita espacios indeseados */
+
+      .icon-btn.active { background-color:var(--white-18); } /* Clase .active: estado «encendido» cuando lo activa el JS */
+
+      /* ===== Slider volumen (MÚSICA) ===== */
+      .volume-slider {
+        appearance:none; /* Estándar */
+        -webkit-appearance:none; /* Prefijo WebKit */
+        flex:1 1 160px; /* Se estira, puede reducirse, base 160px: funciona bien en flexbox */
+        max-width:320px; /* En pantallas grandes crece hasta 320px */
+        @apply min-w-0; /* Evita overflow */
+        @apply h-slider-track-h; /* Alto del track */
+        @apply rounded-pill; /* Bordes redondeados */
+        @apply bg-white-65; /* Fondo */
+        @apply outline-none; /* Sin outline */
+        @apply cursor-pointer; /* Cursor */
+        @apply appearance-none; /* Reset visual */
+      }
     }
 
     /* Thumb (punto que se arrastra) */
@@ -232,96 +254,101 @@
       100%{transform:translateZ(0) scaleY(1)} 
     }
 
-    /* Contenedor principal fijo al lado derecho */
-    .right-handle{ 
-      --thumb:34px; --strip-h:220px; /* Variables: tamaño del botón y altura de la tirita */
-      position:fixed; /* Siempre visible en pantalla */
-      top:0; right:16px; /* Arriba a la derecha */
-      z-index:30; /* Sobre casi todo lo demás */
-      pointer-events:none; /* El contenedor no recibe clics, solo sus hijos */
-      display:flex; align-items:flex-start; justify-content:center; /* Alineación vertical */
-    }
-    
-    /* Barra vertical (la tirita) */
-    .right-handle .track{
-      position:relative; 
-      width:24px; height:var(--strip-h); /* Altura controlada por la variable */
-      background:#fff9e8; /* Color crema */
-      border-radius:0; 
-      margin-bottom:calc(var(--thumb)*.5); /* Espacio para que el botón no se corte */
-      box-shadow:var(--shadow-handle); /* Sombras dobles */
-      pointer-events:auto; /* Esta parte sí recibe clics */
-      transform-origin:top center; /* Punto de origen para la animación stretch */
-      cursor:pointer; 
-      transition:box-shadow .18s, background .18s; /* Cambio suave al pasar el mouse */
-    }
+    @layer components {
+      /* Contenedor principal fijo al lado derecho */
+      .right-handle{ 
+        --thumb:34px; --strip-h:220px; /* Variables: tamaño del botón y altura de la tirita */
+        @apply fixed; /* Siempre visible en pantalla */
+        @apply top-0 right-4; /* Arriba a la derecha */
+        @apply z-handle; /* Sobre casi todo lo demás */
+        @apply pointer-events-none; /* El contenedor no recibe clics, solo sus hijos */
+        @apply flex items-start justify-center; /* Alineación vertical */
+      }
+      
+      /* Barra vertical (la tirita) */
+      .right-handle .track{
+        @apply relative; 
+        @apply w-6; /* Ancho base */
+        height:var(--strip-h); /* Altura controlada por la variable */
+        @apply bg-paper; /* Color crema */
+        @apply rounded-none; 
+        margin-bottom:calc(var(--thumb)*.5); /* Espacio para que el botón no se corte */
+        @apply shadow-handle; /* Sombras dobles */
+        @apply pointer-events-auto; /* Esta parte sí recibe clics */
+        transform-origin:top center; /* Punto de origen para la animación stretch */
+        @apply cursor-pointer; 
+        transition:box-shadow .18s, background .18s; /* Cambio suave al pasar el mouse */
+      }
 
-    /* Hover en la barra */
-    .right-handle .track:hover{ 
-      background:#fff4d1; /* Más clarito */
-      box-shadow:var(--shadow-handle-hover); 
-    }
+      /* Hover en la barra */
+      .right-handle .track:hover{ 
+        @apply bg-paper-2; /* Más clarito */
+        @apply shadow-handle-hover; 
+      }
 
-    /* Cuando se activa la animación stretch */
-    .right-handle .track.stretch{ 
-      animation:stretch 220ms ease-out; 
-    }
+      /* Cuando se activa la animación stretch */
+      .right-handle .track.stretch{ 
+        animation:stretch 220ms ease-out; 
+      }
 
-    /* Botón circular (sol/luna) */
-    .right-handle .thumb{
-      position:absolute; 
-      left:50%; transform:translateX(-50%); /* Centrado horizontal */
-      width:var(--thumb); height:var(--thumb); /* Tamaño según variable */
-      border-radius:50%; /* Perfectamente redondo */
-      border:var(--border-btn) solid var(--color-white); 
-      display:grid; place-items:center; /* Centra el ícono SVG */
-      bottom:calc(-1 * var(--thumb) * .5); /* Sale “medio afuera” de la tirita */
-      transition:background 160ms, color 160ms, box-shadow 160ms, transform 80ms; /* Animaciones */
-      cursor:pointer; 
-      color:#6b4a00; background:#ffc400; /* Color de “sol” */
-      box-shadow:var(--shadow-thumb-lg);
-      pointer-events:auto; /* Sí recibe clics */
-    }
-    
-    /* Hover del botón (crece apenas) */
-    .right-handle .thumb:hover{ 
-      transform:translateX(-50%) scale(1.03); 
-    }
+      /* Botón circular (sol/luna) */
+      .right-handle .thumb{
+        @apply absolute; 
+        left:50%; transform:translateX(-50%); /* Centrado horizontal */
+        width:var(--thumb); height:var(--thumb); /* Tamaño según variable */
+        @apply rounded-full; /* Perfectamente redondo */
+        @apply border-btn border-white; 
+        @apply grid place-items-center; /* Centra el ícono SVG */
+        bottom:calc(-1 * var(--thumb) * .5); /* Sale “medio afuera” de la tirita */
+        transition:background 160ms, color 160ms, box-shadow 160ms, transform 80ms; /* Animaciones */
+        @apply cursor-pointer; 
+        @apply text-accent-dark bg-accent; /* Color de “sol” */
+        @apply shadow-thumb-lg;
+        @apply pointer-events-auto; /* Sí recibe clics */
+      }
+      
+      /* Hover del botón (crece apenas) */
+      .right-handle .thumb:hover{ 
+        transform:translateX(-50%) scale(1.03); 
+      }
 
-    /* Ícono dentro del botón */
-    .right-handle .thumb svg{ 
-      width:18px; height:18px; display:block; 
-    }
+      /* Ícono dentro del botón */
+      .right-handle .thumb svg{ 
+        width:18px; height:18px; display:block; 
+      }
 
-    /* Estado “modo oscuro” (cuando la clase .activo está activada) */
-    .right-handle.activo .thumb{ 
-      background:#2e2e2e; /* Fondo oscuro */
-      color:var(--color-white); /* Ícono blanco */
-    }
+      /* Estado “modo oscuro” (cuando la clase .activo está activada) */
+      .right-handle.activo .thumb{ 
+        @apply bg-ink-2; /* Fondo oscuro */
+        @apply text-white; /* Ícono blanco */
+      }
 
-    /* ===== Oscurecido ===== */
-    .dim-overlay{ 
-      position:fixed; /* Cubre toda la pantalla aunque haya scroll */
-      inset:0; /* Atajo para top:0; right:0; bottom:0; left:0 */
-      background:rgba(0,0,0,.45); /* Capa oscura semitransparente */
-      opacity:0; /* Inicialmente invisible */
-      visibility:hidden; /* No recibe clics cuando está oculto */
-      transition:opacity 160ms, visibility 160ms; /* Fade suave */
-      z-index:25; /* Debajo de la tirita (z=30), encima del resto */
-      pointer-events:none; /* No bloquea clics a menos que se active */
-    }
+      /* ===== Oscurecido ===== */
+      .dim-overlay{ 
+        @apply fixed; /* Cubre toda la pantalla aunque haya scroll */
+        @apply inset-0; /* Atajo para top:0; right:0; bottom:0; left:0 */
+        @apply bg-shadow-45; /* Capa oscura semitransparente */
+        @apply opacity-0; /* Inicialmente invisible */
+        @apply invisible; /* No recibe clics cuando está oculto */
+        transition:opacity 160ms, visibility 160ms; /* Fade suave */
+        @apply z-overlay; /* Debajo de la tirita (z=30), encima del resto */
+        @apply pointer-events-none; /* No bloquea clics a menos que se active */
+      }
 
-    /* Cuando el overlay está activo, aparece */
-    .dim-overlay.activo{ 
-      opacity:1; 
-      visibility:visible; 
+      /* Cuando el overlay está activo, aparece */
+      .dim-overlay.activo{ 
+        @apply opacity-100; 
+        @apply visible; 
+      }
     }
 
     /* ===== Frame: mismo ancho para GIF y barra ===== */
-    .frame{ 
-      width:100%; 
-      max-width:var(--frame-max); /* Límite de ancho */
-      margin-inline:auto; /* Centrado */
+    @layer components {
+      .frame{ 
+        @apply w-full; /* Ocupa el ancho disponible */
+        max-width:var(--frame-max); /* Límite de ancho */
+        @apply mx-auto; /* Centrado */
+      }
     }
 
     /* ===== Fullscreen (F11 / Fullscreen API) ===== */
@@ -350,17 +377,18 @@
     @media (max-width:520px){
 
       .barra-musica{ 
-        padding:var(--bar-pad-compact); /* Menos padding para pantallas pequeñas */
-        gap:var(--bar-gap-compact); /* Menor separación entre íconos */
+        @apply px-bar-pad-compact-x py-bar-pad-compact-y; /* Menos padding para pantallas pequeñas */
+        @apply gap-bar-gap-compact; /* Menor separación entre íconos */
       }
 
       .icon-btn{ 
-        width:36px; height:36px; flex-basis:36px; /* Botones más pequeños */
+        @apply w-9 h-9; /* Botones más pequeños */
+        flex-basis:36px; /* Mantiene el ancho base en flex */
       }
 
       .volume-slider{ 
-        min-width:0; 
-        max-width:none; /* Permite que el slider se ajuste en móviles */
+        @apply min-w-0; 
+        @apply max-w-none; /* Permite que el slider se ajuste en móviles */
       }
 
       .volume-slider::-webkit-slider-thumb{ 
@@ -375,12 +403,12 @@
       .frame .img-redondeada{
         height: 72vh;       /* Ocupa ~72% del alto visible del móvil */
         max-height: 80vh;   /* Evita que sea demasiado grande */
-        width: 100%;
+        @apply w-full;
       }
 
       .frame .img-redondeada img{
-        width: 100%;
-        height: 100%;
+        @apply w-full;
+        @apply h-full;
         object-fit: cover;  /* Imagen recortada, bien centrada */
         object-position: center bottom;
       }
@@ -388,16 +416,16 @@
 
     /* ===== Ajustes móviles extra (pantallas muy pequeñas) ===== */
     @media (max-width:380px){
-      .page{ padding:8px 8px 0; } /* Reduce padding general para pantallas súper chicas */
-      .right-handle{ right:8px; --strip-h:160px; } /* Acerca la tirita y la hace más corta */
-      .icon-btn{ width:40px; height:40px; } /* Botones un poco más pequeños */
+      .page{ @apply px-2 pt-2 pb-0; } /* Reduce padding general para pantallas súper chicas */
+      .right-handle{ @apply right-2; --strip-h:160px; } /* Acerca la tirita y la hace más corta */
+      .icon-btn{ @apply w-10 h-10; } /* Botones un poco más pequeños */
       .volume-slider::-webkit-slider-thumb{ width:14px; height:14px; } /* Thumb más chico en Chrome/Opera */
       .volume-slider::-moz-range-thumb{ width:14px; height:14px; } /* Thumb más chico en Firefox */
     }
 
     /* En pantallas ultrapequeñas (celulares mini), oculta la tirita */
     @media (max-width:320px){ 
-      .right-handle{ display:none; } /* Evita que tape contenido */
+      .right-handle{ @apply hidden; } /* Evita que tape contenido */
     }
 
     /* ===== Notion embed: limpio y sin cortes ===== */

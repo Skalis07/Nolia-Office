@@ -11,10 +11,7 @@ module.exports = {
         "bar-pad-compact-y": "8px",
         "bar-gap": "var(--bar-gap)",
         "bar-gap-compact": "var(--bar-gap-compact)",
-        "frame-gap": "var(--frame-gap)",
-        "frame-max": "var(--frame-max)",
         "slider-track-h": "var(--slider-track-h)",
-        "slider-thumb": "var(--slider-thumb)",
       },
       borderRadius: {
         lg: "var(--radius-lg)",
@@ -31,8 +28,6 @@ module.exports = {
         bar: "var(--color-bar)",
         "bar-line": "var(--color-bar-border)",
         "white-65": "var(--white-65)",
-        "white-18": "var(--white-18)",
-        "white-12": "var(--white-12)",
         paper: "#fff9e8",
         "paper-2": "#fff4d1",
         accent: "#ffc400",
@@ -43,7 +38,6 @@ module.exports = {
       boxShadow: {
         card: "var(--shadow-card)",
         bar: "var(--shadow-bar)",
-        thumb: "var(--shadow-thumb)",
         "thumb-lg": "var(--shadow-thumb-lg)",
         handle: "var(--shadow-handle)",
         "handle-hover": "var(--shadow-handle-hover)",
@@ -55,9 +49,6 @@ module.exports = {
         bar: "20",
         overlay: "25",
         handle: "30",
-      },
-      animation: {
-        stretch: "stretch 230ms ease",
       },
       fontFamily: {
         title: ["Arial", "sans-serif"],

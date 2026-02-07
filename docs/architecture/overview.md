@@ -26,7 +26,7 @@ Este documento resume cómo está organizada la app y por qué.
 
 **Scripts del cliente**
 - `src/client/`
-- JS que conecta la UI y los eventos.
+- TS (compilado a JS) que conecta la UI y los eventos.
 
 **Estilos**
 - `src/styles/index.css`
@@ -70,4 +70,3 @@ index.astro
 - **Cambiar controles** → `src/components/ControlsBar.astro`
 - **Cambiar GIFs** → `src/assets/gifs/`
 - **Cambiar fondo/estilos globales** → `src/styles/index.css`
-

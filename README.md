@@ -5,6 +5,7 @@ _(Spanish version available [here](README.es.md))_
 **Nolia Office** is a Notion-friendly web app (embeddable as a widget) created by **Skalis07** as a relaxing, customizable study/work space.
 It is inspired by [NookOffice](https://github.com/VijiatJack/nookoffice) and uses _Animal Crossing_-themed visuals to create a warm and cozy atmosphere.
 The code has been developed from scratch, incorporating aesthetic changes and functional improvements.
+Built with **Astro**, **TypeScript**, and **Tailwind CSS**.
 
 ---
 
@@ -38,7 +39,7 @@ This project was born with two main goals:
 ## 🛠️ How It Works
 
 **Nolia Office** is a static web application built with [Astro](https://astro.build/).  
-On the client side, JavaScript handles:
+On the client side, TypeScript (compiled to JavaScript) handles:
 
 - Determining the current GIF and allowing it to be changed.
 - Playing background music via the YouTube API.
