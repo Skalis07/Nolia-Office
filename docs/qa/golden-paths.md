@@ -40,7 +40,7 @@ Estos golden paths son el checklist que se repite en cada PR para asegurar que e
 
 ## 7) Embed Notion (si aplica)
 - [ ] Si el PR toca Notion, el embed carga y no rompe el layout.
-- [ ] Test local: abre `docs/qa/testing/test-embed.html` y confirma que el fondo queda transparente.
+- [ ] Test local: abre `docs/qa/testing/test-embed.html` y confirma que el fondo se adapta al tema del sistema (`prefers-color-scheme`): claro `#ffffff`, oscuro `#191919`.
 
 ---
 

@@ -63,6 +63,7 @@ Actualmente en `src/styles/index.css` con selectores:
 
 Responsabilidad:
 - Ajustes de layout dentro del iframe de Notion.
+- Ajuste de fondo del `body` en embed segun `prefers-color-scheme` desde `src/client/features/embed-notion.ts`.
 
 --------------------------------------------------------------------------------
 ## Orden sugerido de migracion
