@@ -19,7 +19,6 @@ Estos golden paths son el checklist que se repite en cada PR para asegurar que e
 - [ ] Pausa funciona.
 - [ ] El volumen responde al control.
 - [ ] Al cambiar modo (día/noche o escena) el estado queda consistente (no se rompe ni queda en estado raro).
-- [ ] En embed (Notion), si el primer play queda bloqueado por políticas del host/navegador, un segundo click reintenta reproducción y termina sonando.
 
 ## 3) Ambiente (lluvia)
 - [ ] On/Off funciona.
@@ -41,7 +40,7 @@ Estos golden paths son el checklist que se repite en cada PR para asegurar que e
 
 ## 7) Embed Notion (si aplica)
 - [ ] Si el PR toca Notion, el embed carga y no rompe el layout.
-- [ ] Test local: abre `docs/qa/testing/test-embed.html` y confirma que el fondo se adapta al tema del sistema (`prefers-color-scheme`): claro `#ffffff`, oscuro `#191919`.
+- [ ] Test local: abre `docs/qa/testing/test-embed.html` y confirma que el fondo queda transparente.
 
 ---
 

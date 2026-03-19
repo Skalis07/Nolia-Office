@@ -33,7 +33,6 @@ This project was born with two main goals:
 - 🌓 **Visual modes** (day/night) with an interactive switch.
 - 📱 **Responsive design**, suitable for mobile and desktop.
 - 🖥️ **Embedded mode in Notion** with automatic detection, no additional URL parameters required, to integrate the page into Notion workspaces.
-- 🌓 **Notion embed background** synced with system theme (`prefers-color-scheme`) to avoid white background in dark mode.
 
 ---
 
@@ -45,7 +44,6 @@ On the client side, TypeScript (compiled to JavaScript) handles:
 - Determining the current GIF and allowing it to be changed.
 - Playing background music via the YouTube API.
 - Controlling volume, pausing/resuming, and toggling ambient sounds.
-- Retrying YouTube playback in embeds when host/browser autoplay policies block the first attempt.
 - Switching between day and night modes.
 - Adjusting the GIF frame to maintain the original aspect ratio or crop correctly.
 - Adjusting styles so it works embedded in Notion without losing functionality.
