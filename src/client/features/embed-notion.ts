@@ -3,6 +3,30 @@
 // - Agrega la clase "embed-notion" al <html> cuando la página está embebida.
 // - Esto activa estilos especiales para Notion (sin bordes, sin sombra, etc.).
 // ============================================================================
+function setupEmbedBodyBackground() {
+  const setBodyBackground = () => {
+    try {
+      const isDark =
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.body.style.background = isDark ? "#191919" : "#ffffff";
+    } catch {
+      document.body.style.background = "#ffffff";
+    }
+  };
+
+  if (window.matchMedia) {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", setBodyBackground);
+    } else if (typeof mediaQuery.addListener === "function") {
+      mediaQuery.addListener(setBodyBackground);
+    }
+  }
+
+  setBodyBackground();
+}
+
 export function setupNotionEmbedClass() {
   const qs = new URLSearchParams(window.location.search);
 
@@ -25,5 +49,6 @@ export function setupNotionEmbedClass() {
 
   if (inIframe && isNotion) {
     document.documentElement.classList.add("embed-notion");
+    setupEmbedBodyBackground();
   }
 }

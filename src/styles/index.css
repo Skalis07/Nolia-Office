@@ -433,7 +433,7 @@
     /* Quita fondo en Notion (su iframe ya maneja su propio fondo) */
     html.embed-notion, 
     html.embed-notion body{ 
-      background:transparent!important; 
+      background:transparent; 
     }
 
     /* Quita fondo, padding y otras propiedades de la página */
