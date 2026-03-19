@@ -31,6 +31,7 @@ Este proyecto nació con dos objetivos principales:
 - 🌓 **Modos visuales** (día/noche) con un interruptor interactivo.
 - 📱 **Diseño responsive**, apto para móviles y escritorio.
 - 🖥️ **Modo embebido en Notion** con detección automática, sin necesidad de parámetros adicionales en la URL, para integrar la página en espacios de trabajo de Notion.
+- 🌓 **Fondo del embed en Notion** ajustado al tema del sistema (`prefers-color-scheme`) para evitar fondo blanco en modo oscuro.
 
 ---
 
@@ -42,6 +43,7 @@ En el cliente, TypeScript (compilado a JavaScript) se encarga de:
 - Determinar el GIF actual y permitir cambiarlo.
 - Reproducir música de fondo mediante la API de YouTube.
 - Controlar volumen, pausa/reanudación y alternar sonidos ambientales.
+- Reintentar reproducción de YouTube en embebidos cuando el host/navegador bloquea el primer intento por política de autoplay.
 - Cambiar entre modo día y noche.
 - Adaptar el marco del GIF para que mantenga la proporción original o recorte correctamente.
 - Ajustar estilos para que funcione embebido en Notion sin perder funcionalidad.
