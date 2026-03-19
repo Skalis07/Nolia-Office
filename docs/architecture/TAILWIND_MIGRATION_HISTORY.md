@@ -1266,8 +1266,9 @@ Archivos objetivo:
 --------------------------------------------------------------------------------
 ## Fuera de alcance (se dejan en CSS puro)
 
-- `!important` en Notion (necesario para sobrescribir el iframe).
-- `@media` y `@supports` (Tailwind no reemplaza reglas con `!important` mejor).
+- `!important` en Notion se mantiene en la mayoria de overrides de layout (orden/flex/ancho/visibilidad).
+- Excepcion: `html.embed-notion` y `html.embed-notion body` usan `background: transparent` sin `!important` para permitir ajuste dinamico por JS segun `prefers-color-scheme`.
+- `@media` y `@supports` (Tailwind no reemplaza bien reglas con `!important`).
 - Reglas que dependen de `calc()` o variables dinámicas.
 
 --------------------------------------------------------------------------------
@@ -1324,17 +1325,18 @@ Se puede migrar **lo básico** a `@apply`, por ejemplo:
 - `max-width:100%` → `@apply max-w-full`
 
 Pero:
-- `!important` se mantiene en CSS (Tailwind no lo evita).
+- `!important` se mantiene en CSS para la mayoria de overrides (excepto fondo de `html.embed-notion`/`body`, que debe quedar sin `!important`).
 - `order`, `flex` y `width` se dejan en CSS si llevan `!important`.
 
 ### Resultado 7.4 (hecho)
-- Se decidió **mantener overrides de Notion en CSS puro** por el uso de `!important` y reglas específicas.
+- Se decidió **mantener overrides de Notion en CSS puro** por reglas específicas del embed y uso puntual de `!important`.
+- El fondo del `body` en embed se resuelve por JS (`embed-notion.ts`) con `prefers-color-scheme` para evitar fondo blanco en tema oscuro.
 
 --------------------------------------------------------------------------------
 ## Salida del Hito 7
 - ✅ Responsive migrado con `@apply` cuando convino.
 - ✅ Notion se mantiene en CSS puro (decisión final).
-- ✅ Override de Notion en Tailwind: Se decidió mantenerlos en CSS puro por !important y reglas específicas del embed.
+- ✅ Override de Notion en Tailwind: Se decidió mantenerlos en CSS puro por reglas específicas del embed y `!important` solo donde aporta.
 
 ---
 

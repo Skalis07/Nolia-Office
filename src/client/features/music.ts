@@ -12,6 +12,7 @@ type YTPlayerOptions = {
   playerVars: Record<string, number | string>;
   events: {
     onReady: () => void;
+    onAutoplayBlocked?: () => void;
   };
 };
 
@@ -47,7 +48,8 @@ export function setupMusic({ btn, slider, videoId, playerId }: MusicSetupOptions
   const safeSlider = slider;
 
   let player: YTPlayer | null = null;
-  let isPlaying = false;
+  let isPlaying = false; // Estado real de reproducción.
+  let wantsPlaying = false; // Intención del usuario (UI).
   let playerReady = false;
   let pendingPlay = false;
   let pendingResume = false;
@@ -58,11 +60,10 @@ export function setupMusic({ btn, slider, videoId, playerId }: MusicSetupOptions
      HELPERS DE ESTADO (UI)
      - Centraliza cambios de icono/aria/estado.
      --------------------------------------------------------------------------- */
-  // Actualiza icono y aria-label según el estado actual.
-  function setState(playing: boolean): void {
+  // Actualiza icono y aria-label según intención del usuario.
+  function setVisualState(playing: boolean): void {
     safeBtn.innerHTML = playing ? ICONS.ICON_PAUSE : ICONS.ICON_PLAY;
     safeBtn.setAttribute("aria-label", playing ? "Pausar musica" : "Reproducir musica");
-    isPlaying = playing;
   }
 
   // Aplica el volumen del slider al player de YouTube.
@@ -96,7 +97,7 @@ export function setupMusic({ btn, slider, videoId, playerId }: MusicSetupOptions
 
     const resume = () => {
       resumeBound = false;
-      if (!pendingResume || !isPlaying) return;
+      if (!pendingResume || !wantsPlaying) return;
       pendingResume = false;
       tryPlay();
     };
@@ -131,10 +132,13 @@ export function setupMusic({ btn, slider, videoId, playerId }: MusicSetupOptions
       const state = player.getPlayerState();
 
       if (state === YT.PlayerState.PLAYING) {
-        setState(true);
+        isPlaying = true;
+        wantsPlaying = true;
+        setVisualState(true);
         saveIntent(true);
       }
-      if (state !== YT.PlayerState.PLAYING) {
+      if (state !== YT.PlayerState.PLAYING && wantsPlaying) {
+        isPlaying = false;
         pendingResume = true;
         ensureResumeOnGesture();
       }
@@ -142,8 +146,17 @@ export function setupMusic({ btn, slider, videoId, playerId }: MusicSetupOptions
   }
 
   function handleToggle(): void {
-    const nextPlaying = !isPlaying;
-    setState(nextPlaying);
+    // Si el usuario ya pidió "play" pero el navegador lo bloqueó,
+    // un nuevo click debe reintentar (no cambiar a pausa).
+    if (wantsPlaying && !isPlaying) {
+      pendingResume = false;
+      tryPlay();
+      return;
+    }
+
+    const nextPlaying = !wantsPlaying;
+    wantsPlaying = nextPlaying;
+    setVisualState(nextPlaying);
 
     if (!playerReady || !player) {
       pendingPlay = nextPlaying;
@@ -157,6 +170,7 @@ export function setupMusic({ btn, slider, videoId, playerId }: MusicSetupOptions
 
     pendingPlay = false;
     pendingResume = false;
+    isPlaying = false;
     player.pauseVideo();
     saveIntent(false);
   }
@@ -172,11 +186,13 @@ export function setupMusic({ btn, slider, videoId, playerId }: MusicSetupOptions
     playerReady = true;
     applyVolume();
     if (readIntent()) {
+      wantsPlaying = true;
+      setVisualState(true);
       pendingResume = true;
       ensureResumeOnGesture();
     }
 
-    if (pendingPlay && isPlaying) {
+    if (pendingPlay && wantsPlaying) {
       tryPlay();
     }
   }
@@ -200,6 +216,13 @@ export function setupMusic({ btn, slider, videoId, playerId }: MusicSetupOptions
       },
       events: {
         onReady,
+        onAutoplayBlocked: () => {
+          isPlaying = false;
+          if (wantsPlaying) {
+            pendingResume = true;
+            ensureResumeOnGesture();
+          }
+        },
       },
     });
   }
@@ -243,5 +266,5 @@ export function setupMusic({ btn, slider, videoId, playerId }: MusicSetupOptions
       applyVolume();
     });
   }
-  setState(false);
+  setVisualState(false);
 }

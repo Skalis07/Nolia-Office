@@ -63,6 +63,7 @@ Actualmente en `src/styles/index.css` con selectores:
 
 Responsabilidad:
 - Ajustes de layout dentro del iframe de Notion.
+- Fondo del `body` del embed alineado al tema del sistema (claro/oscuro) desde `src/client/features/embed-notion.ts`.
 
 --------------------------------------------------------------------------------
 ## Orden sugerido de migracion
@@ -73,4 +74,3 @@ Responsabilidad:
 5. Overlay
 6. Page shell
 7. Overrides Notion
-
